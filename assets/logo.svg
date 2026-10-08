@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Family tree logo</title>
+  <desc id="desc">A stylized family tree icon in purple and teal.</desc>
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7c5cff" />
+      <stop offset="100%" stop-color="#4d2d8f" />
+    </linearGradient>
+    <linearGradient id="g2" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#30c9a9" />
+      <stop offset="100%" stop-color="#128a74" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="#f6f1ff"/>
+  <circle cx="128" cy="54" r="20" fill="url(#g1)"/>
+  <path d="M128 82v44" stroke="#3f2d70" stroke-width="10" stroke-linecap="round"/>
+  <path d="M82 138h92" stroke="#3f2d70" stroke-width="10" stroke-linecap="round"/>
+  <path d="M92 138v48" stroke="#3f2d70" stroke-width="10" stroke-linecap="round"/>
+  <path d="M164 138v48" stroke="#3f2d70" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="92" cy="186" r="18" fill="url(#g2)"/>
+  <circle cx="164" cy="186" r="18" fill="url(#g1)"/>
+  <circle cx="128" cy="128" r="16" fill="#f7d989"/>
+  <path d="M128 144v28" stroke="#3f2d70" stroke-width="8" stroke-linecap="round"/>
+  <path d="M108 160h40" stroke="#3f2d70" stroke-width="8" stroke-linecap="round"/>
+</svg>

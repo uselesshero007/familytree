@@ -1,0 +1,87 @@
+{
+  "people": [
+    {
+      "id": "person_grandfather",
+      "firstName": "আবদুল",
+      "lastName": "আহমেদ",
+      "nickname": "দাদা",
+      "gender": "male",
+      "birthDate": "1948-02-15",
+      "birthPlace": "ঢাকা",
+      "deathDate": "",
+      "deathPlace": "",
+      "photo": "",
+      "occupation": "ব্যবসায়ী",
+      "biography": "পরিবারের শিকড় ও ঐতিহ্য ধরে রাখেন।",
+      "createdAt": "2026-10-09T00:00:00.000Z"
+    },
+    {
+      "id": "person_grandmother",
+      "firstName": "রওশন",
+      "lastName": "আহমেদ",
+      "nickname": "দাদি",
+      "gender": "female",
+      "birthDate": "1952-09-12",
+      "birthPlace": "চট্টগ্রাম",
+      "deathDate": "",
+      "deathPlace": "",
+      "photo": "",
+      "occupation": "গৃহিণী",
+      "biography": "পরিবারের মূল্যবোধ ও স্মৃতি সংরক্ষণের প্রধান ভরসা।",
+      "createdAt": "2026-10-09T00:00:00.000Z"
+    },
+    {
+      "id": "person_father",
+      "firstName": "ফারহাদ",
+      "lastName": "আহমেদ",
+      "nickname": "ফারহাদ",
+      "gender": "male",
+      "birthDate": "1977-06-03",
+      "birthPlace": "ঢাকা",
+      "deathDate": "",
+      "deathPlace": "",
+      "photo": "",
+      "occupation": "প্রকৌশলী",
+      "biography": "পরিবারের নতুন প্রজন্মের অনুপ্রেরণা।",
+      "createdAt": "2026-10-09T00:00:00.000Z"
+    },
+    {
+      "id": "person_mother",
+      "firstName": "নাসরিন",
+      "lastName": "আহমেদ",
+      "nickname": "নাসরিন",
+      "gender": "female",
+      "birthDate": "1981-11-21",
+      "birthPlace": "খুলনা",
+      "deathDate": "",
+      "deathPlace": "",
+      "photo": "",
+      "occupation": "শিক্ষক",
+      "biography": "বাড়ির মানুষদের শিক্ষা ও সংহতি গড়ে তোলেন।",
+      "createdAt": "2026-10-09T00:00:00.000Z"
+    },
+    {
+      "id": "person_user",
+      "firstName": "আশরাফ",
+      "lastName": "আহমেদ",
+      "nickname": "আশ",
+      "gender": "male",
+      "birthDate": "1999-04-16",
+      "birthPlace": "ঢাকা",
+      "deathDate": "",
+      "deathPlace": "",
+      "photo": "",
+      "occupation": "ফ্রন্ট-এন্ড ডেভেলপার",
+      "biography": "বংশগাছটি তৈরির মূল উদ্যোক্তা ও সদস্য।",
+      "createdAt": "2026-10-09T00:00:00.000Z"
+    }
+  ],
+  "relationships": [
+    { "id": "r1", "type": "parentOf", "from": "person_grandfather", "to": "person_father" },
+    { "id": "r2", "type": "parentOf", "from": "person_grandmother", "to": "person_father" },
+    { "id": "r3", "type": "parentOf", "from": "person_father", "to": "person_user" },
+    { "id": "r4", "type": "parentOf", "from": "person_mother", "to": "person_user" },
+    { "id": "r5", "type": "spouseOf", "from": "person_father", "to": "person_mother" },
+    { "id": "r6", "type": "spouseOf", "from": "person_user", "to": "person_mother" }
+  ]
+}

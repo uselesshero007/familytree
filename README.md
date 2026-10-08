@@ -1,28 +1,49 @@
-# Japan Education App
+# Family Tree
 
-Stitch HTML screens prepared for GitHub Pages and Kodular WebViewer.
+A private family tree and family history app. The existing tree editor works locally in the browser and can optionally sync each signed-in user's family to their own Firestore path.
 
-Files:
-- index.html — Home
-- alphabet.html — Hiragana / Katakana
-- lessons.html — Vocabulary / Flashcards
-- quiz.html — Quiz / Practice
-- profile.html — Profile / Progress
+## Run locally
 
-The pages use the external fonts/Tailwind resources already present in the Stitch export.
+From this folder, run:
 
-## Offline and progress features
+```powershell
+python -m http.server 8000
+```
 
-- `app.js` adds the brief creator splash, offline status message, speech-synthesis pronunciation where the device supports it, and local progress for kana practice, study time, favorites, lesson completion, and streaks.
-- `sw.js` caches the page shell and keeps previously visited pages and remote assets available after the connection is lost. The first visit should be made online so the browser can populate its cache.
-- `manifest.webmanifest` provides the installable PWA metadata. Put the supplied logo at `assets/logo.png`; that path is reserved for the splash/logo slot and PWA icons.
-- `levels.html` provides the offline JLPT path for N5, N4, and N3. All levels and lessons remain visible for browsing and review; lesson buttons enforce sequential prerequisites with a clear next-step message, while completed lessons remain available.
-- All learning content remains free and is stored in the existing static pages. No server or account is required.
+Open `http://localhost:8000`. Use an HTTP server rather than opening `index.html` directly so ES modules, the service worker, and Firebase work.
 
-## Local testing
+## Add Firebase Google sign-in and cloud sync
 
-Service workers require HTTP. From this folder, run `npx --yes http-server -p 4173` and open `http://127.0.0.1:4173/index.html`. Visit each page once while online, then use the browser's offline mode or disconnect the network and reload.
+Firebase credentials are not included. To configure the optional real Google authentication and per-user Firestore sync:
 
-## GitHub Pages
+1. Create or open a project in the Firebase Console and register a Firebase Web App.
+2. Copy the Web App configuration values into `js/firebase-config.js`. Replace each `PASTE_...` placeholder. These are public web-app configuration values, not server credentials.
+3. In **Authentication → Sign-in method**, enable **Google**. Add `localhost` and your deployed website's hostname to **Authorized domains**.
+4. Create the Firestore database.
+5. Publish the rules from `firestore.rules` in **Firestore → Rules**. The rules limit every family-member read/write to the authenticated matching UID.
+6. Host the app over HTTPS for production. Google sign-in popups and service workers require a secure context (localhost is accepted for local testing).
 
-Commit and push the project files to the configured Pages branch. GitHub Pages serves this static structure directly; keep `sw.js`, `manifest.webmanifest`, `app.js`, and the HTML files in the same published root. If the repository is hosted under a project path, the relative URLs in the app keep navigation and service-worker scope working there.
+After configuration, **Sign in with Google** opens Firebase's real Google sign-in flow. The app reads and writes members at `users/{uid}/familyMembers/{memberId}`. Relationship records are stored on the document for their `from` member. Signed-in local cache keys are UID-specific; signing out clears the displayed private tree.
+
+Without configuration, Google sign-in is unavailable and the app remains usable with browser-local storage, JSON import/export, and printing.
+
+## Family data and PDF
+
+Add, edit, or delete people from the member dialog/profile. A member can be linked to a father, mother, child, spouse, sibling, or other relative. The tree, member list, profiles, timeline, and photo view update from the same family data.
+
+The **Download Family Tree PDF** action opens the browser's print dialog with a print-ready report containing the tree, members, relationships, key details, export timestamp, and the requested courtesy footer. Choose **Save as PDF** in the print dialog to download the PDF. The report uses the browser's installed Bengali fonts.
+
+## Deploying Firebase rules
+
+Use the Firebase Console Rules editor, or install the Firebase CLI and run:
+
+```powershell
+npm install -g firebase-tools
+firebase login
+firebase use YOUR_FIREBASE_PROJECT_ID
+firebase deploy --only firestore:rules
+```
+
+## SEO domain placeholders
+
+Replace `https://YOUR_DOMAIN.example/` in `index.html`, `robots.txt`, and `sitemap.xml` with the production HTTPS origin before deployment. The `.example` host is a placeholder, not a real domain.

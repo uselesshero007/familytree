@@ -1,61 +1,356 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_tab" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#f8f9ff;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-primary-fixed": "#410002", "outline": "#906f6c", "primary": "#b7131a", "on-secondary-fixed": "#111c2d", "on-tertiary-fixed-variant": "#005236", "secondary-container": "#d5e0f8", "on-secondary-fixed-variant": "#3c475a", "on-primary-fixed-variant": "#93000d", "on-primary-container": "#fffbff", "secondary": "#545f73", "on-error-container": "#93000a", "outline-variant": "#e4beb9", "surface-tint": "#bb171c", "on-primary": "#ffffff", "inverse-on-surface": "#eaf1ff", "background": "#f8f9ff", "surface-container-lowest": "#ffffff", "on-secondary-container": "#586377", "on-surface-variant": "#5b403d", "surface": "#f8f9ff", "surface-variant": "#d3e4fe", "surface-dim": "#cbdbf5", "surface-container-high": "#dce9ff", "primary-fixed-dim": "#ffb4ac", "tertiary-fixed-dim": "#4edea3", "surface-container": "#e5eeff", "inverse-primary": "#ffb4ac", "tertiary-container": "#00855b", "on-tertiary": "#ffffff", "on-tertiary-container": "#f5fff6", "on-secondary": "#ffffff", "secondary-fixed": "#d8e3fb", "tertiary": "#006947", "primary-fixed": "#ffdad6", "tertiary-fixed": "#6ffbbe", "on-error": "#ffffff", "on-background": "#0b1c30", "surface-bright": "#f8f9ff", "surface-container-low": "#eff4ff", "on-tertiary-fixed": "#002113", "secondary-fixed-dim": "#bcc7de", "on-surface": "#0b1c30", "surface-container-highest": "#d3e4fe", "error-container": "#ffdad6", "error": "#ba1a1a", "inverse-surface": "#213145", "primary-container": "#db322f" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-lg": "1.5rem", "space-xl": "2.25rem", "gutter-mobile": "0.75rem", "gutter": "1rem", "space-sm": "0.5rem", "space-xs": "0.25rem", "margin": "1.5rem", "space-md": "1rem", "margin-mobile": "1rem" }, "fontFamily": { "headline-lg": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "furigana": ["Noto Sans"], "label-prominent": ["Plus Jakarta Sans"], "body-cjk-char-mobile": ["Noto Sans"], "display-hero": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "body-cjk-char": ["Noto Sans"], "body-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"] }, "fontSize": { "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "furigana": ["10px", { "lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "600" }], "label-prominent": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "700" }], "body-cjk-char-mobile": ["36px", { "lineHeight": "44px", "fontWeight": "500" }], "display-hero": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "display-hero-mobile": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "800" }], "body-cjk-char": ["48px", { "lineHeight": "56px", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "500" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "700" }] } } } };</script><style>
-    body {
-      min-height: max(884px, 100dvh);
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#5c3b9a" />
+  <meta name="description" content="A private family tree and family history application for building, exploring, and preserving your family story." />
+  <link rel="canonical" href="https://YOUR_DOMAIN.example/" />
+  <link rel="sitemap" type="application/xml" href="sitemap.xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Family Tree — Private Family History" />
+  <meta property="og:description" content="Build and preserve your private family history." />
+  <meta property="og:url" content="https://YOUR_DOMAIN.example/" />
+  <meta property="og:image" content="https://YOUR_DOMAIN.example/assets/logo.svg" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Family Tree — Private Family History" />
+  <meta name="twitter:description" content="Build and preserve your private family history." />
+  <meta name="robots" content="index,follow" />
+  <title>পারিবারিক বংশগাছ</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Family Tree",
+      "description": "A private family tree and family history application.",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Any"
     }
-  </style>
-  </head><body class="bg-surface font-body-md text-on-surface min-h-screen flex flex-col antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 w-full z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(11,28,48,0.04)] pt-safe"><div class="h-20 px-4 flex flex-col justify-center gap-1"><div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><img alt="Japan Education Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWFMDcrHH5kmYq6KRBd0IfttCmdB3QMZp5g502OXZFL8fltQH4neETqYwPFk6I_4jdKMbsgLdNFLrYvHxr_cjKWgWCU3kI_-02mXmUekj-_r48M1kOqahhH5GsBRWQSD22DG2s8XiXYajJk9RXONnw895xnnvOSkb5QfoXS27Ujo3i_jBg8bY8uU1vtSNvdzJ8VLhB-toDr4c-sLHINAwQHX1blql_GSK3fZzJfHletpK1t5OadvGO"><div class="flex flex-col"><div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm text-primary tracking-tight">Japan Education</span><span class="hidden">Home</span></div><span class="font-label-sm text-label-sm text-secondary font-medium tracking-normal">with Md Injamam ul Haque</span></div></div><div class="flex items-center gap-2"><div class="flex items-center gap-1 bg-error-container/40 px-2 py-1 rounded-full text-primary font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px] fill-1 text-primary">local_fire_department</span><span class="">7 Days</span></div><div class="relative flex items-center justify-center p-0.5 rounded-full ring-2 ring-primary/20"><img alt="Profile" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAt5rq6zdKyR2heYTN8am8hLG3Wvsuw-VhbuVqOzx4dye85vyiKxKJofXq7VvyNXk2Glrw889HV7aI1clLvlH4R-hICepLUku9DDjlSXCpnUfwz1AVSq6cKPE_vuHMepDnVrW34zmq0ite0WGmVNXKbgu09n-90HC3zeQhOYRO4tBQgVY_NHQN1n4SlKRsUxkFhl0K92GPup79MUW43dpLXX7bx1pBlIUZCtWI4JiBXEt6q6eUhz9U"></div></div></div><div class="flex items-center justify-between px-0.5"><div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-low text-tertiary"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="font-furigana text-furigana tracking-wide uppercase font-bold">100% Free Forever • No Ads</span></div><div class="font-furigana text-furigana text-secondary/70 tracking-wider">日本語教育</div></div></div></header><main class="flex flex-col relative w-full pt-20 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full">
-<div class="px-4 py-3 flex flex-col gap-4">
-<!-- Hero Greeting & Philanthropic Mission Tag -->
-<div class="flex flex-col gap-1.5 pt-1"><div class="inline-flex items-center gap-1.5 self-start px-2.5 py-0.5 rounded-full bg-error-container/50 text-on-error-container"><span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">school</span><span class="font-furigana text-furigana font-bold tracking-wider uppercase">বাংলায় সহজ জাপানি শিক্ষা • JLPT N5</span></div><div class="flex items-baseline justify-between"><h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Alex, Konnichiwa! <span class="font-furigana text-furigana text-primary font-bold ml-1">こんにちは • কনিচিওয়া</span></h1></div><p class="font-body-md text-body-md text-secondary">আজকের জাপানি পাঠ শুরু করা যাক! (100% Free Lifetime Learning)</p></div>
-<!-- Daily Progress & Gamification Tile (Bento Core) -->
-<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3 relative overflow-hidden"><div class="absolute -right-6 -bottom-6 w-28 h-28 bg-primary/5 rounded-full pointer-events-none"></div><div class="flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-9 h-9 rounded-full bg-error-container/60 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span></div><div><div class="font-label-prominent text-label-prominent text-on-surface flex items-center gap-1">৭ দিনের স্ট্রিক (7-Day Streak)<span class="inline-block w-1.5 h-1.5 rounded-full bg-tertiary"></span></div><p class="font-furigana text-furigana text-secondary">ধারাবাহিকতাই সফলতার চাবিকাঠি!</p></div></div><div class="bg-surface-container-low px-3 py-1.5 rounded-full flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-tertiary" style="font-variation-settings: 'FILL' 1;">diamond</span><span class="font-label-prominent text-label-prominent text-tertiary">৩৫০ XP Today</span></div></div><div class="flex flex-col gap-1.5 pt-1"><div class="flex justify-between items-center text-body-sm font-body-sm"><span class="text-secondary font-medium">দৈনিক লক্ষ্য: ১৫ / ২০ মিনিট (Daily Goal)</span><span class="text-primary font-bold">৭৫%</span></div><div class="w-full h-2.5 bg-surface-container rounded-full overflow-hidden flex"><div class="h-full bg-primary rounded-full transition-all duration-500 ease-out" style="width: 75%;"></div></div></div><div class="flex items-center justify-between pt-1"><div class="flex items-center gap-1 text-secondary font-body-sm text-body-sm"><span class="material-symbols-outlined text-[16px]">schedule</span><span class="">আজকের বাকি মাত্র ৫ মিনিট</span></div><button class="font-label-sm text-label-sm text-primary font-bold active:scale-95 transition-transform flex items-center gap-0.5" id="streakBoostBtn"><span class="">পুরস্কার দেখুন (Rewards)</span><span class="material-symbols-outlined text-[14px]">chevron_right</span></button></div></div>
-<!-- Active Resume Learning Banner -->
-<div class="bg-gradient-to-br from-primary via-primary-container to-primary text-on-primary rounded-xl p-4 shadow-md flex flex-col gap-3 relative overflow-hidden"><div class="absolute -right-3 -top-3 w-20 h-20 rounded-full bg-white/10 pointer-events-none"></div><div class="flex items-start justify-between z-10"><div class="flex flex-col gap-0.5"><div class="flex items-center gap-1.5"><span class="px-2 py-0.5 rounded-full bg-white/20 font-furigana text-furigana font-bold text-white tracking-wider uppercase">বর্তমান পাঠ • Lesson 3 of 5</span><span class="font-furigana text-furigana text-white/80">হিরাগানা লেভেল</span></div><h2 class="font-headline-sm text-headline-sm text-white pt-1">Hiragana: Voiced Sounds (দাকুওন - Dakuon)</h2><p class="font-body-sm text-body-sm text-white/85">が (Ga - গা), ざ (Za - যা), だ (Da - দা), ば (Ba - বা) এর সঠিক উচ্চারণ।</p></div></div><div class="flex items-center justify-between pt-1 z-10"><div class="flex items-center gap-2"><div class="flex -space-x-1.5"><span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center font-furigana text-furigana font-bold">が</span><span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center font-furigana text-furigana font-bold">ざ</span><span class="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center font-furigana text-furigana font-bold">だ</span></div><span class="font-furigana text-furigana text-white/80">+১২টি যুক্তবর্ণ</span></div><a class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-surface-container-lowest text-primary font-label-prominent text-label-prominent shadow-sm active:translate-y-0.5 transition-all" href="lessons.html"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span><span class="">চালিয়ে যান (Resume)</span></a></div></div>
-<!-- Free Platform Credo Banner -->
-<div class="bg-surface-container-low rounded-xl p-3.5 flex items-center gap-3 shadow-sm">
-<div class="w-10 h-10 rounded-full bg-tertiary-container/20 flex-shrink-0 flex items-center justify-center text-tertiary">
-<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">verified</span>
-</div>
-<div class="flex flex-col">
-<div class="font-label-prominent text-label-prominent text-on-surface flex items-center gap-1">
-          100% Free Lifetime Access
+  </script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-icon">
+          <img src="assets/logo.svg" alt="Family tree logo" />
         </div>
-<p class="font-body-sm text-body-sm text-secondary">
-          Founded by Md Injamam ul Haque • Zero Ads &amp; Zero Paywalls forever.
-        </p>
-</div>
-</div>
-<!-- Daily Quick Practice Bento: Word of Day & Daily Kana -->
-<div class="flex flex-col gap-2">
-<div class="flex items-center justify-between px-0.5">
-<span class="font-headline-sm text-headline-sm text-on-surface">Daily Micro-Drills</span>
-<span class="font-label-sm text-label-sm text-primary font-bold">Refreshes in 4h</span>
-</div>
-<div class="grid grid-cols-2 gap-2.5"><div class="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm flex flex-col justify-between"><div class="flex items-center justify-between"><span class="font-furigana text-furigana text-secondary font-bold uppercase tracking-wider">Word of the Day</span><button class="w-6 h-6 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:text-primary transition-colors" onclick="const a = document.getElementById('sakuraAudio'); a.innerText = '🔊 উচ্চারণ শুনছেন...'; setTimeout(() =&gt; a.innerText = 'さくら • চেরি ফুল (Sakura)', 1300);"><span class="material-symbols-outlined text-[14px]">volume_up</span></button></div><div class="my-2 flex flex-col items-center"><span class="font-body-cjk-char-mobile text-body-cjk-char-mobile text-primary font-medium">桜</span><span class="font-furigana text-furigana text-secondary font-medium" id="sakuraAudio">さくら • Sakura</span><span class="font-label-sm text-label-sm text-on-surface font-semibold mt-0.5">চেরি ফুল (Cherry Blossom)</span></div><button class="w-full py-1.5 rounded-lg bg-surface-container-low text-primary font-label-sm text-label-sm font-bold text-center active:bg-surface-container transition-colors">স্ট্রোক লিখুন (Stroke)</button></div><div class="bg-surface-container-lowest p-3.5 rounded-xl shadow-sm flex flex-col justify-between"><div class="flex items-center justify-between"><span class="font-furigana text-furigana text-tertiary font-bold uppercase tracking-wider">স্পিড টেস্ট</span><span class="material-symbols-outlined text-[16px] text-tertiary">timer</span></div><div class="my-2 flex flex-col items-center text-center"><div class="w-10 h-10 rounded-full bg-tertiary-container/15 flex items-center justify-center text-tertiary mb-1"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">bolt</span></div><span class="font-label-prominent text-label-prominent text-on-surface">দৈনিক কুইজ চ্যালেঞ্জ</span><span class="font-furigana text-furigana text-secondary">২ মিনিট • ১০টি ক্যারেক্টার</span></div><button class="w-full py-1.5 rounded-lg bg-tertiary text-on-tertiary font-label-sm text-label-sm font-bold text-center active:opacity-90 transition-opacity">কুইজ শুরু করুন</button></div></div>
-</div>
-<!-- Structured Japanese Learning Pathway (JLPT N5 Roadmap) -->
-<div class="flex flex-col gap-3 pt-1">
-<div class="flex items-center justify-between px-0.5">
-<div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface">Curriculum Pathway</h2>
-<p class="font-body-sm text-body-sm text-secondary">Structured for JLPT N5 Foundation</p>
-</div>
-<div class="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full text-secondary font-label-sm text-label-sm">
-<span class="">8 Units</span>
-</div>
-</div>
-<!-- Unit Cards Stack -->
-<div class="flex flex-col gap-2.5"><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-tertiary-container/20 text-tertiary flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">check_circle</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-tertiary uppercase tracking-wider">Unit 1 • সম্পন্ন হয়েছে (100%)</span><span class="font-furigana text-furigana text-secondary">JLPT N5</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Japanese Basics (জাপানি বর্ণমালার ভিত্তি)</h3><p class="font-body-sm text-body-sm text-secondary truncate">উচ্চারণ, পিচ অ্যাকসেন্ট ও ৩টি লেখন পদ্ধতি</p></div><div class="flex-shrink-0"><button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:text-on-surface active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">replay</span></button></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex flex-col gap-2.5 relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div><div class="flex items-center gap-3 pl-1"><div class="w-11 h-11 rounded-xl bg-error-container/50 text-primary flex items-center justify-center flex-shrink-0"><span class="font-headline-sm text-headline-sm font-bold">あ</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-primary uppercase tracking-wider">Unit 2 • ৮০% সমাপ্ত (চলমান)</span><span class="px-1.5 py-0.2 bg-primary/10 text-primary rounded font-furigana text-furigana font-bold">Active</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Hiragana Syllabary (হিরাগানা অক্ষরমালা)</h3><p class="font-body-sm text-body-sm text-secondary truncate">৪৬টি মূল বর্ণ + দাকুওন, হানদাকুওন ও য়ুওন</p></div></div><div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 80%;"></div></div><div class="flex items-center justify-between pt-0.5"><span class="font-body-sm text-body-sm text-secondary">৪/৫ লেসন শেষ হয়েছে</span><a class="px-3 py-1 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-bold active:scale-95 transition-transform" href="lessons.html">চালিয়ে যান</a></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex flex-col gap-2"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-secondary-container/40 text-secondary flex items-center justify-center flex-shrink-0"><span class="font-headline-sm text-headline-sm font-bold">ア</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-secondary uppercase tracking-wider">Unit 3 • ৩০% সম্পন্ন</span><span class="font-furigana text-furigana text-secondary">Loanwords</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Katakana Foundations (কাতাকানা বর্ণমালা)</h3><p class="font-body-sm text-body-sm text-secondary truncate">বিদেশি শব্দ ও ব্র্যান্ডের নাম লেখার নিয়ম</p></div><div class="flex-shrink-0"><button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">play_arrow</span></button></div></div><div class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-secondary rounded-full" style="width: 30%;"></div></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-surface-container text-on-surface-variant flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[22px]">waving_hand</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-tertiary uppercase tracking-wider">Unit 4 • শুরু করুন</span><span class="px-1.5 py-0.2 bg-tertiary-container/20 text-tertiary rounded font-furigana text-furigana font-bold">Free</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Greetings &amp; Etiquette (অভিবাদন ও শিষ্টাচার)</h3><p class="font-body-sm text-body-sm text-secondary truncate">Aisatsu: সকালের শুভেচ্ছা ও মাথা নিচু করার নিয়ম</p></div><div class="flex-shrink-0"><button class="px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold active:scale-95 transition-all">শুরু করুন</button></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-surface-container text-on-surface-variant flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[22px]">calculate</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-secondary uppercase tracking-wider">Unit 5 • আনলক করা</span><span class="font-furigana text-furigana text-tertiary font-bold">100% Free</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Numbers &amp; Time (সংখ্যা, গণনা ও সময়)</h3><p class="font-body-sm text-body-sm text-secondary truncate">Suuji, কাউন্টার (一つ, 二つ), ঘড়ির সময় ও দিনপঞ্জি</p></div><div class="flex-shrink-0"><button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">lock_open</span></button></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-surface-container text-on-surface-variant flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[22px]">restaurant</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-secondary uppercase tracking-wider">Unit 6 • আনলক করা</span><span class="font-furigana text-furigana text-tertiary font-bold">100% Free</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Essential Vocabulary (দৈনন্দিন শব্দভাণ্ডার)</h3><p class="font-body-sm text-body-sm text-secondary truncate">খাবার, পরিবারের সদস্য ও নিত্যপ্রয়োজনীয় দ্রব্যাদি</p></div><div class="flex-shrink-0"><button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">lock_open</span></button></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-surface-container text-on-surface-variant flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[22px]">extension</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-secondary uppercase tracking-wider">Unit 7 • ব্যাকরণ কোর</span><span class="font-furigana text-furigana text-tertiary font-bold">100% Free</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Grammar Particles は, を, が, に (পার্টিকেল)</h3><p class="font-body-sm text-body-sm text-secondary truncate">বাক্যের গঠন, desu/da ও প্রশ্নবোধক (ka) এর ব্যবহার</p></div><div class="flex-shrink-0"><button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">lock_open</span></button></div></div><div class="bg-surface-container-lowest rounded-xl p-3.5 shadow-sm flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-surface-container text-on-surface-variant flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-[22px]">forum</span></div><div class="flex flex-col flex-1 min-w-0"><div class="flex items-center justify-between gap-1"><span class="font-furigana text-furigana font-bold text-secondary uppercase tracking-wider">Unit 8 • বাস্তব পরিস্থিতি</span><span class="font-furigana text-furigana text-tertiary font-bold">100% Free</span></div><h3 class="font-label-prominent text-label-prominent text-on-surface truncate">Everyday Tokyo Dialogues (টোকিও সংলাপ)</h3><p class="font-body-sm text-body-sm text-secondary truncate">কনবিনিতে কেনাকাটা, সাবওয়ে যাতায়াত ও অর্ডার দেওয়া</p></div><div class="flex-shrink-0"><button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">lock_open</span></button></div></div></div>
-</div>
-<!-- Cultural Encouragement Hanko Stamp Card -->
-<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex items-center justify-between mb-2"><div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0"><span class="font-headline-sm text-headline-sm font-bold">気</span></div><div class="flex flex-col"><div class="font-label-prominent text-label-prominent text-on-surface">Ganbatte Kudasai! (がんばって)</div><p class="font-body-sm text-body-sm text-secondary">Md Injamam ul Haque এর সাথে ১০০% ফ্রি জাপানি শিক্ষা — সম্পূর্ণ বিনামূল্যে!</p></div></div><div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">military_tech</span></div></div>
-</div>
-</div>
-<script>
-  document.getElementById('streakBoostBtn')?.addEventListener('click', function() {
-    alert('🔥 Keep your 7-day streak! You are 5 minutes away from unlocking the "N5 Hiragana Master" badge.');
-  });
-</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(11,28,48,0.06)]" data-active-classes="text-primary font-bold"><div class="flex justify-around items-center h-16 px-2"><a aria-current="page" class="flex flex-col items-center justify-center gap-1 min-w-[56px] h-12 transition-colors text-primary font-bold" data-path="home" href="index.html"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm">Home</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] h-12 text-secondary hover:text-on-surface transition-colors" data-path="alphabet" href="alphabet.html"><span class="material-symbols-outlined text-[24px]">translate</span><span class="font-label-sm text-label-sm">Alphabet</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] h-12 text-secondary hover:text-on-surface transition-colors" data-path="lessons" href="lessons.html"><span class="material-symbols-outlined text-[24px]">auto_stories</span><span class="font-label-sm text-label-sm">Lessons</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] h-12 text-secondary hover:text-on-surface transition-colors" data-path="quiz" href="quiz.html"><span class="material-symbols-outlined text-[24px]">emoji_events</span><span class="font-label-sm text-label-sm">Quiz</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] h-12 text-secondary hover:text-on-surface transition-colors" data-path="profile" href="profile.html"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-sm text-label-sm">Profile</span></a></div></nav>
+        <div>
+          <h1 data-i18n="appTitle">পারিবারিক বংশগাছ</h1>
+          <p>FamilyTree Studio</p>
+        </div>
+      </div>
 
-</body><script src="app.js?v=10"></script></html>
+      <nav class="nav-panel" aria-label="Main navigation" data-i18n-aria="mainNavigation">
+        <button class="nav-item active" data-section="dashboard" data-i18n="dashboard">ড্যাশবোর্ড</button>
+        <button class="nav-item" data-section="tree" data-i18n="familyTree">বংশগাছ</button>
+        <button class="nav-item" data-section="members" data-i18n="familyMembers">পরিবারের সদস্য</button>
+        <button class="nav-item" data-section="timeline" data-i18n="timeline">টাইমলাইন</button>
+        <button class="nav-item" data-section="photos" data-i18n="photos">ফটো</button>
+        <button class="nav-item" data-section="settings" data-i18n="settings">সেটিংস</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <p class="eyebrow" data-i18n="quickActions">দ্রুত কাজ</p>
+        <button class="secondary-btn full-width" id="quick-add-btn" data-i18n="addFamilyMember">সদস্য যোগ করুন</button>
+        <button class="ghost-btn full-width" id="export-btn" data-i18n="export">এক্সপোর্ট</button>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="search-box">
+          <span class="search-icon">⌕</span>
+          <input id="global-search" type="search" placeholder="সদস্য খুঁজুন..." aria-label="Search family members" data-i18n-placeholder="search" data-i18n-aria="searchMembers" list="search-results" />
+          <datalist id="search-results"></datalist>
+        </div>
+        <div class="header-actions">
+          <div class="language-switch" aria-label="Language">
+            <button type="button" id="lang-bn" aria-pressed="true">বাংলা</button>
+            <span aria-hidden="true">|</span>
+            <button type="button" id="lang-en" aria-pressed="false">English</button>
+          </div>
+          <div class="auth-controls">
+            <span id="user-profile" class="user-profile" hidden></span>
+            <button class="secondary-btn" id="google-login-btn" data-i18n="signInGoogle">Google দিয়ে সাইন ইন</button>
+            <button class="ghost-btn" id="logout-btn" data-i18n="logout" hidden>লগ আউট</button>
+            <span id="auth-status" class="auth-status" aria-live="polite"></span>
+          </div>
+          <button class="secondary-btn" id="save-btn" data-i18n="save">সংরক্ষণ করুন</button>
+          <button class="primary-btn" id="add-member-btn" data-i18n="addFamilyMember">সদস্য যোগ করুন</button>
+        </div>
+      </header>
+
+      <section id="dashboard" class="page-panel active">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow" data-i18n="familyOverview">পরিবারের ওভারভিউ</p>
+            <h2 data-i18n="welcome">স্বাগতম, পারিবারিক ইতিহাসের কেন্দ্রে</h2>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card accent-purple">
+            <span class="stat-label" data-i18n="totalMembers">মোট সদস্য</span>
+            <strong id="total-members">0</strong>
+          </article>
+          <article class="stat-card accent-blue">
+            <span class="stat-label" data-i18n="generations">প্রজন্ম</span>
+            <strong id="generation-count">0</strong>
+          </article>
+          <article class="stat-card accent-gold">
+            <span class="stat-label" data-i18n="recentAdditions">সাম্প্রতিক যোগ</span>
+            <strong id="recent-additions">0</strong>
+          </article>
+          <article class="stat-card accent-green">
+            <span class="stat-label" data-i18n="importantEvents">গুরুত্বপূর্ণ ঘটনা</span>
+            <strong id="event-count">0</strong>
+          </article>
+        </div>
+
+        <div class="two-column-layout">
+          <div class="card-panel">
+            <div class="panel-head">
+              <h3 data-i18n="familyPreview">পরিবারের পূর্বাভাস</h3>
+              <button class="text-btn" id="preview-tree-btn" data-i18n="viewFamilyTree">বংশগাছ দেখুন</button>
+            </div>
+            <div id="family-preview" class="family-preview"></div>
+          </div>
+
+          <div class="card-panel">
+            <div class="panel-head">
+              <h3 data-i18n="recentEvents">সাম্প্রতিক ঘটনা</h3>
+            </div>
+            <div id="recent-events" class="event-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tree" class="page-panel">
+        <div class="page-header with-actions">
+          <div>
+            <p class="eyebrow" data-i18n="familyTree">বংশগাছ</p>
+            <h2 data-i18n="interactiveRelationships">ইন্টারঅ্যাকটিভ পারিবারিক সম্পর্ক</h2>
+          </div>
+          <div class="toolbar">
+            <button class="toolbar-btn" data-action="zoom-out" data-i18n="zoomOut">-</button>
+            <button class="toolbar-btn" data-action="zoom-in" data-i18n="zoomIn">+</button>
+            <button class="toolbar-btn" data-action="center" data-i18n="center">কেন্দ্র</button>
+            <button class="toolbar-btn" data-action="collapse" data-i18n="collapse">সংকোচন</button>
+            <button class="toolbar-btn" data-action="expand" data-i18n="expand">বিস্তার</button>
+            <button class="secondary-btn" id="download-pdf-btn" data-i18n="downloadPdf">ফ্যামিলি ট্রি PDF ডাউনলোড</button>
+            <button class="ghost-btn" id="print-tree-btn" data-i18n="printTree">ফ্যামিলি ট্রি প্রিন্ট</button>
+          </div>
+        </div>
+        <div class="tree-container" id="print-tree-container">
+          <div id="family-tree-viewport" class="tree-viewport">
+            <svg id="family-tree-svg" class="family-tree-svg" aria-label="Family tree diagram"></svg>
+          </div>
+        </div>
+      </section>
+
+      <section id="members" class="page-panel">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow" data-i18n="familyMembers">পরিবারের সদস্য</p>
+            <h2 data-i18n="allMembers">সকল সদস্য</h2>
+          </div>
+        </div>
+        <div id="members-list" class="member-list"></div>
+      </section>
+
+      <section id="timeline" class="page-panel">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow" data-i18n="timeline">টাইমলাইন</p>
+            <h2 data-i18n="familyImportantDates">পরিবারের গুরুত্বপূর্ণ দিন</h2>
+          </div>
+        </div>
+        <div id="timeline-list" class="timeline-list"></div>
+      </section>
+
+      <section id="photos" class="page-panel">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow" data-i18n="photos">ফটো</p>
+            <h2 data-i18n="familyPhotos">পারিবারিক আলোকচিত্র</h2>
+          </div>
+        </div>
+        <div id="photos-grid" class="photos-grid"></div>
+      </section>
+
+      <section id="settings" class="page-panel">
+        <div class="page-header">
+          <div>
+            <p class="eyebrow" data-i18n="settings">সেটিংস</p>
+            <h2 data-i18n="dataManagement">তথ্য ব্যবস্থাপনা</h2>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div class="card-panel">
+            <h3 data-i18n="dataStorage">ডেটা স্টোরেজ</h3>
+            <p id="storage-status">লোকাল স্টোরেজে সংরক্ষিত</p>
+            <button class="secondary-btn" id="reset-btn" data-i18n="resetTree">ফ্যামিলি ট্রি রিসেট</button>
+          </div>
+          <div class="card-panel">
+            <h3 data-i18n="importExport">আমদানি / রপ্তানি</h3>
+            <div class="stacked-actions">
+              <button class="secondary-btn" id="export-tree-btn" data-i18n="export">রপ্তানি</button>
+              <button class="secondary-btn" id="import-tree-btn" data-i18n="import">আমদানি</button>
+              <input id="import-file" type="file" accept="application/json" hidden />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section id="print-report" class="print-report" aria-hidden="true"></section>
+
+  <aside id="profile-panel" class="profile-panel closed" aria-live="polite">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar">A</div>
+      <div>
+        <p class="eyebrow" data-i18n="profile">প্রোফাইল</p>
+        <h3 id="profile-name">নির্বাচিত সদস্য</h3>
+      </div>
+      <button id="close-profile" class="icon-btn" aria-label="Close profile">✕</button>
+    </div>
+
+    <div class="profile-content" id="profile-content"></div>
+    <div class="profile-actions">
+      <button class="primary-btn" id="profile-edit-btn" data-i18n="edit">সম্পাদনা</button>
+      <button class="secondary-btn" id="profile-add-btn" data-i18n="addFamilyMember">সদস্য যোগ</button>
+      <button class="ghost-btn" id="profile-tree-btn" data-i18n="viewFamilyTree">বংশগাছ দেখুন</button>
+      <button class="danger-btn" id="profile-delete-btn" data-i18n="delete">মুছে ফেলুন</button>
+    </div>
+  </aside>
+
+  <div id="member-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="member-modal-title" data-i18n="addFamilyMember">সদস্য যোগ করুন</h3>
+        <button class="icon-btn" id="close-modal-btn" aria-label="Close">✕</button>
+      </div>
+      <form id="member-form">
+        <input type="hidden" id="member-id" />
+        <div class="form-grid">
+          <label class="full-span">
+            <span data-i18n="fullName">পূর্ণ নাম</span>
+            <input id="full-name" name="fullName" type="text" required autocomplete="name" />
+          </label>
+          <label>
+            <span data-i18n="nickname">ডাকনাম</span>
+            <input id="nickname" name="nickname" type="text" />
+          </label>
+          <label>
+            <span data-i18n="gender">লিঙ্গ</span>
+            <select id="gender" name="gender">
+              <option value="male" data-i18n="male">পুরুষ</option>
+              <option value="female" data-i18n="female">মহিলা</option>
+              <option value="other" data-i18n="other">অন্যান্য</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="dateOfBirth">জন্ম তারিখ</span>
+            <input id="birth-date" name="birthDate" type="date" />
+          </label>
+          <label>
+            <span data-i18n="birthPlace">জন্মস্থান</span>
+            <input id="birth-place" name="birthPlace" type="text" />
+          </label>
+          <label>
+            <span data-i18n="dateOfDeath">মৃত্যু তারিখ</span>
+            <input id="death-date" name="deathDate" type="date" />
+          </label>
+          <label>
+            <span data-i18n="deathPlace">মৃত্যুস্থান</span>
+            <input id="death-place" name="deathPlace" type="text" />
+          </label>
+          <label>
+            <span data-i18n="occupation">পেশা</span>
+            <input id="occupation" name="occupation" type="text" />
+          </label>
+          <label>
+            <span data-i18n="photoUrl">ফটো URL</span>
+            <input id="photo" name="photo" type="url" placeholder="https://..." />
+          </label>
+          <label class="full-span">
+            <span data-i18n="notes">জীবনী / নোট</span>
+            <textarea id="biography" name="biography" rows="4"></textarea>
+          </label>
+          <label>
+            <span data-i18n="phone">ফোন</span>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" />
+          </label>
+          <label>
+            <span data-i18n="email">ইমেইল</span>
+            <input id="email" name="email" type="email" autocomplete="email" />
+          </label>
+          <label class="full-span">
+            <span data-i18n="address">ঠিকানা</span>
+            <textarea id="address" name="address" rows="2" autocomplete="street-address"></textarea>
+          </label>
+          <label>
+            <span data-i18n="father">পিতা</span>
+            <select id="father-person" name="fatherPerson">
+              <option value="">সদস্য নির্বাচন করুন</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="mother">মাতা</span>
+            <select id="mother-person" name="motherPerson">
+              <option value="">সদস্য নির্বাচন করুন</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="spouse">স্বামী/স্ত্রী</span>
+            <select id="spouse-person" name="spousePerson" multiple size="3"></select>
+          </label>
+          <label>
+            <span data-i18n="children">সন্তান</span>
+            <select id="children-person" name="childrenPerson" multiple size="3"></select>
+          </label>
+          <label>
+            <span data-i18n="relationship">সম্পর্ক</span>
+            <select id="relationship-type" name="relationshipType">
+              <option value="none" data-i18n="noRelationship">কোনো সম্পর্ক নেই</option>
+              <option value="father" data-i18n="father">পিতা</option>
+              <option value="mother" data-i18n="mother">মাতা</option>
+              <option value="son" data-i18n="son">পুত্র</option>
+              <option value="daughter" data-i18n="daughter">কন্যা</option>
+              <option value="brother" data-i18n="brother">ভাই</option>
+              <option value="sister" data-i18n="sister">বোন</option>
+              <option value="husband" data-i18n="husband">স্বামী</option>
+              <option value="wife" data-i18n="wife">স্ত্রী</option>
+              <option value="grandfather" data-i18n="grandfather">দাদা</option>
+              <option value="grandmother" data-i18n="grandmother">দাদি</option>
+              <option value="uncle" data-i18n="uncle">চাচা/কাকু/মামা</option>
+              <option value="aunt" data-i18n="aunt">চাচী/কাকিমা/মামি</option>
+              <option value="cousin" data-i18n="cousin">চাচাতো/কাকাতো/মামাতো</option>
+              <option value="other" data-i18n="other">অন্যান্য</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="relatedMember">সম্পর্কিত সদস্য</span>
+            <select id="related-person" name="relatedPerson">
+              <option value="">সদস্য নির্বাচন করুন</option>
+            </select>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost-btn" id="cancel-btn" data-i18n="cancel">বাতিল</button>
+          <button type="submit" class="primary-btn" data-i18n="save">সংরক্ষণ করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/family-data.js"></script>
+  <script src="js/storage.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
