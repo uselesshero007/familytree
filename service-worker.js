@@ -1,17 +1,7 @@
-const CACHE_NAME = 'family-tree-cache-v2';
+const CACHE_NAME = 'family-tree-cache-v4';
 const ASSETS = [
   './',
-  './index.html',
-  './manifest.json',
-  './css/style.css',
-  './js/family-data.js',
-  './js/storage.js',
-  './js/app.js',
-  './js/firebase.js',
-  './js/firebase-config.js',
-  './robots.txt',
-  './sitemap.xml',
-  './assets/logo.svg'
+  './index.html'
 ];
 
 self.addEventListener('install', (event) => {

@@ -224,12 +224,23 @@ img { max-width: 100%; display: block; }
 .language-switch button[aria-pressed="true"] { color: var(--primary); }
 .auth-controls { flex-wrap: wrap; }
 .user-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   max-width: 170px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--text-soft);
   font-size: 0.82rem;
+}
+.user-profile[hidden], .user-photo[hidden] { display: none; }
+.user-photo {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 .auth-status {
   max-width: 240px;

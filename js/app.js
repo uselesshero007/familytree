@@ -1,4 +1,6 @@
 import { createFirebaseClient } from './firebase.js';
+import { buildSeedFamily, createPerson, FAMILY_STORAGE_KEY } from './family-data.js';
+import { exportTreeJson, importTreeJson, readTreeData, writeTreeData } from './storage.js';
 
 const TRANSLATIONS = {
   bn: {
@@ -27,8 +29,13 @@ const TRANSLATIONS = {
     noData: 'তথ্য নেই', unknownOccupation: 'অজানা পেশা', familyMember: 'পরিবারের সদস্য', newMember: 'নতুন',
     birthEvent: 'জন্মগ্রহণ করেছেন', deathEvent: 'এর মৃত্যু ঘটেছে', marriage: 'বিয়ে',
     born: 'জন্ম', died: 'মৃত্যু', saveFailed: 'সংরক্ষণ ব্যর্থ হয়েছে।', cloudSaved: 'ক্লাউডে সংরক্ষিত',
+    loadingCloud: 'Firestore থেকে তথ্য লোড হচ্ছে…', importFailed: 'আমদানি ব্যর্থ হয়েছে:',
+    familyHistory: 'পারিবারিক ইতিহাস', closeProfile: 'প্রোফাইল বন্ধ করুন',
+    closeDialog: 'ডায়ালগ বন্ধ করুন', treeDiagram: 'পারিবারিক বংশগাছের চিত্র',
     localSaved: 'এই ডিভাইসে সংরক্ষিত', cloudSaving: 'ক্লাউডে সংরক্ষণ হচ্ছে…',
     firebaseSetup: 'ক্লাউড লগইনের জন্য js/firebase-config.js-এ Firebase Web App config যোগ করুন।',
+    authInitializing: 'Firebase সংযোগ হচ্ছে…', authFailed: 'Firebase লগইন প্রস্তুত করা যায়নি।',
+    cloudUnavailable: 'Firebase সংযোগ প্রস্তুত নয়। কিছুক্ষণ পর আবার চেষ্টা করুন।',
     loginFailed: 'Google লগইন ব্যর্থ হয়েছে', logoutFailed: 'লগ আউট ব্যর্থ হয়েছে',
     chooseMember: 'সদস্য নির্বাচন করুন', addTitle: 'পরিবারের সদস্য যোগ করুন', editTitle: 'সদস্য সম্পাদনা',
     nameRequired: 'পূর্ণ নাম অবশ্যই দিতে হবে।', exportDate: 'রপ্তানির তারিখ',
@@ -65,8 +72,13 @@ const TRANSLATIONS = {
     noData: 'Not provided', unknownOccupation: 'Occupation not provided', familyMember: 'Family member', newMember: 'New',
     birthEvent: 'was born', deathEvent: 'passed away', marriage: 'Marriage',
     born: 'Birth', died: 'Death', saveFailed: 'Could not save family data.', cloudSaved: 'Saved to cloud',
+    loadingCloud: 'Loading family data from Firestore…', importFailed: 'Import failed:',
+    familyHistory: 'Family History', closeProfile: 'Close profile',
+    closeDialog: 'Close dialog', treeDiagram: 'Family tree diagram',
     localSaved: 'Saved on this device', cloudSaving: 'Saving to cloud…',
-    firebaseSetup: 'Add your Firebase Web App config in js/firebase-config.js to enable cloud sign-in.',
+    firebaseSetup: 'Firebase configuration is incomplete. Check js/firebase-config.js.',
+    authInitializing: 'Connecting to Firebase…', authFailed: 'Firebase authentication could not be initialized.',
+    cloudUnavailable: 'Firebase is not ready. Please try again shortly.',
     loginFailed: 'Google sign-in failed', logoutFailed: 'Sign out failed',
     chooseMember: 'Select a family member', addTitle: 'Add Family Member', editTitle: 'Edit Family Member',
     nameRequired: 'Full name is required.', exportDate: 'Exported',
@@ -91,6 +103,9 @@ const TRANSLATIONS = {
     user: null,
     cloudSaveQueue: Promise.resolve(),
     cloudLoadToken: 0,
+    authStatusKey: 'firebaseSetup',
+    authStatusDetails: '',
+    authInitialized: false,
     tree: {
       scale: 1,
       panX: 40,
@@ -167,6 +182,8 @@ const TRANSLATIONS = {
     dom.googleLoginBtn = document.getElementById('google-login-btn');
     dom.logoutBtn = document.getElementById('logout-btn');
     dom.userProfile = document.getElementById('user-profile');
+    dom.userPhoto = document.getElementById('user-photo');
+    dom.userName = document.getElementById('user-name');
     dom.authStatus = document.getElementById('auth-status');
     dom.downloadPdfBtn = document.getElementById('download-pdf-btn');
     dom.printTreeBtn = document.getElementById('print-tree-btn');
@@ -180,13 +197,12 @@ const TRANSLATIONS = {
     if (!TRANSLATIONS[language]) return;
     state.language = language;
     localStorage.setItem('familyTreeLanguage', language);
-    applyLanguage();
     renderAll();
   }
 
   function applyLanguage() {
     document.documentElement.lang = state.language;
-    document.title = `${t('appTitle')} — ${state.language === 'bn' ? 'পারিবারিক ইতিহাস' : 'Family History'}`;
+    document.title = `${t('appTitle')} — ${t('familyHistory')}`;
     document.querySelectorAll('[data-i18n]').forEach((element) => {
       const key = element.dataset.i18n;
       if (TRANSLATIONS[state.language][key]) element.textContent = t(key);
@@ -199,8 +215,7 @@ const TRANSLATIONS = {
     });
     dom.languageBn.setAttribute('aria-pressed', String(state.language === 'bn'));
     dom.languageEn.setAttribute('aria-pressed', String(state.language === 'en'));
-    if (!state.firebase) dom.authStatus.textContent = t('firebaseSetup');
-    else if (!state.user) dom.authStatus.textContent = t('loginNeeded');
+    setAuthStatus(state.authStatusKey, state.authStatusDetails);
     if (dom.memberModal && !dom.memberModal.classList.contains('hidden')) {
       const editing = Boolean(document.getElementById('member-id').value);
       dom.memberModalTitle.textContent = editing ? t('editTitle') : t('addTitle');
@@ -208,31 +223,47 @@ const TRANSLATIONS = {
   }
 
   function initializeCloudFeatures() {
+    setAuthStatus('authInitializing');
     createFirebaseClient().then((client) => {
-      if (!client) {
-        dom.authStatus.textContent = t('firebaseSetup');
-        return;
-      }
       state.firebase = client;
       client.onAuthStateChanged((user) => {
         void handleAuthState(user);
+      }, (error) => {
+        console.error('Firebase authentication state failed:', error);
+        setAuthStatus('authFailed', error.message);
       });
     }).catch((error) => {
       console.error('Firebase initialization failed:', error);
-      dom.authStatus.textContent = `${t('firebaseSetup')} (${error.message})`;
+      state.authInitialized = true;
+      setAuthStatus(
+        error.message.includes('configuration is incomplete') ? 'firebaseSetup' : 'authFailed',
+        `(${error.message})`
+      );
     });
+  }
+
+  function setAuthStatus(key, details = '') {
+    state.authStatusKey = key;
+    state.authStatusDetails = details;
+    if (dom.authStatus) {
+      dom.authStatus.textContent = `${t(key)}${details ? ` ${details}` : ''}`;
+    }
   }
 
   async function handleAuthState(user) {
     const token = ++state.cloudLoadToken;
     const signedOut = Boolean(state.user && !user);
     state.user = user;
+    state.authInitialized = true;
     dom.googleLoginBtn.hidden = Boolean(user);
     dom.logoutBtn.hidden = !user;
     dom.userProfile.hidden = !user;
-    dom.userProfile.textContent = user ? (user.displayName || user.email || user.uid) : '';
+    dom.userName.textContent = user ? (user.displayName || user.email || user.uid) : '';
+    dom.userPhoto.hidden = !user?.photoURL;
+    if (user?.photoURL) dom.userPhoto.src = user.photoURL;
+    else dom.userPhoto.removeAttribute('src');
     if (!user) {
-      dom.authStatus.textContent = t('loginNeeded');
+      setAuthStatus('loginNeeded');
       if (signedOut) {
         state.people = [];
         state.relationships = [];
@@ -242,37 +273,41 @@ const TRANSLATIONS = {
       return;
     }
 
-    dom.authStatus.textContent = state.language === 'bn' ? 'Firestore থেকে তথ্য লোড হচ্ছে…' : 'Loading family data from Firestore…';
+    const cached = readTreeData(userStorageKey(user.uid));
+    state.people = cached?.people || [];
+    state.relationships = cached?.relationships || [];
+    state.selectedPersonId = state.people[0]?.id || null;
+    renderAll();
+    setAuthStatus('loadingCloud');
     try {
       const cloudFamily = await state.firebase.loadFamily(user.uid);
       if (token !== state.cloudLoadToken) return;
       let family = cloudFamily;
       if (!family.people.length) {
-        family = readTreeData(userStorageKey(user.uid)) || { people: [], relationships: [] };
+        family = cached || { people: [], relationships: [] };
         if (family.people.length) await state.firebase.saveFamily(user.uid, family);
       }
       state.people = family.people.map((person) => createPerson(person));
       state.relationships = family.relationships || [];
       state.selectedPersonId = state.people[0]?.id || null;
       writeTreeData({ people: state.people, relationships: state.relationships }, userStorageKey(user.uid));
-      dom.authStatus.textContent = t('cloudSaved');
+      setAuthStatus('cloudSaved');
       renderAll();
     } catch (error) {
       console.error('Could not load family data from Firestore:', error);
-      const cached = readTreeData(userStorageKey(user.uid));
       if (cached) {
         state.people = cached.people;
         state.relationships = cached.relationships || [];
         state.selectedPersonId = state.people[0]?.id || null;
         renderAll();
       }
-      dom.authStatus.textContent = `${t('saveFailed')} ${error.message}`;
+      setAuthStatus('saveFailed', error.message);
     }
   }
 
   async function signInWithGoogle() {
     if (!state.firebase) {
-      alert(t('firebaseSetup'));
+      alert(state.authInitialized ? t('cloudUnavailable') : t('authInitializing'));
       return;
     }
     try {
@@ -825,24 +860,27 @@ const TRANSLATIONS = {
   }
 
   function saveFamilyData() {
-    const data = { people: state.people, relationships: state.relationships };
+    const data = JSON.parse(JSON.stringify({
+      people: state.people,
+      relationships: state.relationships
+    }));
     const key = state.user ? userStorageKey(state.user.uid) : FAMILY_STORAGE_KEY;
     if (!writeTreeData(data, key)) {
-      dom.authStatus.textContent = t('saveFailed');
+      setAuthStatus('saveFailed');
       return false;
     }
     updateStorageStatus();
-    dom.authStatus.textContent = state.user ? t('cloudSaving') : t('localSaved');
+    setAuthStatus(state.user ? 'cloudSaving' : 'localSaved');
     if (!state.user || !state.firebase) return true;
 
     const uid = state.user.uid;
     state.cloudSaveQueue = state.cloudSaveQueue.then(() => (
       state.firebase.saveFamily(uid, data)
     )).then(() => {
-      if (state.user?.uid === uid) dom.authStatus.textContent = t('cloudSaved');
+      if (state.user?.uid === uid) setAuthStatus('cloudSaved');
     }).catch((error) => {
       console.error('Could not save family data to Firestore:', error);
-      if (state.user?.uid === uid) dom.authStatus.textContent = `${t('saveFailed')} ${error.message}`;
+      if (state.user?.uid === uid) setAuthStatus('saveFailed', error.message);
     });
     return true;
   }
@@ -870,7 +908,7 @@ const TRANSLATIONS = {
         dom.importFileInput.value = '';
       })
       .catch((error) => {
-        alert(`আমদানি ব্যর্থ হয়েছে: ${error.message}`);
+        alert(`${t('importFailed')} ${error.message}`);
       });
   }
 

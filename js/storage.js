@@ -1,4 +1,6 @@
-function readTreeData(storageKey = FAMILY_STORAGE_KEY) {
+import { FAMILY_STORAGE_KEY } from './family-data.js';
+
+export function readTreeData(storageKey = FAMILY_STORAGE_KEY) {
   try {
     const raw = localStorage.getItem(storageKey);
     if (!raw) return null;
@@ -11,7 +13,7 @@ function readTreeData(storageKey = FAMILY_STORAGE_KEY) {
   }
 }
 
-function writeTreeData(data, storageKey = FAMILY_STORAGE_KEY) {
+export function writeTreeData(data, storageKey = FAMILY_STORAGE_KEY) {
   try {
     localStorage.setItem(storageKey, JSON.stringify(data));
     return true;
@@ -21,7 +23,7 @@ function writeTreeData(data, storageKey = FAMILY_STORAGE_KEY) {
   }
 }
 
-function exportTreeJson(data) {
+export function exportTreeJson(data) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -33,7 +35,7 @@ function exportTreeJson(data) {
   URL.revokeObjectURL(url);
 }
 
-function importTreeJson(file) {
+export function importTreeJson(file) {
   return new Promise((resolve, reject) => {
     if (!file) return reject(new Error('No file selected'));
     const reader = new FileReader();
@@ -53,7 +55,7 @@ function importTreeJson(file) {
   });
 }
 
-function getStorageEstimate() {
+export function getStorageEstimate() {
   const estimate = localStorage.length;
   return `${estimate} KB`;
 }

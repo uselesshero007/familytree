@@ -1,11 +1,11 @@
 export const firebaseConfig = {
-  // Paste the Firebase Web App config from Firebase Console > Project settings > Your apps.
-  apiKey: 'PASTE_YOUR_FIREBASE_API_KEY',
-  authDomain: 'PASTE_YOUR_FIREBASE_AUTH_DOMAIN',
-  projectId: 'PASTE_YOUR_FIREBASE_PROJECT_ID',
-  storageBucket: 'PASTE_YOUR_FIREBASE_STORAGE_BUCKET',
-  messagingSenderId: 'PASTE_YOUR_FIREBASE_MESSAGING_SENDER_ID',
-  appId: 'PASTE_YOUR_FIREBASE_APP_ID'
+  apiKey: 'AIzaSyBEmuJphu-sKS6xHzdyz1gOzLwIer4Tms8',
+  authDomain: 'family-tree-48c11.firebaseapp.com',
+  projectId: 'family-tree-48c11',
+  storageBucket: 'family-tree-48c11.firebasestorage.app',
+  messagingSenderId: '568847663426',
+  appId: '1:568847663426:web:0667af3f6298f6712d08db',
+  measurementId: 'G-0636ZBVBM1'
 };
 
 export function hasFirebaseConfig(config = firebaseConfig) {

@@ -1,4 +1,4 @@
-const FAMILY_STORAGE_KEY = 'familyTreeDataV1';
+export const FAMILY_STORAGE_KEY = 'familyTreeDataV1';
 
 const RELATION_OPTIONS = [
   { value: 'father', label: 'পিতা' },
@@ -17,7 +17,7 @@ const RELATION_OPTIONS = [
   { value: 'other', label: 'অন্যান্য' }
 ];
 
-function createPerson(person = {}) {
+export function createPerson(person = {}) {
   return {
     id: person.id || cryptoRandomId('person'),
     firstName: person.firstName || '',
@@ -47,7 +47,7 @@ function cryptoRandomId(prefix) {
   return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
-function buildSeedFamily() {
+export function buildSeedFamily() {
   const people = [
     createPerson({ id: 'person_grandfather', firstName: 'আবদুল', lastName: 'আহমেদ', nickname: 'দাদা', gender: 'male', birthDate: '1948-02-15', birthPlace: 'ঢাকা', deathDate: '', deathPlace: '', occupation: 'ব্যবসায়ী', biography: 'পরিবারের শিকড় ও ঐতিহ্য ধরে রাখেন।' }),
     createPerson({ id: 'person_grandmother', firstName: 'রওশন', lastName: 'আহমেদ', nickname: 'দাদি', gender: 'female', birthDate: '1952-09-12', birthPlace: 'চট্টগ্রাম', deathDate: '', deathPlace: '', occupation: 'গৃহিণী', biography: 'পরিবারের মূল্যবোধ ও স্মৃতি সংরক্ষণের প্রধান ভরসা।' }),
