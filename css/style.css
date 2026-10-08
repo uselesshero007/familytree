@@ -612,6 +612,11 @@ label {
 label span { font-size: 0.86rem; }
 .form-label { display: flex; align-items: center; gap: 4px; }
 .required-indicator { color: #c62828; }
+.form-error {
+  margin: 12px 0 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
 input, select, textarea {
   width: 100%;
   border: 1px solid rgba(92, 59, 154, 0.18);

@@ -3,6 +3,7 @@ import { createFirebaseClient } from './firebase.js';
 import {
   buildSeedFamily,
   createPerson,
+  cryptoRandomId,
   FAMILY_STORAGE_KEY
 } from './family-data.js';
 
@@ -283,6 +284,7 @@ const TRANSLATIONS = {
 
     cloudSaveQueue: Promise.resolve(),
     cloudLoadToken: 0,
+    isSavingMember: false,
 
     authStatusKey: 'firebaseSetup',
     authStatusDetails: '',
@@ -408,6 +410,9 @@ const TRANSLATIONS = {
 
     dom.memberForm =
       document.getElementById('member-form');
+
+    dom.memberFormError =
+      document.getElementById('member-form-error');
 
     dom.memberModalTitle =
       document.getElementById('member-modal-title');
@@ -2367,6 +2372,9 @@ const TRANSLATIONS = {
     relatedPersonId = null
   ) {
 
+    dom.memberFormError.hidden = true;
+    dom.memberFormError.textContent = '';
+
     const selectedPerson =
       getPersonById(
         state.selectedPersonId
@@ -2582,6 +2590,8 @@ const TRANSLATIONS = {
     );
 
     dom.memberForm.reset();
+    dom.memberFormError.hidden = true;
+    dom.memberFormError.textContent = '';
   }
 
 
@@ -2591,6 +2601,61 @@ const TRANSLATIONS = {
 
     event.preventDefault();
 
+    if (
+      state.isSavingMember ||
+      !dom.memberForm.reportValidity()
+    ) {
+      return;
+    }
+
+    dom.memberFormError.hidden = true;
+    dom.memberFormError.textContent = '';
+
+    state.isSavingMember = true;
+
+    const previousPeople = [...state.people];
+    const previousRelationships = [...state.relationships];
+    const previousSelectedPersonId = state.selectedPersonId;
+    let localSaveSucceeded = false;
+
+    try {
+      localSaveSucceeded = saveMemberFromForm();
+
+      if (!localSaveSucceeded) {
+        return;
+      }
+
+      renderAll();
+      closeMemberModal();
+    } catch (error) {
+      if (!localSaveSucceeded) {
+        state.people = previousPeople;
+        state.relationships = previousRelationships;
+        state.selectedPersonId = previousSelectedPersonId;
+      }
+
+      console.error(
+        'Could not save family member:',
+        error
+      );
+
+      setAuthStatus(
+        'saveFailed',
+        error instanceof Error
+          ? error.message
+          : String(error)
+      );
+
+      dom.memberFormError.textContent =
+        t('saveFailed');
+      dom.memberFormError.hidden = false;
+    } finally {
+      state.isSavingMember = false;
+    }
+  }
+
+
+  function saveMemberFromForm() {
 
     const memberId =
       document.getElementById(
@@ -2612,19 +2677,41 @@ const TRANSLATIONS = {
       ).trim();
 
 
+    if (!fullName) {
+      dom.memberFormError.textContent =
+        t('nameRequired');
+      dom.memberFormError.hidden = false;
+      document.getElementById('full-name').focus();
+      return false;
+    }
+
+
     const nameParts =
       fullName.split(
         /\s+/
       );
 
 
+    let personId = memberId;
+
+    if (!personId) {
+      do {
+        personId = cryptoRandomId('person');
+      } while (
+        state.people.some(
+          (person) => person.id === personId
+        )
+      );
+
+      document.getElementById(
+        'member-id'
+      ).value = personId;
+    }
+
+
     const personData = {
 
-      id:
-        memberId ||
-        cryptoRandomId(
-          'person'
-        ),
+      id: personId,
 
       firstName:
         nameParts.shift() ||
@@ -2717,18 +2804,6 @@ const TRANSLATIONS = {
           ) || ''
         )
     };
-
-
-    if (
-      !personData.firstName
-    ) {
-
-      alert(
-        t('nameRequired')
-      );
-
-      return;
-    }
 
 
     const existingIndex =
@@ -2881,13 +2956,11 @@ const TRANSLATIONS = {
     if (
       !saveFamilyData()
     ) {
-      return;
+      throw new Error(t('saveFailed'));
     }
 
 
-    renderAll();
-
-    closeMemberModal();
+    return true;
   }
 
 
@@ -4821,58 +4894,6 @@ const TRANSLATIONS = {
         ),
       1000
     );
-  }
-
-
-  /*
-   * FIX:
-   * cryptoRandomId is defined directly
-   * inside app.js so it can NEVER cause
-   * "cryptoRandomId is not defined".
-   */
-  function cryptoRandomId(
-    prefix = 'id'
-  ) {
-
-    if (
-      globalThis.crypto?.randomUUID
-    ) {
-
-      return `${prefix}_${globalThis.crypto.randomUUID()}`;
-    }
-
-
-    if (
-      globalThis.crypto?.getRandomValues
-    ) {
-
-      const bytes =
-        new Uint8Array(
-          16
-        );
-
-
-      globalThis.crypto.getRandomValues(
-        bytes
-      );
-
-
-      return `${prefix}_${Array.from(
-        bytes,
-        (byte) =>
-          byte
-            .toString(16)
-            .padStart(
-              2,
-              '0'
-            )
-      ).join('')}`;
-    }
-
-
-    return `${prefix}_${Date.now()}_${Math.random()
-      .toString(36)
-      .slice(2, 10)}`;
   }
 
 
