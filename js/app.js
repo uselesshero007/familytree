@@ -1,114 +1,289 @@
 import { createFirebaseClient } from './firebase.js';
+
 import {
   buildSeedFamily,
   createPerson,
-  FAMILY_STORAGE_KEY,
-  cryptoRandomId
+  FAMILY_STORAGE_KEY
 } from './family-data.js';
-import { exportTreeJson, importTreeJson, readTreeData, writeTreeData } from './storage.js';
+
+import {
+  exportTreeJson,
+  importTreeJson,
+  readTreeData,
+  writeTreeData
+} from './storage.js';
+
 
 const TRANSLATIONS = {
   bn: {
-    appTitle: 'পারিবারিক বংশগাছ', dashboard: 'ড্যাশবোর্ড', familyTree: 'বংশগাছ',
-    familyMembers: 'পরিবারের সদস্য', timeline: 'টাইমলাইন', photos: 'ফটো', settings: 'সেটিংস',
-    quickActions: 'দ্রুত কাজ', addFamilyMember: 'পরিবারের সদস্য যোগ করুন', export: 'রপ্তানি',
-    import: 'আমদানি', save: 'সংরক্ষণ করুন', cancel: 'বাতিল', edit: 'সম্পাদনা', delete: 'মুছে ফেলুন',
-    search: 'সদস্য খুঁজুন...', searchMembers: 'পরিবারের সদস্য খুঁজুন', signInGoogle: 'Google দিয়ে সাইন ইন',
-    logout: 'লগ আউট', familyOverview: 'পরিবারের ওভারভিউ', welcome: 'স্বাগতম, পারিবারিক ইতিহাসের কেন্দ্রে',
-    totalMembers: 'মোট সদস্য', generations: 'প্রজন্ম', recentAdditions: 'সাম্প্রতিক যোগ',
-    importantEvents: 'গুরুত্বপূর্ণ ঘটনা', familyPreview: 'পরিবারের পূর্বাভাস', viewFamilyTree: 'বংশগাছ দেখুন',
-    recentEvents: 'সাম্প্রতিক ঘটনা', interactiveRelationships: 'ইন্টারঅ্যাকটিভ পারিবারিক সম্পর্ক',
-    allMembers: 'সকল সদস্য', familyImportantDates: 'পরিবারের গুরুত্বপূর্ণ দিন', familyPhotos: 'পারিবারিক আলোকচিত্র',
-    dataManagement: 'তথ্য ব্যবস্থাপনা', dataStorage: 'ডেটা স্টোরেজ', resetTree: 'ফ্যামিলি ট্রি রিসেট',
-    importExport: 'আমদানি / রপ্তানি', profile: 'প্রোফাইল', fullName: 'পূর্ণ নাম', gender: 'লিঙ্গ',
-    male: 'পুরুষ', female: 'মহিলা', other: 'অন্যান্য', dateOfBirth: 'জন্ম তারিখ', birthPlace: 'জন্মস্থান',
-    dateOfDeath: 'মৃত্যু তারিখ', deathPlace: 'মৃত্যুস্থান', occupation: 'পেশা', photoUrl: 'ফটো URL',
-    notes: 'নোট', nickname: 'ডাকনাম', phone: 'ফোন', email: 'ইমেইল', address: 'ঠিকানা', relationship: 'সম্পর্ক',
-    spouse: 'স্বামী/স্ত্রী', children: 'সন্তান', child: 'সন্তান',
-    father: 'পিতা', mother: 'মাতা', son: 'পুত্র', daughter: 'কন্যা', brother: 'ভাই', sister: 'বোন',
-    husband: 'স্বামী', wife: 'স্ত্রী', grandfather: 'দাদা', grandmother: 'দাদি',
-    uncle: 'চাচা/কাকু/মামা', aunt: 'চাচী/কাকিমা/মামি', cousin: 'চাচাতো/কাকাতো/মামাতো',
-    noRelationship: 'কোনো সম্পর্ক নেই', relatedMember: 'সম্পর্কিত সদস্য', downloadPdf: 'ফ্যামিলি ট্রি PDF ডাউনলোড',
-    printTree: 'ফ্যামিলি ট্রি প্রিন্ট', noMembers: 'কোনো পরিবারের সদস্য পাওয়া যায়নি',
-    noEvents: 'এখনো কোনো সময়রেখা নেই।', noPhotos: 'এখনো কোনো ফটো সংযুক্ত করা হয়নি।',
-    noData: 'তথ্য নেই', unknownOccupation: 'অজানা পেশা', familyMember: 'পরিবারের সদস্য', newMember: 'নতুন',
-    birthEvent: 'জন্মগ্রহণ করেছেন', deathEvent: 'এর মৃত্যু ঘটেছে', marriage: 'বিয়ে',
-    born: 'জন্ম', died: 'মৃত্যু', saveFailed: 'সংরক্ষণ ব্যর্থ হয়েছে।', cloudSaved: 'ক্লাউডে সংরক্ষিত',
-    loadingCloud: 'Firestore থেকে তথ্য লোড হচ্ছে…', importFailed: 'আমদানি ব্যর্থ হয়েছে:',
-    familyHistory: 'পারিবারিক ইতিহাস', closeProfile: 'প্রোফাইল বন্ধ করুন',
-    closeDialog: 'ডায়ালগ বন্ধ করুন', treeDiagram: 'পারিবারিক বংশগাছের চিত্র',
-    localSaved: 'এই ডিভাইসে সংরক্ষিত', cloudSaving: 'ক্লাউডে সংরক্ষণ হচ্ছে…',
+    appTitle: 'পারিবারিক বংশগাছ',
+    dashboard: 'ড্যাশবোর্ড',
+    familyTree: 'বংশগাছ',
+    familyMembers: 'পরিবারের সদস্য',
+    timeline: 'টাইমলাইন',
+    photos: 'ফটো',
+    settings: 'সেটিংস',
+    quickActions: 'দ্রুত কাজ',
+    addFamilyMember: 'পরিবারের সদস্য যোগ করুন',
+    export: 'রপ্তানি',
+    import: 'আমদানি',
+    save: 'সংরক্ষণ করুন',
+    cancel: 'বাতিল',
+    edit: 'সম্পাদনা',
+    delete: 'মুছে ফেলুন',
+    search: 'সদস্য খুঁজুন...',
+    searchMembers: 'পরিবারের সদস্য খুঁজুন',
+    signInGoogle: 'Google দিয়ে সাইন ইন',
+    logout: 'লগ আউট',
+    familyOverview: 'পরিবারের ওভারভিউ',
+    welcome: 'স্বাগতম, পারিবারিক ইতিহাসের কেন্দ্রে',
+    totalMembers: 'মোট সদস্য',
+    generations: 'প্রজন্ম',
+    recentAdditions: 'সাম্প্রতিক যোগ',
+    importantEvents: 'গুরুত্বপূর্ণ ঘটনা',
+    familyPreview: 'পরিবারের পূর্বাভাস',
+    viewFamilyTree: 'বংশগাছ দেখুন',
+    recentEvents: 'সাম্প্রতিক ঘটনা',
+    interactiveRelationships: 'ইন্টারঅ্যাকটিভ পারিবারিক সম্পর্ক',
+    allMembers: 'সকল সদস্য',
+    familyImportantDates: 'পরিবারের গুরুত্বপূর্ণ দিন',
+    familyPhotos: 'পারিবারিক আলোকচিত্র',
+    dataManagement: 'তথ্য ব্যবস্থাপনা',
+    dataStorage: 'ডেটা স্টোরেজ',
+    resetTree: 'ফ্যামিলি ট্রি রিসেট',
+    importExport: 'আমদানি / রপ্তানি',
+    profile: 'প্রোফাইল',
+    fullName: 'পূর্ণ নাম',
+    gender: 'লিঙ্গ',
+    male: 'পুরুষ',
+    female: 'মহিলা',
+    other: 'অন্যান্য',
+    dateOfBirth: 'জন্ম তারিখ',
+    birthPlace: 'জন্মস্থান',
+    dateOfDeath: 'মৃত্যু তারিখ',
+    deathPlace: 'মৃত্যুস্থান',
+    occupation: 'পেশা',
+    photoUrl: 'ফটো URL',
+    notes: 'নোট',
+    nickname: 'ডাকনাম',
+    phone: 'ফোন',
+    email: 'ইমেইল',
+    address: 'ঠিকানা',
+    relationship: 'সম্পর্ক',
+    spouse: 'স্বামী/স্ত্রী',
+    children: 'সন্তান',
+    child: 'সন্তান',
+    father: 'পিতা',
+    mother: 'মাতা',
+    son: 'পুত্র',
+    daughter: 'কন্যা',
+    brother: 'ভাই',
+    sister: 'বোন',
+    husband: 'স্বামী',
+    wife: 'স্ত্রী',
+    grandfather: 'দাদা',
+    grandmother: 'দাদি',
+    uncle: 'চাচা/কাকু/মামা',
+    aunt: 'চাচী/কাকিমা/মামি',
+    cousin: 'চাচাতো/কাকাতো/মামাতো',
+    noRelationship: 'কোনো সম্পর্ক নেই',
+    relatedMember: 'সম্পর্কিত সদস্য',
+    downloadPdf: 'ফ্যামিলি ট্রি PDF ডাউনলোড',
+    printTree: 'ফ্যামিলি ট্রি প্রিন্ট',
+    noMembers: 'কোনো পরিবারের সদস্য পাওয়া যায়নি',
+    noEvents: 'এখনো কোনো সময়রেখা নেই।',
+    noPhotos: 'এখনো কোনো ফটো সংযুক্ত করা হয়নি।',
+    noData: 'তথ্য নেই',
+    unknownOccupation: 'অজানা পেশা',
+    familyMember: 'পরিবারের সদস্য',
+    newMember: 'নতুন',
+    birthEvent: 'জন্মগ্রহণ করেছেন',
+    deathEvent: 'এর মৃত্যু ঘটেছে',
+    marriage: 'বিয়ে',
+    born: 'জন্ম',
+    died: 'মৃত্যু',
+    saveFailed: 'সংরক্ষণ ব্যর্থ হয়েছে।',
+    cloudSaved: 'ক্লাউডে সংরক্ষিত',
+    loadingCloud: 'Firestore থেকে তথ্য লোড হচ্ছে…',
+    importFailed: 'আমদানি ব্যর্থ হয়েছে:',
+    familyHistory: 'পারিবারিক ইতিহাস',
+    closeProfile: 'প্রোফাইল বন্ধ করুন',
+    closeDialog: 'ডায়ালগ বন্ধ করুন',
+    treeDiagram: 'পারিবারিক বংশগাছের চিত্র',
+    localSaved: 'এই ডিভাইসে সংরক্ষিত',
+    cloudSaving: 'ক্লাউডে সংরক্ষণ হচ্ছে…',
     firebaseSetup: 'ক্লাউড লগইনের জন্য js/firebase-config.js-এ Firebase Web App config যোগ করুন।',
-    authInitializing: 'Firebase সংযোগ হচ্ছে…', authFailed: 'Firebase লগইন প্রস্তুত করা যায়নি।',
+    authInitializing: 'Firebase সংযোগ হচ্ছে…',
+    authFailed: 'Firebase লগইন প্রস্তুত করা যায়নি।',
     cloudUnavailable: 'Firebase সংযোগ প্রস্তুত নয়। কিছুক্ষণ পর আবার চেষ্টা করুন।',
-    loginFailed: 'Google লগইন ব্যর্থ হয়েছে', logoutFailed: 'লগ আউট ব্যর্থ হয়েছে',
-    chooseMember: 'সদস্য নির্বাচন করুন', addTitle: 'পরিবারের সদস্য যোগ করুন', editTitle: 'সদস্য সম্পাদনা',
-    nameRequired: 'পূর্ণ নাম অবশ্যই দিতে হবে।', exportDate: 'রপ্তানির তারিখ',
-    courtesy: 'সৌজন্যে by Md Injamam Ul Haque', familyReport: 'পারিবারিক বংশগাছ',
+    loginFailed: 'Google লগইন ব্যর্থ হয়েছে',
+    logoutFailed: 'লগ আউট ব্যর্থ হয়েছে',
+    chooseMember: 'সদস্য নির্বাচন করুন',
+    addTitle: 'পরিবারের সদস্য যোগ করুন',
+    editTitle: 'সদস্য সম্পাদনা',
+    nameRequired: 'পূর্ণ নাম অবশ্যই দিতে হবে।',
+    exportDate: 'রপ্তানির তারিখ',
+    courtesy: 'সৌজন্যে by Md Injamam Ul Haque',
+    familyReport: 'পারিবারিক বংশগাছ',
     loginNeeded: 'Google দিয়ে সাইন ইন করে ব্যক্তিগত Firestore-এ সংরক্ষণ করুন।',
-    treeEmpty: 'কোনো সদস্য নেই', unknownMember: 'অজ্ঞাত সদস্য', relationshipLabel: 'সম্পর্ক', zoomOut: 'ছোট করুন',
-    zoomIn: 'বড় করুন', center: 'কেন্দ্র', collapse: 'সংকোচন', expand: 'বিস্তার',
+    treeEmpty: 'কোনো সদস্য নেই',
+    unknownMember: 'অজ্ঞাত সদস্য',
+    relationshipLabel: 'সম্পর্ক',
+    zoomOut: 'ছোট করুন',
+    zoomIn: 'বড় করুন',
+    center: 'কেন্দ্র',
+    collapse: 'সংকোচন',
+    expand: 'বিস্তার',
     resetConfirm: 'আপনি কি সত্যিই ফ্যামিলি ট্রি রিসেট করতে চান? এটি সব সদস্য ও সম্পর্ক মুছে ফেলবে।',
-    deleteConfirm: 'আপনি কি এই সদস্যকে মুছে ফেলতে চান?', mainNavigation: 'প্রধান নেভিগেশন'
+    deleteConfirm: 'আপনি কি এই সদস্যকে মুছে ফেলতে চান?',
+    mainNavigation: 'প্রধান নেভিগেশন'
   },
 
   en: {
-    appTitle: 'Family Tree', dashboard: 'Dashboard', familyTree: 'Family Tree',
-    familyMembers: 'Family Members', timeline: 'Timeline', photos: 'Photos', settings: 'Settings',
-    quickActions: 'Quick Actions', addFamilyMember: 'Add Family Member', export: 'Export',
-    import: 'Import', save: 'Save', cancel: 'Cancel', edit: 'Edit', delete: 'Delete',
-    search: 'Search members...', searchMembers: 'Search family members', signInGoogle: 'Sign in with Google',
-    logout: 'Log out', familyOverview: 'Family Overview', welcome: 'Welcome to your family history',
-    totalMembers: 'Total Members', generations: 'Generations', recentAdditions: 'Recent Additions',
-    importantEvents: 'Important Events', familyPreview: 'Family Preview', viewFamilyTree: 'View Family Tree',
-    recentEvents: 'Recent Events', interactiveRelationships: 'Interactive Family Relationships',
-    allMembers: 'All Members', familyImportantDates: 'Important Family Dates', familyPhotos: 'Family Photos',
-    dataManagement: 'Data Management', dataStorage: 'Data Storage', resetTree: 'Reset Family Tree',
-    importExport: 'Import / Export', profile: 'Profile', fullName: 'Full Name', gender: 'Gender',
-    male: 'Male', female: 'Female', other: 'Other', dateOfBirth: 'Date of Birth', birthPlace: 'Place of Birth',
-    dateOfDeath: 'Date of Death', deathPlace: 'Place of Death', occupation: 'Occupation', photoUrl: 'Photo URL',
-    notes: 'Notes', nickname: 'Nickname', phone: 'Phone', email: 'Email', address: 'Address', relationship: 'Relationship',
-    spouse: 'Spouse', children: 'Children', child: 'Child',
-    father: 'Father', mother: 'Mother', son: 'Son', daughter: 'Daughter', brother: 'Brother', sister: 'Sister',
-    husband: 'Husband', wife: 'Wife', grandfather: 'Grandfather', grandmother: 'Grandmother',
-    uncle: 'Uncle', aunt: 'Aunt', cousin: 'Cousin', noRelationship: 'No relationship',
-    relatedMember: 'Related family member', downloadPdf: 'Download Family Tree PDF',
-    printTree: 'Print Family Tree', noMembers: 'No family members found',
-    noEvents: 'No timeline events yet.', noPhotos: 'No photos have been added yet.',
-    noData: 'Not provided', unknownOccupation: 'Occupation not provided', familyMember: 'Family member', newMember: 'New',
-    birthEvent: 'was born', deathEvent: 'passed away', marriage: 'Marriage',
-    born: 'Birth', died: 'Death', saveFailed: 'Could not save family data.', cloudSaved: 'Saved to cloud',
-    loadingCloud: 'Loading family data from Firestore…', importFailed: 'Import failed:',
-    familyHistory: 'Family History', closeProfile: 'Close profile',
-    closeDialog: 'Close dialog', treeDiagram: 'Family tree diagram',
-    localSaved: 'Saved on this device', cloudSaving: 'Saving to cloud…',
+    appTitle: 'Family Tree',
+    dashboard: 'Dashboard',
+    familyTree: 'Family Tree',
+    familyMembers: 'Family Members',
+    timeline: 'Timeline',
+    photos: 'Photos',
+    settings: 'Settings',
+    quickActions: 'Quick Actions',
+    addFamilyMember: 'Add Family Member',
+    export: 'Export',
+    import: 'Import',
+    save: 'Save',
+    cancel: 'Cancel',
+    edit: 'Edit',
+    delete: 'Delete',
+    search: 'Search members...',
+    searchMembers: 'Search family members',
+    signInGoogle: 'Sign in with Google',
+    logout: 'Log out',
+    familyOverview: 'Family Overview',
+    welcome: 'Welcome to your family history',
+    totalMembers: 'Total Members',
+    generations: 'Generations',
+    recentAdditions: 'Recent Additions',
+    importantEvents: 'Important Events',
+    familyPreview: 'Family Preview',
+    viewFamilyTree: 'View Family Tree',
+    recentEvents: 'Recent Events',
+    interactiveRelationships: 'Interactive Family Relationships',
+    allMembers: 'All Members',
+    familyImportantDates: 'Important Family Dates',
+    familyPhotos: 'Family Photos',
+    dataManagement: 'Data Management',
+    dataStorage: 'Data Storage',
+    resetTree: 'Reset Family Tree',
+    importExport: 'Import / Export',
+    profile: 'Profile',
+    fullName: 'Full Name',
+    gender: 'Gender',
+    male: 'Male',
+    female: 'Female',
+    other: 'Other',
+    dateOfBirth: 'Date of Birth',
+    birthPlace: 'Place of Birth',
+    dateOfDeath: 'Date of Death',
+    deathPlace: 'Place of Death',
+    occupation: 'Occupation',
+    photoUrl: 'Photo URL',
+    notes: 'Notes',
+    nickname: 'Nickname',
+    phone: 'Phone',
+    email: 'Email',
+    address: 'Address',
+    relationship: 'Relationship',
+    spouse: 'Spouse',
+    children: 'Children',
+    child: 'Child',
+    father: 'Father',
+    mother: 'Mother',
+    son: 'Son',
+    daughter: 'Daughter',
+    brother: 'Brother',
+    sister: 'Sister',
+    husband: 'Husband',
+    wife: 'Wife',
+    grandfather: 'Grandfather',
+    grandmother: 'Grandmother',
+    uncle: 'Uncle',
+    aunt: 'Aunt',
+    cousin: 'Cousin',
+    noRelationship: 'No relationship',
+    relatedMember: 'Related family member',
+    downloadPdf: 'Download Family Tree PDF',
+    printTree: 'Print Family Tree',
+    noMembers: 'No family members found',
+    noEvents: 'No timeline events yet.',
+    noPhotos: 'No photos have been added yet.',
+    noData: 'Not provided',
+    unknownOccupation: 'Occupation not provided',
+    familyMember: 'Family member',
+    newMember: 'New',
+    birthEvent: 'was born',
+    deathEvent: 'passed away',
+    marriage: 'Marriage',
+    born: 'Birth',
+    died: 'Death',
+    saveFailed: 'Could not save family data.',
+    cloudSaved: 'Saved to cloud',
+    loadingCloud: 'Loading family data from Firestore…',
+    importFailed: 'Import failed:',
+    familyHistory: 'Family History',
+    closeProfile: 'Close profile',
+    closeDialog: 'Close dialog',
+    treeDiagram: 'Family tree diagram',
+    localSaved: 'Saved on this device',
+    cloudSaving: 'Saving to cloud…',
     firebaseSetup: 'Firebase configuration is incomplete. Check js/firebase-config.js.',
-    authInitializing: 'Connecting to Firebase…', authFailed: 'Firebase authentication could not be initialized.',
+    authInitializing: 'Connecting to Firebase…',
+    authFailed: 'Firebase authentication could not be initialized.',
     cloudUnavailable: 'Firebase is not ready. Please try again shortly.',
-    loginFailed: 'Google sign-in failed', logoutFailed: 'Sign out failed',
-    chooseMember: 'Select a family member', addTitle: 'Add Family Member', editTitle: 'Edit Family Member',
-    nameRequired: 'Full name is required.', exportDate: 'Exported',
-    courtesy: 'সৌজন্যে by Md Injamam Ul Haque', familyReport: 'Family Tree',
+    loginFailed: 'Google sign-in failed',
+    logoutFailed: 'Sign out failed',
+    chooseMember: 'Select a family member',
+    addTitle: 'Add Family Member',
+    editTitle: 'Edit Family Member',
+    nameRequired: 'Full name is required.',
+    exportDate: 'Exported',
+    courtesy: 'সৌজন্যে by Md Injamam Ul Haque',
+    familyReport: 'Family Tree',
     loginNeeded: 'Sign in with Google to save privately to Firestore.',
-    treeEmpty: 'No family members yet', unknownMember: 'Unknown family member', relationshipLabel: 'Relationship', zoomOut: 'Zoom out',
-    zoomIn: 'Zoom in', center: 'Center', collapse: 'Collapse', expand: 'Expand',
+    treeEmpty: 'No family members yet',
+    unknownMember: 'Unknown family member',
+    relationshipLabel: 'Relationship',
+    zoomOut: 'Zoom out',
+    zoomIn: 'Zoom in',
+    center: 'Center',
+    collapse: 'Collapse',
+    expand: 'Expand',
     resetConfirm: 'Reset the family tree? This will remove all members and relationships.',
-    deleteConfirm: 'Delete this family member?', mainNavigation: 'Main navigation'
+    deleteConfirm: 'Delete this family member?',
+    mainNavigation: 'Main navigation'
   }
 };
 
+
 (function () {
+
   const state = {
     people: [],
     relationships: [],
     selectedPersonId: null,
     activeSection: 'dashboard',
     searchTerm: '',
-    language: localStorage.getItem('familyTreeLanguage') === 'en' ? 'en' : 'bn',
+    language:
+      localStorage.getItem('familyTreeLanguage') === 'en'
+        ? 'en'
+        : 'bn',
+
     firebase: null,
     user: null,
+
     cloudSaveQueue: Promise.resolve(),
     cloudLoadToken: 0,
+
     authStatusKey: 'firebaseSetup',
     authStatusDetails: '',
     authInitialized: false,
@@ -126,9 +301,15 @@ const TRANSLATIONS = {
     }
   };
 
+
   const dom = {};
 
-  document.addEventListener('DOMContentLoaded', initializeApp);
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    initializeApp
+  );
+
 
   function initializeApp() {
     cacheDom();
@@ -139,128 +320,355 @@ const TRANSLATIONS = {
     registerServiceWorker();
   }
 
+
   function cacheDom() {
-    dom.navItems = [...document.querySelectorAll('.nav-item')];
-    dom.pages = [...document.querySelectorAll('.page-panel')];
-    dom.searchInput = document.getElementById('global-search');
-    dom.saveBtn = document.getElementById('save-btn');
-    dom.addMemberBtn = document.getElementById('add-member-btn');
-    dom.quickAddBtn = document.getElementById('quick-add-btn');
-    dom.exportBtn = document.getElementById('export-btn');
-    dom.previewTreeBtn = document.getElementById('preview-tree-btn');
-    dom.resetBtn = document.getElementById('reset-btn');
-    dom.importBtn = document.getElementById('import-tree-btn');
-    dom.exportTreeBtn = document.getElementById('export-tree-btn');
-    dom.importFileInput = document.getElementById('import-file');
-    dom.membersList = document.getElementById('members-list');
-    dom.timelineList = document.getElementById('timeline-list');
-    dom.photosGrid = document.getElementById('photos-grid');
-    dom.familyPreview = document.getElementById('family-preview');
-    dom.recentEvents = document.getElementById('recent-events');
-    dom.profilePanel = document.getElementById('profile-panel');
-    dom.profileName = document.getElementById('profile-name');
-    dom.profileAvatar = document.getElementById('profile-avatar');
-    dom.profileContent = document.getElementById('profile-content');
-    dom.profileEditBtn = document.getElementById('profile-edit-btn');
-    dom.profileAddBtn = document.getElementById('profile-add-btn');
-    dom.profileTreeBtn = document.getElementById('profile-tree-btn');
-    dom.profileDeleteBtn = document.getElementById('profile-delete-btn');
-    dom.closeProfileBtn = document.getElementById('close-profile');
-    dom.memberModal = document.getElementById('member-modal');
-    dom.memberForm = document.getElementById('member-form');
-    dom.memberModalTitle = document.getElementById('member-modal-title');
-    dom.closeModalBtn = document.getElementById('close-modal-btn');
-    dom.cancelBtn = document.getElementById('cancel-btn');
-    dom.relatedPerson = document.getElementById('related-person');
-    dom.relationshipType = document.getElementById('relationship-type');
-    dom.fatherPerson = document.getElementById('father-person');
-    dom.motherPerson = document.getElementById('mother-person');
-    dom.spousePerson = document.getElementById('spouse-person');
-    dom.childrenPerson = document.getElementById('children-person');
-    dom.treeSvg = document.getElementById('family-tree-svg');
-    dom.treeViewport = document.getElementById('family-tree-viewport');
-    dom.storageStatus = document.getElementById('storage-status');
-    dom.totalMembers = document.getElementById('total-members');
-    dom.generationCount = document.getElementById('generation-count');
-    dom.recentAdditions = document.getElementById('recent-additions');
-    dom.eventCount = document.getElementById('event-count');
-    dom.languageBn = document.getElementById('lang-bn');
-    dom.languageEn = document.getElementById('lang-en');
-    dom.googleLoginBtn = document.getElementById('google-login-btn');
-    dom.logoutBtn = document.getElementById('logout-btn');
-    dom.userProfile = document.getElementById('user-profile');
-    dom.userPhoto = document.getElementById('user-photo');
-    dom.userName = document.getElementById('user-name');
-    dom.authStatus = document.getElementById('auth-status');
-    dom.downloadPdfBtn = document.getElementById('download-pdf-btn');
-    dom.printTreeBtn = document.getElementById('print-tree-btn');
+
+    dom.navItems = [
+      ...document.querySelectorAll('.nav-item')
+    ];
+
+    dom.pages = [
+      ...document.querySelectorAll('.page-panel')
+    ];
+
+    dom.searchInput =
+      document.getElementById('global-search');
+
+    dom.saveBtn =
+      document.getElementById('save-btn');
+
+    dom.addMemberBtn =
+      document.getElementById('add-member-btn');
+
+    dom.quickAddBtn =
+      document.getElementById('quick-add-btn');
+
+    dom.exportBtn =
+      document.getElementById('export-btn');
+
+    dom.previewTreeBtn =
+      document.getElementById('preview-tree-btn');
+
+    dom.resetBtn =
+      document.getElementById('reset-btn');
+
+    dom.importBtn =
+      document.getElementById('import-tree-btn');
+
+    dom.exportTreeBtn =
+      document.getElementById('export-tree-btn');
+
+    dom.importFileInput =
+      document.getElementById('import-file');
+
+    dom.membersList =
+      document.getElementById('members-list');
+
+    dom.timelineList =
+      document.getElementById('timeline-list');
+
+    dom.photosGrid =
+      document.getElementById('photos-grid');
+
+    dom.familyPreview =
+      document.getElementById('family-preview');
+
+    dom.recentEvents =
+      document.getElementById('recent-events');
+
+    dom.profilePanel =
+      document.getElementById('profile-panel');
+
+    dom.profileName =
+      document.getElementById('profile-name');
+
+    dom.profileAvatar =
+      document.getElementById('profile-avatar');
+
+    dom.profileContent =
+      document.getElementById('profile-content');
+
+    dom.profileEditBtn =
+      document.getElementById('profile-edit-btn');
+
+    dom.profileAddBtn =
+      document.getElementById('profile-add-btn');
+
+    dom.profileTreeBtn =
+      document.getElementById('profile-tree-btn');
+
+    dom.profileDeleteBtn =
+      document.getElementById('profile-delete-btn');
+
+    dom.closeProfileBtn =
+      document.getElementById('close-profile');
+
+    dom.memberModal =
+      document.getElementById('member-modal');
+
+    dom.memberForm =
+      document.getElementById('member-form');
+
+    dom.memberModalTitle =
+      document.getElementById('member-modal-title');
+
+    dom.closeModalBtn =
+      document.getElementById('close-modal-btn');
+
+    dom.cancelBtn =
+      document.getElementById('cancel-btn');
+
+    dom.relatedPerson =
+      document.getElementById('related-person');
+
+    dom.relationshipType =
+      document.getElementById('relationship-type');
+
+    dom.fatherPerson =
+      document.getElementById('father-person');
+
+    dom.motherPerson =
+      document.getElementById('mother-person');
+
+    dom.spousePerson =
+      document.getElementById('spouse-person');
+
+    dom.childrenPerson =
+      document.getElementById('children-person');
+
+    dom.treeSvg =
+      document.getElementById('family-tree-svg');
+
+    dom.treeViewport =
+      document.getElementById('family-tree-viewport');
+
+    dom.storageStatus =
+      document.getElementById('storage-status');
+
+    dom.totalMembers =
+      document.getElementById('total-members');
+
+    dom.generationCount =
+      document.getElementById('generation-count');
+
+    dom.recentAdditions =
+      document.getElementById('recent-additions');
+
+    dom.eventCount =
+      document.getElementById('event-count');
+
+    dom.languageBn =
+      document.getElementById('lang-bn');
+
+    dom.languageEn =
+      document.getElementById('lang-en');
+
+    dom.googleLoginBtn =
+      document.getElementById('google-login-btn');
+
+    dom.logoutBtn =
+      document.getElementById('logout-btn');
+
+    dom.userProfile =
+      document.getElementById('user-profile');
+
+    dom.userPhoto =
+      document.getElementById('user-photo');
+
+    dom.userName =
+      document.getElementById('user-name');
+
+    dom.authStatus =
+      document.getElementById('auth-status');
+
+    dom.downloadPdfBtn =
+      document.getElementById('download-pdf-btn');
+
+    dom.printTreeBtn =
+      document.getElementById('print-tree-btn');
   }
+
 
   function t(key) {
-    return TRANSLATIONS[state.language][key] || TRANSLATIONS.en[key] || key;
+    return (
+      TRANSLATIONS[state.language][key] ||
+      TRANSLATIONS.en[key] ||
+      key
+    );
   }
 
+
   function setLanguage(language) {
+
     if (!TRANSLATIONS[language]) return;
+
     state.language = language;
-    localStorage.setItem('familyTreeLanguage', language);
+
+    localStorage.setItem(
+      'familyTreeLanguage',
+      language
+    );
+
     renderAll();
   }
 
+
   function applyLanguage() {
-    document.documentElement.lang = state.language;
-    document.title = `${t('appTitle')} — ${t('familyHistory')}`;
 
-    document.querySelectorAll('[data-i18n]').forEach((element) => {
-      const key = element.dataset.i18n;
-      if (TRANSLATIONS[state.language][key]) {
-        element.textContent = t(key);
+    document.documentElement.lang =
+      state.language;
+
+    document.title =
+      `${t('appTitle')} — ${t('familyHistory')}`;
+
+
+    document
+      .querySelectorAll('[data-i18n]')
+      .forEach((element) => {
+
+        const key =
+          element.dataset.i18n;
+
+        if (
+          TRANSLATIONS[state.language][key]
+        ) {
+          element.textContent =
+            t(key);
+        }
+      });
+
+
+    document
+      .querySelectorAll(
+        '[data-i18n-placeholder]'
+      )
+      .forEach((element) => {
+
+        element.placeholder =
+          t(
+            element.dataset
+              .i18nPlaceholder
+          );
+      });
+
+
+    document
+      .querySelectorAll(
+        '[data-i18n-aria]'
+      )
+      .forEach((element) => {
+
+        element.setAttribute(
+          'aria-label',
+          t(
+            element.dataset
+              .i18nAria
+          )
+        );
+      });
+
+
+    if (dom.languageBn) {
+      dom.languageBn.setAttribute(
+        'aria-pressed',
+        String(
+          state.language === 'bn'
+        )
+      );
+    }
+
+
+    if (dom.languageEn) {
+      dom.languageEn.setAttribute(
+        'aria-pressed',
+        String(
+          state.language === 'en'
+        )
+      );
+    }
+
+
+    setAuthStatus(
+      state.authStatusKey,
+      state.authStatusDetails
+    );
+
+
+    if (
+      dom.memberModal &&
+      !dom.memberModal.classList.contains(
+        'hidden'
+      )
+    ) {
+
+      const editing =
+        Boolean(
+          document.getElementById(
+            'member-id'
+          )?.value
+        );
+
+      if (dom.memberModalTitle) {
+        dom.memberModalTitle.textContent =
+          editing
+            ? t('editTitle')
+            : t('addTitle');
       }
-    });
-
-    document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
-      element.placeholder = t(element.dataset.i18nPlaceholder);
-    });
-
-    document.querySelectorAll('[data-i18n-aria]').forEach((element) => {
-      element.setAttribute('aria-label', t(element.dataset.i18nAria));
-    });
-
-    dom.languageBn.setAttribute('aria-pressed', String(state.language === 'bn'));
-    dom.languageEn.setAttribute('aria-pressed', String(state.language === 'en'));
-
-    setAuthStatus(state.authStatusKey, state.authStatusDetails);
-
-    if (dom.memberModal && !dom.memberModal.classList.contains('hidden')) {
-      const editing = Boolean(document.getElementById('member-id').value);
-      dom.memberModalTitle.textContent = editing ? t('editTitle') : t('addTitle');
     }
   }
 
+
   function initializeCloudFeatures() {
-    setAuthStatus('authInitializing');
+
+    setAuthStatus(
+      'authInitializing'
+    );
+
 
     createFirebaseClient()
+
       .then((client) => {
+
         state.firebase = client;
 
+
         client.onAuthStateChanged(
+
           (user) => {
-            void handleAuthState(user);
+            void handleAuthState(
+              user
+            );
           },
+
           (error) => {
-            console.error('Firebase authentication state failed:', error);
-            setAuthStatus('authFailed', error.message);
+
+            console.error(
+              'Firebase authentication state failed:',
+              error
+            );
+
+            setAuthStatus(
+              'authFailed',
+              error.message
+            );
           }
         );
       })
+
       .catch((error) => {
-        console.error('Firebase initialization failed:', error);
+
+        console.error(
+          'Firebase initialization failed:',
+          error
+        );
 
         state.authInitialized = true;
 
+
         setAuthStatus(
-          error.message.includes('configuration is incomplete')
+          error.message.includes(
+            'configuration is incomplete'
+          )
             ? 'firebaseSetup'
             : 'authFailed',
           `(${error.message})`
@@ -268,306 +676,866 @@ const TRANSLATIONS = {
       });
   }
 
-  function setAuthStatus(key, details = '') {
-    state.authStatusKey = key;
-    state.authStatusDetails = details;
+
+  function setAuthStatus(
+    key,
+    details = ''
+  ) {
+
+    state.authStatusKey =
+      key;
+
+    state.authStatusDetails =
+      details;
+
 
     if (dom.authStatus) {
-      dom.authStatus.textContent = `${t(key)}${details ? ` ${details}` : ''}`;
+
+      dom.authStatus.textContent =
+        `${t(key)}${
+          details
+            ? ` ${details}`
+            : ''
+        }`;
     }
   }
 
-  async function handleAuthState(user) {
-    const token = ++state.cloudLoadToken;
-    const signedOut = Boolean(state.user && !user);
+
+  async function handleAuthState(
+    user
+  ) {
+
+    const token =
+      ++state.cloudLoadToken;
+
+    const signedOut =
+      Boolean(
+        state.user &&
+        !user
+      );
+
 
     state.user = user;
-    state.authInitialized = true;
 
-    dom.googleLoginBtn.hidden = Boolean(user);
-    dom.logoutBtn.hidden = !user;
-    dom.userProfile.hidden = !user;
+    state.authInitialized =
+      true;
 
-    dom.userName.textContent = user
-      ? (user.displayName || user.email || user.uid)
-      : '';
 
-    dom.userPhoto.hidden = !user?.photoURL;
-
-    if (user?.photoURL) {
-      dom.userPhoto.src = user.photoURL;
-    } else {
-      dom.userPhoto.removeAttribute('src');
+    if (dom.googleLoginBtn) {
+      dom.googleLoginBtn.hidden =
+        Boolean(user);
     }
 
+    if (dom.logoutBtn) {
+      dom.logoutBtn.hidden =
+        !user;
+    }
+
+    if (dom.userProfile) {
+      dom.userProfile.hidden =
+        !user;
+    }
+
+
+    if (dom.userName) {
+      dom.userName.textContent =
+        user
+          ? (
+              user.displayName ||
+              user.email ||
+              user.uid
+            )
+          : '';
+    }
+
+
+    if (dom.userPhoto) {
+
+      dom.userPhoto.hidden =
+        !user?.photoURL;
+
+
+      if (user?.photoURL) {
+        dom.userPhoto.src =
+          user.photoURL;
+      } else {
+        dom.userPhoto.removeAttribute(
+          'src'
+        );
+      }
+    }
+
+
     if (!user) {
-      setAuthStatus('loginNeeded');
+
+      setAuthStatus(
+        'loginNeeded'
+      );
+
 
       if (signedOut) {
+
         state.people = [];
+
         state.relationships = [];
-        state.selectedPersonId = null;
+
+        state.selectedPersonId =
+          null;
+
         renderAll();
       }
 
       return;
     }
 
-    const cached = readTreeData(userStorageKey(user.uid));
 
-    state.people = cached?.people || [];
-    state.relationships = cached?.relationships || [];
-    state.selectedPersonId = state.people[0]?.id || null;
+    const cached =
+      readTreeData(
+        userStorageKey(
+          user.uid
+        )
+      );
+
+
+    state.people =
+      cached?.people || [];
+
+    state.relationships =
+      cached?.relationships || [];
+
+    state.selectedPersonId =
+      state.people[0]?.id ||
+      null;
+
 
     renderAll();
-    setAuthStatus('loadingCloud');
+
+    setAuthStatus(
+      'loadingCloud'
+    );
+
 
     try {
-      const cloudFamily = await state.firebase.loadFamily(user.uid);
 
-      if (token !== state.cloudLoadToken) return;
+      const cloudFamily =
+        await state.firebase.loadFamily(
+          user.uid
+        );
 
-      let family = cloudFamily;
 
-      if (!family.people.length) {
-        family = cached || { people: [], relationships: [] };
+      if (
+        token !==
+        state.cloudLoadToken
+      ) {
+        return;
+      }
 
-        if (family.people.length) {
-          await state.firebase.saveFamily(user.uid, family);
+
+      let family =
+        cloudFamily;
+
+
+      if (
+        !family.people.length
+      ) {
+
+        family =
+          cached || {
+            people: [],
+            relationships: []
+          };
+
+
+        if (
+          family.people.length
+        ) {
+
+          await state.firebase.saveFamily(
+            user.uid,
+            family
+          );
         }
       }
 
-      state.people = family.people.map((person) => createPerson(person));
-      state.relationships = family.relationships || [];
-      state.selectedPersonId = state.people[0]?.id || null;
+
+      state.people =
+        family.people.map(
+          (person) =>
+            createPerson(person)
+        );
+
+
+      state.relationships =
+        family.relationships ||
+        [];
+
+
+      state.selectedPersonId =
+        state.people[0]?.id ||
+        null;
+
 
       writeTreeData(
         {
-          people: state.people,
-          relationships: state.relationships
+          people:
+            state.people,
+
+          relationships:
+            state.relationships
         },
-        userStorageKey(user.uid)
+
+        userStorageKey(
+          user.uid
+        )
       );
 
-      setAuthStatus('cloudSaved');
+
+      setAuthStatus(
+        'cloudSaved'
+      );
+
+
       renderAll();
+
     } catch (error) {
-      console.error('Could not load family data from Firestore:', error);
+
+      console.error(
+        'Could not load family data from Firestore:',
+        error
+      );
+
 
       if (cached) {
-        state.people = cached.people;
-        state.relationships = cached.relationships || [];
-        state.selectedPersonId = state.people[0]?.id || null;
+
+        state.people =
+          cached.people;
+
+        state.relationships =
+          cached.relationships ||
+          [];
+
+        state.selectedPersonId =
+          state.people[0]?.id ||
+          null;
+
         renderAll();
       }
 
-      setAuthStatus('saveFailed', error.message);
+
+      setAuthStatus(
+        'saveFailed',
+        error.message
+      );
     }
   }
 
+
   async function signInWithGoogle() {
+
     if (!state.firebase) {
+
       alert(
         state.authInitialized
           ? t('cloudUnavailable')
           : t('authInitializing')
       );
+
       return;
     }
 
+
     try {
-      await state.firebase.signInWithGoogle();
+
+      await state.firebase
+        .signInWithGoogle();
+
     } catch (error) {
-      console.error('Google sign-in failed:', error);
-      alert(`${t('loginFailed')}: ${error.message}`);
+
+      console.error(
+        'Google sign-in failed:',
+        error
+      );
+
+      alert(
+        `${t('loginFailed')}: ${error.message}`
+      );
     }
   }
+
 
   async function signOut() {
-    if (!state.firebase) return;
+
+    if (!state.firebase) {
+      return;
+    }
+
 
     try {
+
       await state.cloudSaveQueue;
-      await state.firebase.signOut();
+
+      await state.firebase
+        .signOut();
+
     } catch (error) {
-      console.error('Google sign-out failed:', error);
-      alert(`${t('logoutFailed')}: ${error.message}`);
+
+      console.error(
+        'Google sign-out failed:',
+        error
+      );
+
+      alert(
+        `${t('logoutFailed')}: ${error.message}`
+      );
     }
   }
+
 
   function userStorageKey(uid) {
     return `${FAMILY_STORAGE_KEY}:${uid}`;
   }
 
+
   function loadInitialData() {
-    const stored = readTreeData();
+
+    const stored =
+      readTreeData();
+
 
     if (
       stored &&
-      Array.isArray(stored.people) &&
-      Array.isArray(stored.relationships)
+      Array.isArray(
+        stored.people
+      ) &&
+      Array.isArray(
+        stored.relationships
+      )
     ) {
-      state.people = stored.people;
-      state.relationships = stored.relationships;
-    } else {
-      const seed = buildSeedFamily();
 
-      state.people = seed.people;
-      state.relationships = seed.relationships;
+      state.people =
+        stored.people;
+
+      state.relationships =
+        stored.relationships;
+
+    } else {
+
+      const seed =
+        buildSeedFamily();
+
+
+      state.people =
+        seed.people;
+
+      state.relationships =
+        seed.relationships;
+
 
       writeTreeData({
-        people: state.people,
-        relationships: state.relationships
+        people:
+          state.people,
+
+        relationships:
+          state.relationships
       });
     }
 
-    state.selectedPersonId = state.people[0]?.id || null;
+
+    state.selectedPersonId =
+      state.people[0]?.id ||
+      null;
   }
+
 
   function bindUiEvents() {
-    dom.navItems.forEach((button) => {
-      button.addEventListener('click', () => {
-        setActiveSection(button.dataset.section);
-      });
-    });
 
-    dom.searchInput.addEventListener('input', (event) => {
-      state.searchTerm = event.target.value.trim().toLowerCase();
-      renderMembers();
-      renderSearchResults();
-    });
+    dom.navItems.forEach(
+      (button) => {
 
-    dom.saveBtn.addEventListener('click', saveFamilyData);
-    dom.addMemberBtn.addEventListener('click', () => openMemberModal());
-    dom.quickAddBtn.addEventListener('click', () => openMemberModal());
-    dom.previewTreeBtn.addEventListener('click', () => setActiveSection('tree'));
-    dom.exportBtn.addEventListener('click', () => exportFamilyData());
-    dom.resetBtn.addEventListener('click', resetFamilyTree);
-    dom.exportTreeBtn.addEventListener('click', () => exportFamilyData());
-    dom.importBtn.addEventListener('click', () => dom.importFileInput.click());
-    dom.importFileInput.addEventListener('change', handleImportFile);
+        button.addEventListener(
+          'click',
+          () => {
 
-    dom.languageBn.addEventListener('click', () => setLanguage('bn'));
-    dom.languageEn.addEventListener('click', () => setLanguage('en'));
-
-    dom.googleLoginBtn.addEventListener('click', signInWithGoogle);
-    dom.logoutBtn.addEventListener('click', signOut);
-
-    dom.downloadPdfBtn.addEventListener('click', () => openPrintableReport());
-    dom.printTreeBtn.addEventListener('click', () => openPrintableReport());
-
-    dom.searchInput.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter') return;
-
-      const firstMatch = getFilteredPeople()[0];
-
-      if (firstMatch) {
-        openProfile(firstMatch.id);
+            setActiveSection(
+              button.dataset.section
+            );
+          }
+        );
       }
-    });
-
-    dom.relationshipType.addEventListener(
-      'change',
-      updateRelatedPersonOptions
     );
 
-    dom.memberForm.addEventListener('submit', handleFormSubmit);
 
-    dom.closeModalBtn.addEventListener('click', closeMemberModal);
-    dom.cancelBtn.addEventListener('click', closeMemberModal);
-    dom.closeProfileBtn.addEventListener('click', closeProfilePanel);
+    if (dom.searchInput) {
 
-    dom.profileEditBtn.addEventListener('click', () => {
-      const person = getPersonById(state.selectedPersonId);
-      if (person) openMemberModal(person.id);
-    });
+      dom.searchInput.addEventListener(
+        'input',
+        (event) => {
 
-    dom.profileAddBtn.addEventListener('click', () => {
-      const person = getPersonById(state.selectedPersonId);
-      if (person) openMemberModal(null, person.id);
-    });
+          state.searchTerm =
+            event.target.value
+              .trim()
+              .toLowerCase();
 
-    dom.profileTreeBtn.addEventListener('click', () => {
-      setActiveSection('tree');
-      closeProfilePanel();
-    });
+          renderMembers();
+          renderSearchResults();
+        }
+      );
 
-    dom.profileDeleteBtn.addEventListener('click', () => {
-      const person = getPersonById(state.selectedPersonId);
 
-      if (!person) return;
+      dom.searchInput.addEventListener(
+        'keydown',
+        (event) => {
 
-      deletePerson(person.id);
-    });
+          if (
+            event.key !== 'Enter'
+          ) {
+            return;
+          }
 
-    document.querySelectorAll('.toolbar-btn').forEach((button) => {
-      button.addEventListener('click', () => {
-        handleTreeAction(button.dataset.action);
+
+          const firstMatch =
+            getFilteredPeople()[0];
+
+
+          if (firstMatch) {
+
+            openProfile(
+              firstMatch.id
+            );
+          }
+        }
+      );
+    }
+
+
+    if (dom.saveBtn) {
+      dom.saveBtn.addEventListener(
+        'click',
+        saveFamilyData
+      );
+    }
+
+
+    if (dom.addMemberBtn) {
+      dom.addMemberBtn.addEventListener(
+        'click',
+        () =>
+          openMemberModal()
+      );
+    }
+
+
+    if (dom.quickAddBtn) {
+      dom.quickAddBtn.addEventListener(
+        'click',
+        () =>
+          openMemberModal()
+      );
+    }
+
+
+    if (dom.previewTreeBtn) {
+      dom.previewTreeBtn.addEventListener(
+        'click',
+        () =>
+          setActiveSection(
+            'tree'
+          )
+      );
+    }
+
+
+    if (dom.exportBtn) {
+      dom.exportBtn.addEventListener(
+        'click',
+        () =>
+          exportFamilyData()
+      );
+    }
+
+
+    if (dom.resetBtn) {
+      dom.resetBtn.addEventListener(
+        'click',
+        resetFamilyTree
+      );
+    }
+
+
+    if (dom.exportTreeBtn) {
+      dom.exportTreeBtn.addEventListener(
+        'click',
+        () =>
+          exportFamilyData()
+      );
+    }
+
+
+    if (dom.importBtn) {
+      dom.importBtn.addEventListener(
+        'click',
+        () =>
+          dom.importFileInput?.click()
+      );
+    }
+
+
+    if (dom.importFileInput) {
+
+      dom.importFileInput.addEventListener(
+        'change',
+        handleImportFile
+      );
+    }
+
+
+    if (dom.languageBn) {
+      dom.languageBn.addEventListener(
+        'click',
+        () =>
+          setLanguage('bn')
+      );
+    }
+
+
+    if (dom.languageEn) {
+      dom.languageEn.addEventListener(
+        'click',
+        () =>
+          setLanguage('en')
+      );
+    }
+
+
+    if (dom.googleLoginBtn) {
+      dom.googleLoginBtn.addEventListener(
+        'click',
+        signInWithGoogle
+      );
+    }
+
+
+    if (dom.logoutBtn) {
+      dom.logoutBtn.addEventListener(
+        'click',
+        signOut
+      );
+    }
+
+
+    if (dom.downloadPdfBtn) {
+      dom.downloadPdfBtn.addEventListener(
+        'click',
+        () =>
+          openPrintableReport()
+      );
+    }
+
+
+    if (dom.printTreeBtn) {
+      dom.printTreeBtn.addEventListener(
+        'click',
+        () =>
+          openPrintableReport()
+      );
+    }
+
+
+    if (dom.relationshipType) {
+
+      dom.relationshipType.addEventListener(
+        'change',
+        updateRelatedPersonOptions
+      );
+    }
+
+
+    if (dom.memberForm) {
+
+      dom.memberForm.addEventListener(
+        'submit',
+        handleFormSubmit
+      );
+    }
+
+
+    if (dom.closeModalBtn) {
+      dom.closeModalBtn.addEventListener(
+        'click',
+        closeMemberModal
+      );
+    }
+
+
+    if (dom.cancelBtn) {
+      dom.cancelBtn.addEventListener(
+        'click',
+        closeMemberModal
+      );
+    }
+
+
+    if (dom.closeProfileBtn) {
+      dom.closeProfileBtn.addEventListener(
+        'click',
+        closeProfilePanel
+      );
+    }
+
+
+    if (dom.profileEditBtn) {
+      dom.profileEditBtn.addEventListener(
+        'click',
+        () => {
+
+          const person =
+            getPersonById(
+              state.selectedPersonId
+            );
+
+          if (person) {
+            openMemberModal(
+              person.id
+            );
+          }
+        }
+      );
+    }
+
+
+    if (dom.profileAddBtn) {
+      dom.profileAddBtn.addEventListener(
+        'click',
+        () => {
+
+          const person =
+            getPersonById(
+              state.selectedPersonId
+            );
+
+          if (person) {
+            openMemberModal(
+              null,
+              person.id
+            );
+          }
+        }
+      );
+    }
+
+
+    if (dom.profileTreeBtn) {
+      dom.profileTreeBtn.addEventListener(
+        'click',
+        () => {
+
+          setActiveSection(
+            'tree'
+          );
+
+          closeProfilePanel();
+        }
+      );
+    }
+
+
+    if (dom.profileDeleteBtn) {
+      dom.profileDeleteBtn.addEventListener(
+        'click',
+        () => {
+
+          const person =
+            getPersonById(
+              state.selectedPersonId
+            );
+
+          if (person) {
+            deletePerson(
+              person.id
+            );
+          }
+        }
+      );
+    }
+
+
+    document
+      .querySelectorAll(
+        '.toolbar-btn'
+      )
+      .forEach((button) => {
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            handleTreeAction(
+              button.dataset.action
+            );
+          }
+        );
       });
-    });
 
-    dom.treeViewport.addEventListener(
-      'wheel',
-      (event) => {
-        event.preventDefault();
 
-        const delta = event.deltaY < 0 ? 0.08 : -0.08;
+    if (dom.treeViewport) {
 
-        changeZoom(state.tree.scale + delta);
-      },
-      { passive: false }
+      dom.treeViewport.addEventListener(
+        'wheel',
+        (event) => {
+
+          event.preventDefault();
+
+          const delta =
+            event.deltaY < 0
+              ? 0.08
+              : -0.08;
+
+          changeZoom(
+            state.tree.scale +
+              delta
+          );
+        },
+        {
+          passive: false
+        }
+      );
+
+
+      dom.treeViewport.addEventListener(
+        'pointerdown',
+        (event) => {
+
+          if (
+            event.target.closest(
+              '.tree-node'
+            )
+          ) {
+            return;
+          }
+
+
+          state.tree.dragging =
+            true;
+
+          state.tree.dragStartX =
+            event.clientX;
+
+          state.tree.dragStartY =
+            event.clientY;
+
+          state.tree.lastPanX =
+            state.tree.panX;
+
+          state.tree.lastPanY =
+            state.tree.panY;
+
+
+          try {
+            dom.treeViewport.setPointerCapture(
+              event.pointerId
+            );
+          } catch (_) {}
+        }
+      );
+
+
+      dom.treeViewport.addEventListener(
+        'pointermove',
+        (event) => {
+
+          if (
+            !state.tree.dragging
+          ) {
+            return;
+          }
+
+
+          const dx =
+            event.clientX -
+            state.tree.dragStartX;
+
+          const dy =
+            event.clientY -
+            state.tree.dragStartY;
+
+
+          state.tree.panX =
+            state.tree.lastPanX +
+            dx /
+              state.tree.scale;
+
+          state.tree.panY =
+            state.tree.lastPanY +
+            dy /
+              state.tree.scale;
+
+
+          renderFamilyTree();
+        }
+      );
+
+
+      dom.treeViewport.addEventListener(
+        'pointerup',
+        () => {
+          state.tree.dragging =
+            false;
+        }
+      );
+
+
+      dom.treeViewport.addEventListener(
+        'pointercancel',
+        () => {
+          state.tree.dragging =
+            false;
+        }
+      );
+
+
+      dom.treeViewport.addEventListener(
+        'pointerleave',
+        () => {
+          state.tree.dragging =
+            false;
+        }
+      );
+    }
+  }
+
+
+  function setActiveSection(
+    sectionName
+  ) {
+
+    state.activeSection =
+      sectionName;
+
+
+    dom.navItems.forEach(
+      (button) => {
+
+        button.classList.toggle(
+          'active',
+          button.dataset.section ===
+            sectionName
+        );
+      }
     );
 
-    dom.treeViewport.addEventListener('pointerdown', (event) => {
-      if (event.target.closest('.tree-node')) return;
 
-      state.tree.dragging = true;
-      state.tree.dragStartX = event.clientX;
-      state.tree.dragStartY = event.clientY;
-      state.tree.lastPanX = state.tree.panX;
-      state.tree.lastPanY = state.tree.panY;
+    dom.pages.forEach(
+      (page) => {
 
-      dom.treeViewport.setPointerCapture(event.pointerId);
-    });
-
-    dom.treeViewport.addEventListener('pointermove', (event) => {
-      if (!state.tree.dragging) return;
-
-      const dx = event.clientX - state.tree.dragStartX;
-      const dy = event.clientY - state.tree.dragStartY;
-
-      state.tree.panX = state.tree.lastPanX + dx / state.tree.scale;
-      state.tree.panY = state.tree.lastPanY + dy / state.tree.scale;
-
-      renderFamilyTree();
-    });
-
-    dom.treeViewport.addEventListener('pointerup', () => {
-      state.tree.dragging = false;
-    });
-
-    dom.treeViewport.addEventListener('pointerleave', () => {
-      state.tree.dragging = false;
-    });
+        page.classList.toggle(
+          'active',
+          page.id ===
+            sectionName
+        );
+      }
+    );
   }
 
-  function setActiveSection(sectionName) {
-    state.activeSection = sectionName;
-
-    dom.navItems.forEach((button) => {
-      button.classList.toggle(
-        'active',
-        button.dataset.section === sectionName
-      );
-    });
-
-    dom.pages.forEach((page) => {
-      page.classList.toggle(
-        'active',
-        page.id === sectionName
-      );
-    });
-  }
 
   function renderAll() {
     renderDashboard();
@@ -581,636 +1549,1221 @@ const TRANSLATIONS = {
     applyLanguage();
   }
 
+
   function renderDashboard() {
-    const people = state.people;
-    const total = people.length;
-    const generationCount = computeGenerationCount();
 
-    const recent = people
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt) - new Date(a.createdAt)
-      )
-      .slice(0, 3);
+    const people =
+      state.people;
 
-    const events = buildEventList();
+    const total =
+      people.length;
 
-    dom.totalMembers.textContent = String(total);
-    dom.generationCount.textContent = String(generationCount);
-    dom.recentAdditions.textContent = String(recent.length);
-    dom.eventCount.textContent = String(events.length);
+    const generationCount =
+      computeGenerationCount();
 
-    dom.familyPreview.innerHTML = people
-      .slice(0, 4)
-      .map((person) => {
-        const relatives = getFamilyContext(person.id);
 
-        return `
-          <div class="preview-node">
-            <strong>${escapeHtml(getDisplayName(person))}</strong>
-            <span>
-              ${
-                relatives.parents.length
-                  ? `${t('father')}/${t('mother')}:`
-                  : t('familyMember')
-              }
-              ${
-                relatives.parents
-                  .map((parent) =>
-                    escapeHtml(getDisplayName(parent))
-                  )
-                  .join(', ') || t('noData')
-              }
-            </span>
-          </div>
-        `;
-      })
-      .join('');
-
-    dom.recentEvents.innerHTML =
-      events
-        .slice(0, 5)
-        .map(
-          (event) => `
-          <div class="event-item">
-            <span class="event-dot" style="background:${event.color};"></span>
-            <div>
-              <strong>${escapeHtml(event.title)}</strong>
-              <div class="event-meta">
-                ${escapeHtml(event.dateLabel)} •
-                ${escapeHtml(event.person)}
-              </div>
-            </div>
-          </div>
-        `
+    const recent =
+      people
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt
+            ) -
+            new Date(
+              a.createdAt
+            )
         )
-        .join('') ||
-      `<div class="empty-state">${t('noEvents')}</div>`;
+        .slice(0, 3);
+
+
+    const events =
+      buildEventList();
+
+
+    if (dom.totalMembers) {
+      dom.totalMembers.textContent =
+        String(total);
+    }
+
+    if (dom.generationCount) {
+      dom.generationCount.textContent =
+        String(
+          generationCount
+        );
+    }
+
+    if (dom.recentAdditions) {
+      dom.recentAdditions.textContent =
+        String(
+          recent.length
+        );
+    }
+
+    if (dom.eventCount) {
+      dom.eventCount.textContent =
+        String(
+          events.length
+        );
+    }
+
+
+    if (dom.familyPreview) {
+
+      dom.familyPreview.innerHTML =
+        people
+          .slice(0, 4)
+          .map((person) => {
+
+            const relatives =
+              getFamilyContext(
+                person.id
+              );
+
+
+            return `
+              <div class="preview-node">
+                <strong>
+                  ${escapeHtml(
+                    getDisplayName(
+                      person
+                    )
+                  )}
+                </strong>
+
+                <span>
+                  ${
+                    relatives.parents.length
+                      ? `${t(
+                          'father'
+                        )}/${t(
+                          'mother'
+                        )}:`
+                      : t(
+                          'familyMember'
+                        )
+                  }
+
+                  ${
+                    relatives.parents
+                      .map(
+                        (parent) =>
+                          escapeHtml(
+                            getDisplayName(
+                              parent
+                            )
+                          )
+                      )
+                      .join(', ') ||
+                    t('noData')
+                  }
+                </span>
+              </div>
+            `;
+          })
+          .join('');
+    }
+
+
+    if (dom.recentEvents) {
+
+      dom.recentEvents.innerHTML =
+        events
+          .slice(0, 5)
+          .map(
+            (event) => `
+              <div class="event-item">
+
+                <span
+                  class="event-dot"
+                  style="background:${event.color};"
+                ></span>
+
+                <div>
+
+                  <strong>
+                    ${escapeHtml(
+                      event.title
+                    )}
+                  </strong>
+
+                  <div class="event-meta">
+                    ${escapeHtml(
+                      event.dateLabel
+                    )}
+                    •
+                    ${escapeHtml(
+                      event.person
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
+            `
+          )
+          .join('') ||
+        `<div class="empty-state">${t(
+          'noEvents'
+        )}</div>`;
+    }
   }
+
 
   function renderMembers() {
-    const filtered = getFilteredPeople();
+
+    if (!dom.membersList) {
+      return;
+    }
+
+
+    const filtered =
+      getFilteredPeople();
+
 
     if (!filtered.length) {
+
       dom.membersList.innerHTML =
-        `<div class="empty-state">${t('noMembers')}</div>`;
+        `<div class="empty-state">${t(
+          'noMembers'
+        )}</div>`;
+
       return;
     }
 
-    dom.membersList.innerHTML = filtered
-      .map((person) => {
-        const personRelations = getFamilyContext(person.id);
 
-        return `
-          <button
-            type="button"
-            class="member-item"
-            data-person-id="${escapeHtml(person.id)}"
-          >
-            <div class="member-avatar">
-              ${escapeHtml(initialsFor(person))}
-            </div>
+    dom.membersList.innerHTML =
+      filtered
+        .map((person) => {
 
-            <div class="info">
-              <strong>${escapeHtml(getDisplayName(person))}</strong>
-              <span>
+          const personRelations =
+            getFamilyContext(
+              person.id
+            );
+
+
+          return `
+            <button
+              type="button"
+              class="member-item"
+              data-person-id="${escapeHtml(
+                person.id
+              )}"
+            >
+
+              <div class="member-avatar">
                 ${escapeHtml(
-                  person.occupation || t('unknownOccupation')
+                  initialsFor(
+                    person
+                  )
                 )}
-                •
-                ${escapeHtml(person.birthDate || t('noData'))}
-              </span>
-            </div>
+              </div>
 
-            <span class="meta-pill">
-              ${
-                personRelations.parents.length
-                  ? t('familyMembers')
-                  : t('newMember')
-              }
-            </span>
-          </button>
-        `;
-      })
-      .join('');
+              <div class="info">
+
+                <strong>
+                  ${escapeHtml(
+                    getDisplayName(
+                      person
+                    )
+                  )}
+                </strong>
+
+                <span>
+                  ${escapeHtml(
+                    person.occupation ||
+                      t(
+                        'unknownOccupation'
+                      )
+                  )}
+
+                  •
+
+                  ${escapeHtml(
+                    person.birthDate ||
+                      t('noData')
+                  )}
+                </span>
+
+              </div>
+
+              <span class="meta-pill">
+                ${
+                  personRelations.parents
+                    .length
+                    ? t(
+                        'familyMembers'
+                      )
+                    : t(
+                        'newMember'
+                      )
+                }
+              </span>
+
+            </button>
+          `;
+        })
+        .join('');
+
 
     dom.membersList
-      .querySelectorAll('[data-person-id]')
+      .querySelectorAll(
+        '[data-person-id]'
+      )
       .forEach((button) => {
-        button.addEventListener('click', () => {
-          openProfile(
-            button.getAttribute('data-person-id')
-          );
-        });
+
+        button.addEventListener(
+          'click',
+          () => {
+
+            openProfile(
+              button.getAttribute(
+                'data-person-id'
+              )
+            );
+          }
+        );
       });
   }
+
 
   function renderTimeline() {
-    const timeline = buildEventList();
+
+    if (!dom.timelineList) {
+      return;
+    }
+
+
+    const timeline =
+      buildEventList();
+
 
     if (!timeline.length) {
+
       dom.timelineList.innerHTML =
-        `<div class="empty-state">${t('noEvents')}</div>`;
+        `<div class="empty-state">${t(
+          'noEvents'
+        )}</div>`;
+
       return;
     }
 
-    dom.timelineList.innerHTML = timeline
-      .map(
-        (event) => `
-        <div class="timeline-item">
-          <div class="year">${event.year}</div>
 
-          <div class="content">
-            <div>
-              <strong>${escapeHtml(event.title)}</strong>
-              <div class="event-meta">
-                ${escapeHtml(event.person)}
+    dom.timelineList.innerHTML =
+      timeline
+        .map(
+          (event) => `
+            <div class="timeline-item">
+
+              <div class="year">
+                ${event.year}
               </div>
-            </div>
 
-            <span>${escapeHtml(event.label)}</span>
-          </div>
-        </div>
-      `
-      )
-      .join('');
+              <div class="content">
+
+                <div>
+
+                  <strong>
+                    ${escapeHtml(
+                      event.title
+                    )}
+                  </strong>
+
+                  <div class="event-meta">
+                    ${escapeHtml(
+                      event.person
+                    )}
+                  </div>
+
+                </div>
+
+                <span>
+                  ${escapeHtml(
+                    event.label
+                  )}
+                </span>
+
+              </div>
+
+            </div>
+          `
+        )
+        .join('');
   }
 
-  function renderPhotos() {
-    const photos = state.people.filter(
-      (person) => person.photo || person.firstName
-    );
 
-    if (!photos.length) {
-      dom.photosGrid.innerHTML =
-        `<div class="empty-state">${t('noPhotos')}</div>`;
+  function renderPhotos() {
+
+    if (!dom.photosGrid) {
       return;
     }
 
-    dom.photosGrid.innerHTML = photos
-      .map((person) => {
-        const src =
+
+    const photos =
+      state.people.filter(
+        (person) =>
           person.photo ||
-          'https://placehold.co/600x600/efe8ff/5c3b9a?text=' +
-            encodeURIComponent(initialsFor(person));
+          person.firstName
+      );
 
-        return `
-          <article
-            class="photo-card"
-            data-person-id="${escapeHtml(person.id)}"
-          >
-            <img
-              src="${escapeHtml(src)}"
-              alt="${escapeHtml(getDisplayName(person))}"
-            />
 
-            <div class="meta">
-              <strong>
-                ${escapeHtml(getDisplayName(person))}
-              </strong>
+    if (!photos.length) {
 
-              <div class="event-meta">
-                ${escapeHtml(
-                  person.occupation || t('familyMember')
-                )}
+      dom.photosGrid.innerHTML =
+        `<div class="empty-state">${t(
+          'noPhotos'
+        )}</div>`;
+
+      return;
+    }
+
+
+    dom.photosGrid.innerHTML =
+      photos
+        .map((person) => {
+
+          const src =
+            person.photo ||
+            'https://placehold.co/600x600/efe8ff/5c3b9a?text=' +
+              encodeURIComponent(
+                initialsFor(
+                  person
+                )
+              );
+
+
+          return `
+            <article
+              class="photo-card"
+              data-person-id="${escapeHtml(
+                person.id
+              )}"
+            >
+
+              <img
+                src="${escapeHtml(
+                  src
+                )}"
+                alt="${escapeHtml(
+                  getDisplayName(
+                    person
+                  )
+                )}"
+              />
+
+              <div class="meta">
+
+                <strong>
+                  ${escapeHtml(
+                    getDisplayName(
+                      person
+                    )
+                  )}
+                </strong>
+
+                <div class="event-meta">
+                  ${escapeHtml(
+                    person.occupation ||
+                      t(
+                        'familyMember'
+                      )
+                  )}
+                </div>
+
               </div>
-            </div>
-          </article>
-        `;
-      })
-      .join('');
+
+            </article>
+          `;
+        })
+        .join('');
+
 
     dom.photosGrid
-      .querySelectorAll('[data-person-id]')
+      .querySelectorAll(
+        '[data-person-id]'
+      )
       .forEach((card) => {
-        card.addEventListener('click', () => {
-          openProfile(
-            card.getAttribute('data-person-id')
-          );
-        });
+
+        card.addEventListener(
+          'click',
+          () => {
+
+            openProfile(
+              card.getAttribute(
+                'data-person-id'
+              )
+            );
+          }
+        );
       });
   }
 
-  function renderSearchResults() {
-    const results = getFilteredPeople();
 
-    document.getElementById('search-results').innerHTML =
+  function renderSearchResults() {
+
+    const target =
+      document.getElementById(
+        'search-results'
+      );
+
+    if (!target) {
+      return;
+    }
+
+
+    const results =
+      getFilteredPeople();
+
+
+    target.innerHTML =
       results
         .slice(0, 20)
         .map(
           (person) =>
             `<option value="${escapeHtml(
-              getDisplayName(person)
+              getDisplayName(
+                person
+              )
             )}"></option>`
         )
         .join('');
   }
 
-  function renderProfilePanel() {
-    const person = getPersonById(state.selectedPersonId);
 
-    if (!person) {
-      dom.profilePanel.classList.add('closed');
+  function renderProfilePanel() {
+
+    if (!dom.profilePanel) {
       return;
     }
 
+
+    const person =
+      getPersonById(
+        state.selectedPersonId
+      );
+
+
+    if (!person) {
+
+      dom.profilePanel.classList.add(
+        'closed'
+      );
+
+      return;
+    }
+
+
     dom.profileName.textContent =
-      getDisplayName(person);
+      getDisplayName(
+        person
+      );
+
 
     dom.profileAvatar.textContent =
-      initialsFor(person);
+      initialsFor(
+        person
+      );
+
 
     const relations =
-      getFamilyContext(person.id);
+      getFamilyContext(
+        person.id
+      );
 
-    const photo = person.photo || '';
+
+    const photo =
+      person.photo || '';
+
 
     dom.profileContent.innerHTML = `
+
       ${
         photo
           ? `
-          <img
-            src="${escapeHtml(photo)}"
-            alt="${escapeHtml(getDisplayName(person))}"
-            style="
-              width:100%;
-              height:200px;
-              object-fit:cover;
-              border-radius:16px;
-              margin-bottom:12px;
-            "
-          />
-        `
+            <img
+              src="${escapeHtml(
+                photo
+              )}"
+              alt="${escapeHtml(
+                getDisplayName(
+                  person
+                )
+              )}"
+              style="
+                width:100%;
+                height:200px;
+                object-fit:cover;
+                border-radius:16px;
+                margin-bottom:12px;
+              "
+            />
+          `
           : ''
       }
 
+
       <div class="profile-grid">
+
         <div class="profile-field">
           <span>${t('gender')}</span>
-          <strong>${t(person.gender || 'other')}</strong>
+          <strong>
+            ${t(
+              person.gender ||
+                'other'
+            )}
+          </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('dateOfBirth')}</span>
           <strong>
-            ${escapeHtml(person.birthDate || t('noData'))}
+            ${escapeHtml(
+              person.birthDate ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('birthPlace')}</span>
           <strong>
-            ${escapeHtml(person.birthPlace || t('noData'))}
+            ${escapeHtml(
+              person.birthPlace ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('dateOfDeath')}</span>
           <strong>
-            ${escapeHtml(person.deathDate || t('noData'))}
+            ${escapeHtml(
+              person.deathDate ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('deathPlace')}</span>
           <strong>
-            ${escapeHtml(person.deathPlace || t('noData'))}
+            ${escapeHtml(
+              person.deathPlace ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('occupation')}</span>
           <strong>
-            ${escapeHtml(person.occupation || t('noData'))}
+            ${escapeHtml(
+              person.occupation ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('phone')}</span>
           <strong>
-            ${escapeHtml(person.phone || t('noData'))}
+            ${escapeHtml(
+              person.phone ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('email')}</span>
           <strong>
-            ${escapeHtml(person.email || t('noData'))}
+            ${escapeHtml(
+              person.email ||
+                t('noData')
+            )}
           </strong>
         </div>
+
 
         <div class="profile-field">
           <span>${t('address')}</span>
           <strong>
-            ${escapeHtml(person.address || t('noData'))}
+            ${escapeHtml(
+              person.address ||
+                t('noData')
+            )}
           </strong>
         </div>
+
       </div>
 
+
       <div style="margin-top:16px;">
+
         <h4>${t('notes')}</h4>
+
         <p>
-          ${escapeHtml(person.biography || t('noData'))}
+          ${escapeHtml(
+            person.biography ||
+              t('noData')
+          )}
         </p>
+
       </div>
 
+
       <div style="margin-top:16px;">
-        <h4>${t('father')} / ${t('mother')}</h4>
+
+        <h4>
+          ${t('father')} /
+          ${t('mother')}
+        </h4>
+
         <p>
           ${
             relations.parents.length
               ? relations.parents
-                  .map((parent) =>
-                    escapeHtml(getDisplayName(parent))
+                  .map(
+                    (parent) =>
+                      escapeHtml(
+                        getDisplayName(
+                          parent
+                        )
+                      )
                   )
                   .join(', ')
               : t('noData')
           }
         </p>
+
       </div>
 
+
       <div style="margin-top:16px;">
-        <h4>${t('husband')} / ${t('wife')}</h4>
+
+        <h4>
+          ${t('husband')} /
+          ${t('wife')}
+        </h4>
+
         <p>
           ${
             relations.spouse.length
               ? relations.spouse
-                  .map((spouse) =>
-                    escapeHtml(getDisplayName(spouse))
+                  .map(
+                    (spouse) =>
+                      escapeHtml(
+                        getDisplayName(
+                          spouse
+                        )
+                      )
                   )
                   .join(', ')
               : t('noData')
           }
         </p>
+
       </div>
 
+
       <div style="margin-top:16px;">
-        <h4>${t('son')} / ${t('daughter')}</h4>
+
+        <h4>
+          ${t('son')} /
+          ${t('daughter')}
+        </h4>
+
         <p>
           ${
             relations.children.length
               ? relations.children
-                  .map((child) =>
-                    escapeHtml(getDisplayName(child))
+                  .map(
+                    (child) =>
+                      escapeHtml(
+                        getDisplayName(
+                          child
+                        )
+                      )
                   )
                   .join(', ')
               : t('noData')
           }
         </p>
+
       </div>
 
+
       <div style="margin-top:16px;">
-        <h4>${t('brother')} / ${t('sister')}</h4>
+
+        <h4>
+          ${t('brother')} /
+          ${t('sister')}
+        </h4>
+
         <p>
           ${
             relations.siblings.length
               ? relations.siblings
-                  .map((sibling) =>
-                    escapeHtml(getDisplayName(sibling))
+                  .map(
+                    (sibling) =>
+                      escapeHtml(
+                        getDisplayName(
+                          sibling
+                        )
+                      )
                   )
                   .join(', ')
               : t('noData')
           }
         </p>
+
       </div>
     `;
 
-    dom.profilePanel.classList.remove('closed');
+
+    dom.profilePanel.classList.remove(
+      'closed'
+    );
   }
 
-  function openProfile(personId) {
-    state.selectedPersonId = personId;
 
-    setActiveSection('tree');
+  function openProfile(
+    personId
+  ) {
+
+    state.selectedPersonId =
+      personId;
+
+
+    setActiveSection(
+      'tree'
+    );
+
 
     renderProfilePanel();
     renderFamilyTree();
   }
 
+
   function closeProfilePanel() {
-    dom.profilePanel.classList.add('closed');
+
+    if (dom.profilePanel) {
+      dom.profilePanel.classList.add(
+        'closed'
+      );
+    }
   }
+
 
   function openMemberModal(
     personId = null,
     relatedPersonId = null
   ) {
+
     const selectedPerson =
-      getPersonById(state.selectedPersonId) ||
-      getPersonById(relatedPersonId);
+      getPersonById(
+        state.selectedPersonId
+      ) ||
+      getPersonById(
+        relatedPersonId
+      );
 
-    const editMode = Boolean(personId);
 
-    let editingPerson = null;
+    const editMode =
+      Boolean(personId);
+
+
+    let editingPerson =
+      null;
+
 
     if (editMode) {
-      editingPerson = getPersonById(personId);
 
-      if (!editingPerson) return;
+      editingPerson =
+        getPersonById(
+          personId
+        );
 
-      populateForm(editingPerson);
+
+      if (!editingPerson) {
+        return;
+      }
+
+
+      populateForm(
+        editingPerson
+      );
+
     } else {
+
       dom.memberForm.reset();
 
-      document.getElementById('member-id').value = '';
+
+      document.getElementById(
+        'member-id'
+      ).value = '';
+
 
       document.getElementById(
         'relationship-type'
-      ).value = relatedPersonId ? 'father' : 'none';
+      ).value =
+        relatedPersonId
+          ? 'father'
+          : 'none';
     }
 
-    const rootPerson = relatedPersonId
-      ? getPersonById(relatedPersonId)
-      : selectedPerson;
+
+    const rootPerson =
+      relatedPersonId
+        ? getPersonById(
+            relatedPersonId
+          )
+        : selectedPerson;
+
 
     updateRelatedPersonOptions(
-      rootPerson ? rootPerson.id : ''
+      rootPerson
+        ? rootPerson.id
+        : ''
     );
 
+
     if (editingPerson) {
-      populateRelationshipFields(editingPerson);
+
+      populateRelationshipFields(
+        editingPerson
+      );
     }
 
+
     if (relatedPersonId) {
-      dom.relationshipType.value = 'father';
+
+      dom.relationshipType.value =
+        'father';
+
 
       updateRelatedPersonOptions(
         relatedPersonId
       );
 
+
       document.getElementById(
         'related-person'
-      ).value = relatedPersonId;
+      ).value =
+        relatedPersonId;
     }
+
 
     dom.memberModalTitle.textContent =
       editMode
         ? t('editTitle')
         : t('addTitle');
 
-    dom.memberModal.classList.remove('hidden');
+
+    dom.memberModal.classList.remove(
+      'hidden'
+    );
   }
 
-  function populateForm(person) {
-    document.getElementById('member-id').value =
+
+  function populateForm(
+    person
+  ) {
+
+    document.getElementById(
+      'member-id'
+    ).value =
       person.id;
 
-    document.getElementById('full-name').value =
-      getDisplayName(person);
 
-    document.getElementById('nickname').value =
+    document.getElementById(
+      'full-name'
+    ).value =
+      getDisplayName(
+        person
+      );
+
+
+    document.getElementById(
+      'nickname'
+    ).value =
       person.nickname || '';
 
-    document.getElementById('gender').value =
-      person.gender || 'other';
 
-    document.getElementById('birth-date').value =
-      person.birthDate || '';
+    document.getElementById(
+      'gender'
+    ).value =
+      person.gender ||
+      'other';
 
-    document.getElementById('birth-place').value =
-      person.birthPlace || '';
 
-    document.getElementById('death-date').value =
-      person.deathDate || '';
+    document.getElementById(
+      'birth-date'
+    ).value =
+      person.birthDate ||
+      '';
 
-    document.getElementById('death-place').value =
-      person.deathPlace || '';
 
-    document.getElementById('phone').value =
-      person.phone || '';
+    document.getElementById(
+      'birth-place'
+    ).value =
+      person.birthPlace ||
+      '';
 
-    document.getElementById('email').value =
-      person.email || '';
 
-    document.getElementById('address').value =
-      person.address || '';
+    document.getElementById(
+      'death-date'
+    ).value =
+      person.deathDate ||
+      '';
 
-    document.getElementById('occupation').value =
-      person.occupation || '';
 
-    document.getElementById('photo').value =
-      person.photo || '';
+    document.getElementById(
+      'death-place'
+    ).value =
+      person.deathPlace ||
+      '';
 
-    document.getElementById('biography').value =
-      person.biography || '';
+
+    document.getElementById(
+      'phone'
+    ).value =
+      person.phone ||
+      '';
+
+
+    document.getElementById(
+      'email'
+    ).value =
+      person.email ||
+      '';
+
+
+    document.getElementById(
+      'address'
+    ).value =
+      person.address ||
+      '';
+
+
+    document.getElementById(
+      'occupation'
+    ).value =
+      person.occupation ||
+      '';
+
+
+    document.getElementById(
+      'photo'
+    ).value =
+      person.photo ||
+      '';
+
+
+    document.getElementById(
+      'biography'
+    ).value =
+      person.biography ||
+      '';
   }
 
+
   function closeMemberModal() {
-    dom.memberModal.classList.add('hidden');
+
+    dom.memberModal.classList.add(
+      'hidden'
+    );
+
     dom.memberForm.reset();
   }
 
-  function handleFormSubmit(event) {
+
+  function handleFormSubmit(
+    event
+  ) {
+
     event.preventDefault();
 
+
     const memberId =
-      document.getElementById('member-id').value;
+      document.getElementById(
+        'member-id'
+      ).value;
+
 
     const formData =
-      new FormData(dom.memberForm);
+      new FormData(
+        dom.memberForm
+      );
+
 
     const fullName =
       String(
-        formData.get('fullName') || ''
+        formData.get(
+          'fullName'
+        ) || ''
       ).trim();
 
+
     const nameParts =
-      fullName.split(/\s+/);
+      fullName.split(
+        /\s+/
+      );
+
 
     const personData = {
-      id: memberId || cryptoRandomId('person'),
+
+      id:
+        memberId ||
+        cryptoRandomId(
+          'person'
+        ),
 
       firstName:
-        nameParts.shift() || '',
+        nameParts.shift() ||
+        '',
 
       lastName:
         nameParts.join(' '),
 
       nickname:
         String(
-          formData.get('nickname') || ''
+          formData.get(
+            'nickname'
+          ) || ''
         ).trim(),
 
       gender:
         String(
-          formData.get('gender') || 'other'
+          formData.get(
+            'gender'
+          ) || 'other'
         ),
 
       birthDate:
         String(
-          formData.get('birthDate') || ''
+          formData.get(
+            'birthDate'
+          ) || ''
         ),
 
       birthPlace:
         String(
-          formData.get('birthPlace') || ''
+          formData.get(
+            'birthPlace'
+          ) || ''
         ),
 
       deathDate:
         String(
-          formData.get('deathDate') || ''
+          formData.get(
+            'deathDate'
+          ) || ''
         ),
 
       deathPlace:
         String(
-          formData.get('deathPlace') || ''
+          formData.get(
+            'deathPlace'
+          ) || ''
         ),
 
       phone:
         String(
-          formData.get('phone') || ''
+          formData.get(
+            'phone'
+          ) || ''
         ).trim(),
 
       email:
         String(
-          formData.get('email') || ''
+          formData.get(
+            'email'
+          ) || ''
         ).trim(),
 
       address:
         String(
-          formData.get('address') || ''
+          formData.get(
+            'address'
+          ) || ''
         ).trim(),
 
       photo:
         String(
-          formData.get('photo') || ''
+          formData.get(
+            'photo'
+          ) || ''
         ),
 
       occupation:
         String(
-          formData.get('occupation') || ''
+          formData.get(
+            'occupation'
+          ) || ''
         ),
 
       biography:
         String(
-          formData.get('biography') || ''
+          formData.get(
+            'biography'
+          ) || ''
         )
     };
 
-    if (!personData.firstName) {
-      alert(t('nameRequired'));
+
+    if (
+      !personData.firstName
+    ) {
+
+      alert(
+        t('nameRequired')
+      );
+
       return;
     }
+
 
     const existingIndex =
       state.people.findIndex(
         (person) =>
-          person.id === personData.id
+          person.id ===
+          personData.id
       );
 
-    if (existingIndex >= 0) {
-      state.people[existingIndex] = {
-        ...state.people[existingIndex],
+
+    if (
+      existingIndex >= 0
+    ) {
+
+      state.people[
+        existingIndex
+      ] = {
+        ...state.people[
+          existingIndex
+        ],
         ...personData
       };
+
     } else {
+
       state.people.push(
-        createPerson(personData)
+        createPerson(
+          personData
+        )
       );
     }
 
+
     const familyRelations = {
+
       fatherId:
         dom.fatherPerson.value,
 
@@ -1218,62 +2771,91 @@ const TRANSLATIONS = {
         dom.motherPerson.value,
 
       spouseIds:
-        [...dom.spousePerson.selectedOptions]
-          .map((option) => option.value),
+        [
+          ...dom.spousePerson
+            .selectedOptions
+        ].map(
+          (option) =>
+            option.value
+        ),
 
       childrenIds:
-        [...dom.childrenPerson.selectedOptions]
-          .map((option) => option.value)
+        [
+          ...dom.childrenPerson
+            .selectedOptions
+        ].map(
+          (option) =>
+            option.value
+        )
     };
+
 
     replaceFamilyRelationships(
       personData.id,
       familyRelations
     );
 
+
     const relationType =
       document.getElementById(
         'relationship-type'
       ).value;
+
 
     const relatedId =
       document.getElementById(
         'related-person'
       ).value;
 
-    let hasRelationship = Boolean(
-      familyRelations.fatherId ||
-      familyRelations.motherId ||
-      familyRelations.spouseIds.length ||
-      familyRelations.childrenIds.length
-    );
+
+    let hasRelationship =
+      Boolean(
+        familyRelations.fatherId ||
+        familyRelations.motherId ||
+        familyRelations.spouseIds
+          .length ||
+        familyRelations.childrenIds
+          .length
+      );
+
 
     if (
-      relationType !== 'none' &&
+      relationType !==
+        'none' &&
       relatedId
     ) {
-      const personIsRelativeOfSelected = [
-        'father',
-        'mother',
-        'grandfather',
-        'grandmother',
-        'uncle',
-        'aunt',
-        'brother',
-        'sister',
-        'husband',
-        'wife',
-        'cousin',
-        'other'
-      ].includes(relationType);
 
-      if (personIsRelativeOfSelected) {
+      const personIsRelativeOfSelected =
+        [
+          'father',
+          'mother',
+          'grandfather',
+          'grandmother',
+          'uncle',
+          'aunt',
+          'brother',
+          'sister',
+          'husband',
+          'wife',
+          'cousin',
+          'other'
+        ].includes(
+          relationType
+        );
+
+
+      if (
+        personIsRelativeOfSelected
+      ) {
+
         addRelationshipByType(
           personData.id,
           relatedId,
           relationType
         );
+
       } else {
+
         addRelationshipByType(
           relatedId,
           personData.id,
@@ -1281,79 +2863,107 @@ const TRANSLATIONS = {
         );
       }
 
-      hasRelationship = true;
+
+      hasRelationship =
+        true;
     }
 
-    if (hasRelationship) {
+
+    if (
+      hasRelationship
+    ) {
+
       state.selectedPersonId =
         personData.id;
     }
 
-    if (!saveFamilyData()) return;
+
+    if (
+      !saveFamilyData()
+    ) {
+      return;
+    }
+
 
     renderAll();
+
     closeMemberModal();
   }
+
 
   function updateRelatedPersonOptions(
     selectedId = ''
   ) {
+
     const relationType =
       dom.relationshipType.value;
+
 
     const editingId =
       document.getElementById(
         'member-id'
       ).value;
 
+
     const options =
       state.people.filter(
         (person) =>
-          person.id !== editingId
+          person.id !==
+          editingId
       );
 
-    const selectedValues = new Map([
-      [
-        dom.relatedPerson,
-        selectedId
-          ? [selectedId]
-          : [
-              dom.relatedPerson.value ||
-                state.selectedPersonId ||
-                ''
-            ]
-      ],
 
-      [
-        dom.fatherPerson,
-        [dom.fatherPerson.value]
-      ],
-
-      [
-        dom.motherPerson,
-        [dom.motherPerson.value]
-      ],
-
-      [
-        dom.spousePerson,
+    const selectedValues =
+      new Map([
         [
-          ...dom.spousePerson
-            .selectedOptions
-        ].map(
-          (option) => option.value
-        )
-      ],
+          dom.relatedPerson,
+          selectedId
+            ? [selectedId]
+            : [
+                dom.relatedPerson
+                  .value ||
+                  state.selectedPersonId ||
+                  ''
+              ]
+        ],
 
-      [
-        dom.childrenPerson,
         [
-          ...dom.childrenPerson
-            .selectedOptions
-        ].map(
-          (option) => option.value
-        )
-      ]
-    ]);
+          dom.fatherPerson,
+          [
+            dom.fatherPerson.value
+          ]
+        ],
+
+        [
+          dom.motherPerson,
+          [
+            dom.motherPerson.value
+          ]
+        ],
+
+        [
+          dom.spousePerson,
+          [
+            ...dom.spousePerson
+              .selectedOptions
+          ].map(
+            (option) =>
+              option.value
+          )
+        ],
+
+        [
+          dom.childrenPerson,
+          [
+            ...dom.childrenPerson
+              .selectedOptions
+          ].map(
+            (option) =>
+              option.value
+          )
+        ]
+      ]);
+
 
     const selectInputs = [
       dom.relatedPerson,
@@ -1363,178 +2973,265 @@ const TRANSLATIONS = {
       dom.childrenPerson
     ];
 
-    selectInputs.forEach((select) => {
-      const isGeneric =
-        select === dom.relatedPerson;
 
-      const isOptionalSingle =
-        select === dom.fatherPerson ||
-        select === dom.motherPerson;
+    selectInputs.forEach(
+      (select) => {
 
-      const placeholder =
-        isGeneric || isOptionalSingle
-          ? `<option value="">${t(
-              'chooseMember'
-            )}</option>`
-          : '';
+        if (!select) {
+          return;
+        }
 
-      const optionMarkup =
-        options
-          .map((person) => {
-            const selected =
-              selectedValues
-                .get(select)
-                .includes(person.id);
 
-            return `
-              <option
-                value="${escapeHtml(person.id)}"
-                ${selected ? 'selected' : ''}
-              >
-                ${escapeHtml(
-                  getDisplayName(person)
-                )}
-              </option>
-            `;
-          })
-          .join('');
+        const isGeneric =
+          select ===
+          dom.relatedPerson;
 
-      select.innerHTML =
-        `${placeholder}${optionMarkup}`;
-    });
+
+        const isOptionalSingle =
+          select ===
+            dom.fatherPerson ||
+          select ===
+            dom.motherPerson;
+
+
+        const placeholder =
+          isGeneric ||
+          isOptionalSingle
+            ? `<option value="">${t(
+                'chooseMember'
+              )}</option>`
+            : '';
+
+
+        const optionMarkup =
+          options
+            .map(
+              (person) => {
+
+                const selected =
+                  selectedValues
+                    .get(select)
+                    ?.includes(
+                      person.id
+                    );
+
+
+                return `
+                  <option
+                    value="${escapeHtml(
+                      person.id
+                    )}"
+                    ${
+                      selected
+                        ? 'selected'
+                        : ''
+                    }
+                  >
+                    ${escapeHtml(
+                      getDisplayName(
+                        person
+                      )
+                    )}
+                  </option>
+                `;
+              }
+            )
+            .join('');
+
+
+        select.innerHTML =
+          `${placeholder}${optionMarkup}`;
+      }
+    );
+
 
     dom.relatedPerson.disabled =
-      relationType === 'none';
+      relationType ===
+      'none';
   }
 
-  function populateRelationshipFields(person) {
+
+  function populateRelationshipFields(
+    person
+  ) {
+
     const parentRelations =
       state.relationships.filter(
         (relation) =>
-          relation.type === 'parentOf' &&
-          relation.to === person.id
+          relation.type ===
+            'parentOf' &&
+          relation.to ===
+            person.id
       );
+
 
     let father =
       parentRelations.find(
         (relation) =>
-          relation.role === 'father'
+          relation.role ===
+          'father'
       );
+
 
     let mother =
       parentRelations.find(
         (relation) =>
-          relation.role === 'mother'
+          relation.role ===
+          'mother'
       );
+
 
     const unassignedParents =
       parentRelations.filter(
         (relation) =>
-          relation !== father &&
-          relation !== mother
+          relation !==
+            father &&
+          relation !==
+            mother
       );
 
+
     if (!father) {
+
       father =
         unassignedParents.find(
           (relation) =>
             getPersonById(
               relation.from
-            )?.gender === 'male'
+            )?.gender ===
+            'male'
         );
     }
 
+
     if (!mother) {
+
       mother =
         unassignedParents.find(
           (relation) =>
-            relation !== father &&
+            relation !==
+              father &&
             getPersonById(
               relation.from
-            )?.gender === 'female'
+            )?.gender ===
+            'female'
         );
     }
+
 
     if (
       !father &&
       !mother &&
       unassignedParents.length
     ) {
+
       father =
         unassignedParents[0];
     }
 
+
     if (!mother) {
+
       mother =
         unassignedParents.find(
           (relation) =>
-            relation !== father
+            relation !==
+            father
         );
     }
 
+
     dom.fatherPerson.value =
-      father?.from || '';
+      father?.from ||
+      '';
+
 
     dom.motherPerson.value =
-      mother?.from || '';
+      mother?.from ||
+      '';
+
 
     [
       ...dom.spousePerson.options
-    ].forEach((option) => {
-      option.selected =
-        state.relationships.some(
-          (relation) =>
-            relation.type === 'spouseOf' &&
-            (
+    ].forEach(
+      (option) => {
+
+        option.selected =
+          state.relationships.some(
+            (relation) =>
+              relation.type ===
+                'spouseOf' &&
               (
-                relation.from === person.id &&
-                relation.to === option.value
-              ) ||
-              (
-                relation.to === person.id &&
-                relation.from === option.value
+                (
+                  relation.from ===
+                    person.id &&
+                  relation.to ===
+                    option.value
+                ) ||
+                (
+                  relation.to ===
+                    person.id &&
+                  relation.from ===
+                    option.value
+                )
               )
-            )
-        );
-    });
+          );
+      }
+    );
+
 
     [
       ...dom.childrenPerson.options
-    ].forEach((option) => {
-      option.selected =
-        state.relationships.some(
-          (relation) =>
-            relation.type === 'parentOf' &&
-            relation.from === person.id &&
-            relation.to === option.value
-        );
-    });
+    ].forEach(
+      (option) => {
+
+        option.selected =
+          state.relationships.some(
+            (relation) =>
+              relation.type ===
+                'parentOf' &&
+              relation.from ===
+                person.id &&
+              relation.to ===
+                option.value
+          );
+      }
+    );
   }
+
 
   function replaceFamilyRelationships(
     personId,
     familyRelations
   ) {
+
     state.relationships =
       state.relationships.filter(
         (relation) =>
           !(
             (
-              relation.type === 'parentOf' &&
+              relation.type ===
+                'parentOf' &&
               (
-                relation.from === personId ||
-                relation.to === personId
+                relation.from ===
+                  personId ||
+                relation.to ===
+                  personId
               )
             ) ||
             (
-              relation.type === 'spouseOf' &&
+              relation.type ===
+                'spouseOf' &&
               (
-                relation.from === personId ||
-                relation.to === personId
+                relation.from ===
+                  personId ||
+                relation.to ===
+                  personId
               )
             )
           )
       );
+
 
     const add = (
       type,
@@ -1542,6 +3239,7 @@ const TRANSLATIONS = {
       to,
       role
     ) => {
+
       if (
         !from ||
         !to ||
@@ -1550,25 +3248,41 @@ const TRANSLATIONS = {
         return;
       }
 
+
       if (
         state.relationships.some(
           (relation) =>
-            relation.type === type &&
-            relation.from === from &&
-            relation.to === to
+            relation.type ===
+              type &&
+            relation.from ===
+              from &&
+            relation.to ===
+              to
         )
       ) {
         return;
       }
 
+
       state.relationships.push({
-        id: cryptoRandomId('rel'),
+
+        id:
+          cryptoRandomId(
+            'rel'
+          ),
+
         type,
+
         from,
+
         to,
-        ...(role ? { role } : {})
+
+        ...(role
+          ? { role }
+          : {})
       });
     };
+
 
     add(
       'parentOf',
@@ -1577,6 +3291,7 @@ const TRANSLATIONS = {
       'father'
     );
 
+
     add(
       'parentOf',
       familyRelations.motherId,
@@ -1584,31 +3299,37 @@ const TRANSLATIONS = {
       'mother'
     );
 
-    familyRelations.spouseIds.forEach(
-      (spouseId) =>
-        add(
-          'spouseOf',
-          personId,
-          spouseId
-        )
-    );
 
-    familyRelations.childrenIds.forEach(
-      (childId) =>
-        add(
-          'parentOf',
-          personId,
-          childId,
-          'child'
-        )
-    );
+    familyRelations.spouseIds
+      .forEach(
+        (spouseId) =>
+          add(
+            'spouseOf',
+            personId,
+            spouseId
+          )
+      );
+
+
+    familyRelations.childrenIds
+      .forEach(
+        (childId) =>
+          add(
+            'parentOf',
+            personId,
+            childId,
+            'child'
+          )
+      );
   }
+
 
   function addRelationshipByType(
     fromId,
     toId,
     relationType
   ) {
+
     if (
       !fromId ||
       !toId ||
@@ -1617,7 +3338,9 @@ const TRANSLATIONS = {
       return;
     }
 
+
     const relationMap = {
+
       father: {
         type: 'parentOf',
         from: fromId,
@@ -1703,37 +3426,61 @@ const TRANSLATIONS = {
       }
     };
 
-    const relation =
-      relationMap[relationType];
 
-    if (!relation) return;
+    const relation =
+      relationMap[
+        relationType
+      ];
+
+
+    if (!relation) {
+      return;
+    }
+
 
     const duplicate =
       state.relationships.some(
         (item) =>
-          item.type === relation.type &&
-          item.from === relation.from &&
-          item.to === relation.to
+          item.type ===
+            relation.type &&
+          item.from ===
+            relation.from &&
+          item.to ===
+            relation.to
       );
 
+
     if (!duplicate) {
+
       state.relationships.push({
-        id: cryptoRandomId('rel'),
+
+        id:
+          cryptoRandomId(
+            'rel'
+          ),
+
         ...relation,
-        role: relationType
+
+        role:
+          relationType
       });
     }
   }
 
+
   function saveFamilyData() {
+
     const data =
       JSON.parse(
         JSON.stringify({
-          people: state.people,
+          people:
+            state.people,
+
           relationships:
             state.relationships
         })
       );
+
 
     const key =
       state.user
@@ -1742,17 +3489,24 @@ const TRANSLATIONS = {
           )
         : FAMILY_STORAGE_KEY;
 
+
     if (
       !writeTreeData(
         data,
         key
       )
     ) {
-      setAuthStatus('saveFailed');
+
+      setAuthStatus(
+        'saveFailed'
+      );
+
       return false;
     }
 
+
     updateStorageStatus();
+
 
     setAuthStatus(
       state.user
@@ -1760,116 +3514,189 @@ const TRANSLATIONS = {
         : 'localSaved'
     );
 
+
     if (
       !state.user ||
       !state.firebase
     ) {
+
       return true;
     }
+
 
     const uid =
       state.user.uid;
 
+
     state.cloudSaveQueue =
       state.cloudSaveQueue
-        .then(() =>
-          state.firebase.saveFamily(
-            uid,
-            data
-          )
+        .then(
+          () =>
+            state.firebase.saveFamily(
+              uid,
+              data
+            )
         )
         .then(() => {
+
           if (
-            state.user?.uid === uid
+            state.user?.uid ===
+            uid
           ) {
+
             setAuthStatus(
               'cloudSaved'
             );
           }
         })
-        .catch((error) => {
-          console.error(
-            'Could not save family data to Firestore:',
-            error
-          );
+        .catch(
+          (error) => {
 
-          if (
-            state.user?.uid === uid
-          ) {
-            setAuthStatus(
-              'saveFailed',
-              error.message
+            console.error(
+              'Could not save family data to Firestore:',
+              error
             );
+
+
+            if (
+              state.user?.uid ===
+              uid
+            ) {
+
+              setAuthStatus(
+                'saveFailed',
+                error.message
+              );
+            }
           }
-        });
+        );
+
 
     return true;
   }
 
+
   function updateStorageStatus() {
+
+    if (!dom.storageStatus) {
+      return;
+    }
+
+
     const bytes =
       JSON.stringify({
-        people: state.people,
+        people:
+          state.people,
+
         relationships:
           state.relationships
       }).length;
 
+
     dom.storageStatus.textContent =
-      `${t('localSaved')} • ${(bytes / 1024).toFixed(2)} KB`;
+      `${t(
+        'localSaved'
+      )} • ${(bytes / 1024).toFixed(
+        2
+      )} KB`;
   }
 
+
   function exportFamilyData() {
+
     const payload = {
-      people: state.people,
+
+      people:
+        state.people,
+
       relationships:
         state.relationships,
+
       exportedAt:
         new Date().toISOString()
     };
 
-    exportTreeJson(payload);
+
+    exportTreeJson(
+      payload
+    );
   }
 
-  function handleImportFile(event) {
+
+  function handleImportFile(
+    event
+  ) {
+
     const file =
       event.target.files?.[0];
 
-    if (!file) return;
+
+    if (!file) {
+      return;
+    }
+
 
     importTreeJson(file)
+
       .then((payload) => {
+
         state.people =
-          payload.people || [];
+          payload.people ||
+          [];
 
         state.relationships =
-          payload.relationships || [];
+          payload.relationships ||
+          [];
 
         state.selectedPersonId =
-          state.people[0]?.id || null;
+          state.people[0]?.id ||
+          null;
 
-        if (!saveFamilyData()) return;
+
+        if (
+          !saveFamilyData()
+        ) {
+          return;
+        }
+
 
         renderAll();
 
-        dom.importFileInput.value = '';
+
+        dom.importFileInput.value =
+          '';
+
       })
+
       .catch((error) => {
+
         alert(
-          `${t('importFailed')} ${error.message}`
+          `${t(
+            'importFailed'
+          )} ${error.message}`
         );
       });
   }
 
+
   function resetFamilyTree() {
+
     const shouldReset =
       window.confirm(
-        t('resetConfirm')
+        t(
+          'resetConfirm'
+        )
       );
 
-    if (!shouldReset) return;
+
+    if (!shouldReset) {
+      return;
+    }
+
 
     const seed =
       buildSeedFamily();
+
 
     state.people =
       seed.people;
@@ -1878,80 +3705,143 @@ const TRANSLATIONS = {
       seed.relationships;
 
     state.selectedPersonId =
-      state.people[0]?.id || null;
+      state.people[0]?.id ||
+      null;
+
 
     saveFamilyData();
+
     renderAll();
   }
 
-  function handleTreeAction(action) {
-    if (action === 'zoom-in') {
+
+  function handleTreeAction(
+    action
+  ) {
+
+    if (
+      action ===
+      'zoom-in'
+    ) {
+
       changeZoom(
-        state.tree.scale + 0.15
+        state.tree.scale +
+          0.15
       );
     }
 
-    if (action === 'zoom-out') {
+
+    if (
+      action ===
+      'zoom-out'
+    ) {
+
       changeZoom(
-        state.tree.scale - 0.15
+        state.tree.scale -
+          0.15
       );
     }
 
-    if (action === 'center') {
+
+    if (
+      action ===
+      'center'
+    ) {
+
       centerTree();
     }
 
-    if (action === 'expand') {
-      state.tree.maxDepth += 1;
+
+    if (
+      action ===
+      'expand'
+    ) {
+
+      state.tree.maxDepth +=
+        1;
     }
 
-    if (action === 'collapse') {
+
+    if (
+      action ===
+      'collapse'
+    ) {
+
       state.tree.maxDepth =
         Math.max(
           1,
-          state.tree.maxDepth - 1
+          state.tree.maxDepth -
+            1
         );
     }
 
+
     renderFamilyTree();
   }
 
-  function changeZoom(value) {
+
+  function changeZoom(
+    value
+  ) {
+
     state.tree.scale =
       Math.min(
         2.2,
-        Math.max(0.5, value)
+        Math.max(
+          0.5,
+          value
+        )
       );
+
 
     renderFamilyTree();
   }
 
+
   function centerTree() {
+
     const viewportWidth =
       dom.treeViewport.clientWidth;
 
     const viewportHeight =
       dom.treeViewport.clientHeight;
 
+
     state.tree.panX =
-      viewportWidth / 2 - 120;
+      viewportWidth / 2 -
+      120;
 
     state.tree.panY =
-      viewportHeight / 2 - 80;
+      viewportHeight / 2 -
+      80;
+
 
     renderFamilyTree();
   }
 
+
   function renderFamilyTree() {
+
+    if (!dom.treeSvg) {
+      return;
+    }
+
+
     const rootId =
       state.selectedPersonId ||
       state.people[0]?.id;
 
+
     if (!rootId) {
+
       dom.treeSvg.innerHTML =
-        `<text x="20" y="20">${t('treeEmpty')}</text>`;
+        `<text x="20" y="20">${t(
+          'treeEmpty'
+        )}</text>`;
+
       return;
     }
+
 
     const visibleIds =
       collectVisiblePeople(
@@ -1959,11 +3849,13 @@ const TRANSLATIONS = {
         state.tree.maxDepth
       );
 
+
     const positions =
       computeTreeLayout(
         visibleIds,
         rootId
       );
+
 
     const svgWidth =
       Math.max(
@@ -1974,6 +3866,7 @@ const TRANSLATIONS = {
         )
       );
 
+
     const svgHeight =
       Math.max(
         700,
@@ -1983,27 +3876,47 @@ const TRANSLATIONS = {
         )
       );
 
+
     const nodeMarkup =
       positions
         .map((entry) => {
+
           const person =
             getPersonById(
               entry.id
             );
 
+
+          if (!person) {
+            return '';
+          }
+
+
           const isSelected =
             entry.id ===
             state.selectedPersonId;
 
-          const width = 170;
-          const height = 70;
+
+          const width =
+            170;
+
+          const height =
+            70;
+
 
           return `
             <g
-              class="tree-node ${isSelected ? 'selected' : ''}"
-              data-person-id="${escapeHtml(person.id)}"
+              class="tree-node ${
+                isSelected
+                  ? 'selected'
+                  : ''
+              }"
+              data-person-id="${escapeHtml(
+                person.id
+              )}"
               transform="translate(${entry.x}, ${entry.y})"
             >
+
               <rect
                 width="${width}"
                 height="${height}"
@@ -2025,7 +3938,10 @@ const TRANSLATIONS = {
                 font-size="11"
                 style="fill:#5c3b9a;font-weight:700;"
               >
-                ${t(person.gender || 'other')}
+                ${t(
+                  person.gender ||
+                    'other'
+                )}
               </text>
 
               <text
@@ -2035,7 +3951,9 @@ const TRANSLATIONS = {
                 font-weight="700"
               >
                 ${escapeHtml(
-                  getDisplayName(person)
+                  getDisplayName(
+                    person
+                  )
                 )}
               </text>
 
@@ -2047,97 +3965,136 @@ const TRANSLATIONS = {
               >
                 ${escapeHtml(
                   person.occupation ||
-                    t('familyMember')
+                    t(
+                      'familyMember'
+                    )
                 )}
               </text>
+
             </g>
           `;
         })
         .join('');
 
+
     const links = [];
+
 
     const allLinks =
       collectRelationshipsForVisiblePeople(
         visibleIds
       );
 
-    allLinks.forEach((link) => {
-      const from =
-        positions.find(
-          (entry) =>
-            entry.id === link.from
-        );
 
-      const to =
-        positions.find(
-          (entry) =>
-            entry.id === link.to
-        );
+    allLinks.forEach(
+      (link) => {
 
-      if (!from || !to) return;
+        const from =
+          positions.find(
+            (entry) =>
+              entry.id ===
+              link.from
+          );
 
-      const x1 =
-        from.x + 170 / 2;
 
-      const y1 =
-        from.y + 70;
+        const to =
+          positions.find(
+            (entry) =>
+              entry.id ===
+              link.to
+          );
 
-      const x2 =
-        to.x + 170 / 2;
 
-      const y2 =
-        to.y;
+        if (!from || !to) {
+          return;
+        }
 
-      links.push(`
-        <path
-          class="tree-link"
-          d="
-            M ${x1} ${y1}
-            C ${x1} ${(y1 + y2) / 2},
-              ${x2} ${(y1 + y2) / 2},
-              ${x2} ${y2}
-          "
-        />
-      `);
-    });
+
+        const x1 =
+          from.x + 170 / 2;
+
+        const y1 =
+          from.y + 70;
+
+        const x2 =
+          to.x + 170 / 2;
+
+        const y2 =
+          to.y;
+
+
+        links.push(`
+          <path
+            class="tree-link"
+            d="
+              M ${x1} ${y1}
+              C ${x1} ${
+                (y1 + y2) / 2
+              },
+                ${x2} ${
+                  (y1 + y2) / 2
+                },
+                ${x2} ${y2}
+            "
+          />
+        `);
+      }
+    );
+
 
     dom.treeSvg.setAttribute(
       'viewBox',
       `0 0 ${svgWidth} ${svgHeight}`
     );
 
+
     dom.treeSvg.innerHTML =
-      `${links.join('')}${nodeMarkup}`;
+      `${links.join(
+        ''
+      )}${nodeMarkup}`;
+
 
     dom.treeSvg.style.transform =
       `translate(${state.tree.panX}px, ${state.tree.panY}px) scale(${state.tree.scale})`;
 
+
     dom.treeSvg
-      .querySelectorAll('.tree-node')
-      .forEach((node) => {
-        node.addEventListener(
-          'click',
-          () => {
-            const personId =
-              node.dataset.personId;
+      .querySelectorAll(
+        '.tree-node'
+      )
+      .forEach(
+        (node) => {
 
-            state.selectedPersonId =
-              personId;
+          node.addEventListener(
+            'click',
+            () => {
 
-            renderProfilePanel();
-            renderFamilyTree();
-          }
-        );
-      });
+              const personId =
+                node.dataset
+                  .personId;
+
+
+              state.selectedPersonId =
+                personId;
+
+
+              renderProfilePanel();
+              renderFamilyTree();
+            }
+          );
+        }
+      );
   }
+
 
   function collectVisiblePeople(
     rootId,
     maxDepth
   ) {
+
     const visited =
       new Set();
+
 
     const queue = [
       {
@@ -2146,21 +4103,30 @@ const TRANSLATIONS = {
       }
     ];
 
-    while (queue.length) {
+
+    while (
+      queue.length
+    ) {
+
       const current =
         queue.shift();
+
 
       if (
         !current ||
         !current.id ||
-        visited.has(current.id)
+        visited.has(
+          current.id
+        )
       ) {
         continue;
       }
 
+
       visited.add(
         current.id
       );
+
 
       if (
         current.depth >=
@@ -2169,17 +4135,25 @@ const TRANSLATIONS = {
         continue;
       }
 
+
       const context =
         getFamilyContext(
           current.id
         );
 
+
       const relatedIds = [
+
         ...context.parents,
+
         ...context.spouse,
+
         ...context.children,
+
         ...context.siblings,
+
         ...context.related
+
       ]
         .map(
           (person) =>
@@ -2188,44 +4162,60 @@ const TRANSLATIONS = {
               ? person.id
               : null
         )
-        .filter(Boolean);
+        .filter(
+          Boolean
+        );
+
 
       relatedIds.forEach(
         (id) =>
           queue.push({
             id,
             depth:
-              current.depth + 1
+              current.depth +
+              1
           })
       );
     }
 
-    return [...visited];
+
+    return [
+      ...visited
+    ];
   }
+
 
   function computeTreeLayout(
     visibleIds,
     rootId
   ) {
+
     const depthMap =
       new Map();
 
+
     visibleIds.forEach(
       (id) => {
+
         const depth =
           getDistanceFromRoot(
             rootId,
             id
           );
 
+
         if (
-          !depthMap.has(depth)
+          !depthMap.has(
+            depth
+          )
         ) {
+
           depthMap.set(
             depth,
             []
           );
         }
+
 
         depthMap
           .get(depth)
@@ -2233,31 +4223,43 @@ const TRANSLATIONS = {
       }
     );
 
+
     const positions = [];
+
 
     depthMap.forEach(
       (ids, depth) => {
+
         const sorted =
           ids.sort(
             (a, b) =>
               getDisplayName(
-                getPersonById(a)
+                getPersonById(
+                  a
+                )
               ).localeCompare(
                 getDisplayName(
-                  getPersonById(b)
+                  getPersonById(
+                    b
+                  )
                 )
               )
           );
 
+
         sorted.forEach(
           (id, index) => {
+
             positions.push({
+
               id,
+
               x:
                 260 * depth +
                 40 +
                 (index % 3) *
                   60,
+
               y:
                 index * 110 +
                 40 +
@@ -2268,18 +4270,23 @@ const TRANSLATIONS = {
       }
     );
 
+
     return positions;
   }
+
 
   function getDistanceFromRoot(
     rootId,
     targetId
   ) {
+
     if (
-      rootId === targetId
+      rootId ===
+      targetId
     ) {
       return 0;
     }
+
 
     const queue = [
       {
@@ -2288,67 +4295,102 @@ const TRANSLATIONS = {
       }
     ];
 
-    const visited =
-      new Set([rootId]);
 
-    while (queue.length) {
+    const visited =
+      new Set([
+        rootId
+      ]);
+
+
+    while (
+      queue.length
+    ) {
+
       const current =
         queue.shift();
+
 
       const context =
         getFamilyContext(
           current.id
         );
 
+
       const nextIds = [
+
         ...context.parents,
+
         ...context.spouse,
+
         ...context.children,
+
         ...context.siblings,
+
         ...context.related
-      ].map(
-        (person) =>
-          person.id
-      );
+
+      ]
+        .map(
+          (person) =>
+            person.id
+        );
+
 
       for (
-        const nextId of nextIds
+        const nextId of
+        nextIds
       ) {
+
         if (
           nextId ===
           targetId
         ) {
+
           return (
-            current.depth + 1
+            current.depth +
+            1
           );
         }
 
+
         if (
-          !visited.has(nextId)
+          !visited.has(
+            nextId
+          )
         ) {
+
           visited.add(
             nextId
           );
 
+
           queue.push({
-            id: nextId,
+
+            id:
+              nextId,
+
             depth:
-              current.depth + 1
+              current.depth +
+              1
           });
         }
       }
     }
 
+
     return 0;
   }
+
 
   function collectRelationshipsForVisiblePeople(
     visibleIds
   ) {
+
     const links = [];
+
 
     state.relationships.forEach(
       (relation) => {
+
         if (
           visibleIds.includes(
             relation.from
@@ -2357,12 +4399,16 @@ const TRANSLATIONS = {
             relation.to
           )
         ) {
+
           const link = {
+
             from:
               relation.from,
+
             to:
               relation.to
           };
+
 
           if (
             !links.some(
@@ -2373,23 +4419,37 @@ const TRANSLATIONS = {
                   link.to
             )
           ) {
-            links.push(link);
+
+            links.push(
+              link
+            );
           }
         }
       }
     );
 
+
     return links;
   }
 
+
   function openPrintableReport() {
-    if (!state.people.length) {
-      alert(t('noMembers'));
+
+    if (
+      !state.people.length
+    ) {
+
+      alert(
+        t('noMembers')
+      );
+
       return;
     }
 
+
     const previousDepth =
       state.tree.maxDepth;
+
 
     state.tree.maxDepth =
       Math.max(
@@ -2397,172 +4457,232 @@ const TRANSLATIONS = {
         state.people.length
       );
 
+
     renderFamilyTree();
 
+
     const treeSvg =
-      dom.treeSvg.cloneNode(true);
+      dom.treeSvg.cloneNode(
+        true
+      );
+
 
     treeSvg.style.transform =
       'none';
+
 
     treeSvg.setAttribute(
       'width',
       '100%'
     );
 
+
     treeSvg.setAttribute(
       'height',
       'auto'
     );
 
+
     state.tree.maxDepth =
       previousDepth;
 
+
     renderFamilyTree();
+
 
     const relationRows =
       state.relationships
-        .map((relation) => {
-          const from =
-            getPersonById(
-              relation.from
-            );
+        .map(
+          (relation) => {
 
-          const to =
-            getPersonById(
-              relation.to
-            );
+            const from =
+              getPersonById(
+                relation.from
+              );
 
-          if (!from || !to) {
-            return '';
-          }
+            const to =
+              getPersonById(
+                relation.to
+              );
 
-          const label =
-            relation.role &&
-            TRANSLATIONS[
-              state.language
-            ][relation.role]
-              ? t(relation.role)
-              : relation.type ===
-                'parentOf'
-                ? `${t('father')} / ${t('mother')}`
+
+            if (
+              !from ||
+              !to
+            ) {
+              return '';
+            }
+
+
+            const label =
+              relation.role &&
+              TRANSLATIONS[
+                state.language
+              ][
+                relation.role
+              ]
+                ? t(
+                    relation.role
+                  )
                 : relation.type ===
-                  'spouseOf'
-                  ? t('spouse')
+                    'parentOf'
+                  ? `${t(
+                      'father'
+                    )} / ${t(
+                      'mother'
+                    )}`
                   : relation.type ===
-                    'siblingOf'
-                    ? `${t('brother')} / ${t('sister')}`
-                    : t(
-                        'relationshipLabel'
-                      );
+                      'spouseOf'
+                    ? t(
+                        'spouse'
+                      )
+                    : relation.type ===
+                        'siblingOf'
+                      ? `${t(
+                          'brother'
+                        )} / ${t(
+                          'sister'
+                        )}`
+                      : t(
+                          'relationshipLabel'
+                        );
 
-          return `
-            <li>
-              <strong>
+
+            return `
+              <li>
+
+                <strong>
+                  ${escapeHtml(
+                    getDisplayName(
+                      from
+                    )
+                  )}
+                </strong>
+
+                —
+
                 ${escapeHtml(
-                  getDisplayName(from)
+                  label
                 )}
-              </strong>
-              —
-              ${escapeHtml(label)}
-              —
-              <strong>
-                ${escapeHtml(
-                  getDisplayName(to)
-                )}
-              </strong>
-            </li>
-          `;
-        })
-        .filter(Boolean)
+
+                —
+
+                <strong>
+                  ${escapeHtml(
+                    getDisplayName(
+                      to
+                    )
+                  )}
+                </strong>
+
+              </li>
+            `;
+          }
+        )
+        .filter(
+          Boolean
+        )
         .join('');
+
 
     const memberRows =
       state.people
         .map(
           (person) => `
-          <li>
-            <strong>
-              ${escapeHtml(
-                getDisplayName(person)
-              )}
-            </strong>
 
-            <span>
-              ${escapeHtml(t('gender'))}:
-              ${escapeHtml(
-                t(
-                  person.gender ||
-                    'other'
-                )
-              )}
-              ·
-              ${escapeHtml(
-                t('dateOfBirth')
-              )}:
-              ${escapeHtml(
-                person.birthDate ||
-                  t('noData')
-              )}
-              ·
-              ${escapeHtml(
-                t('dateOfDeath')
-              )}:
-              ${escapeHtml(
-                person.deathDate ||
-                  t('noData')
-              )}
-            </span>
+            <li>
 
-            <span>
-              ${escapeHtml(
-                t('occupation')
-              )}:
-              ${escapeHtml(
-                person.occupation ||
-                  t('noData')
-              )}
-              ·
-              ${escapeHtml(
-                t('phone')
-              )}:
-              ${escapeHtml(
-                person.phone ||
-                  t('noData')
-              )}
-              ·
-              ${escapeHtml(
-                t('email')
-              )}:
-              ${escapeHtml(
-                person.email ||
-                  t('noData')
-              )}
-            </span>
+              <strong>
+                ${escapeHtml(
+                  getDisplayName(
+                    person
+                  )
+                )}
+              </strong>
 
-            <span>
-              ${escapeHtml(
-                t('address')
-              )}:
-              ${escapeHtml(
-                person.address ||
-                  t('noData')
-              )}
-            </span>
+              <span>
+                ${escapeHtml(
+                  t('gender')
+                )}:
+                ${escapeHtml(
+                  t(
+                    person.gender ||
+                      'other'
+                  )
+                )}
+                ·
+                ${escapeHtml(
+                  t(
+                    'dateOfBirth'
+                  )
+                )}:
+                ${escapeHtml(
+                  person.birthDate ||
+                    t('noData')
+                )}
+                ·
+                ${escapeHtml(
+                  t(
+                    'dateOfDeath'
+                  )
+                )}:
+                ${escapeHtml(
+                  person.deathDate ||
+                    t('noData')
+                )}
+              </span>
 
-            <span>
-              ${escapeHtml(
-                t('notes')
-              )}:
-              ${escapeHtml(
-                person.biography ||
-                  t('noData')
-              )}
-            </span>
-          </li>
-        `
+              <span>
+                ${escapeHtml(
+                  t('occupation')
+                )}:
+                ${escapeHtml(
+                  person.occupation ||
+                    t('noData')
+                )}
+                ·
+                ${escapeHtml(
+                  t('phone')
+                )}:
+                ${escapeHtml(
+                  person.phone ||
+                    t('noData')
+                )}
+                ·
+                ${escapeHtml(
+                  t('email')
+                )}:
+                ${escapeHtml(
+                  person.email ||
+                    t('noData')
+                )}
+              </span>
+
+              <span>
+                ${escapeHtml(
+                  t('address')
+                )}:
+                ${escapeHtml(
+                  person.address ||
+                    t('noData')
+                )}
+              </span>
+
+              <span>
+                ${escapeHtml(
+                  t('notes')
+                )}:
+                ${escapeHtml(
+                  person.biography ||
+                    t('noData')
+                )}
+              </span>
+
+            </li>
+          `
         )
         .join('');
+
 
     const exportedAt =
       new Intl.DateTimeFormat(
@@ -2570,53 +4690,81 @@ const TRANSLATIONS = {
           ? 'bn-BD'
           : 'en-US',
         {
-          dateStyle: 'medium',
-          timeStyle: 'short'
+          dateStyle:
+            'medium',
+
+          timeStyle:
+            'short'
         }
-      ).format(new Date());
+      ).format(
+        new Date()
+      );
+
 
     const report =
       document.getElementById(
         'print-report'
       );
 
+
+    if (!report) {
+      window.print();
+      return;
+    }
+
+
     report.setAttribute(
       'aria-hidden',
       'false'
     );
 
+
     report.innerHTML = `
+
       <h1>
         ${escapeHtml(
-          t('familyReport')
+          t(
+            'familyReport'
+          )
         )}
       </h1>
 
       <p>
         ${escapeHtml(
-          t('exportDate')
+          t(
+            'exportDate'
+          )
         )}:
         ${escapeHtml(
           exportedAt
         )}
       </p>
 
+
       <section>
+
         <h2>
           ${escapeHtml(
-            t('familyTree')
+            t(
+              'familyTree'
+            )
           )}
         </h2>
 
         <div class="print-tree-svg">
           ${treeSvg.outerHTML}
         </div>
+
       </section>
 
+
       <section>
+
         <h2>
           ${escapeHtml(
-            t('familyMembers')
+            t(
+              'familyMembers'
+            )
           )}
           (${state.people.length})
         </h2>
@@ -2624,33 +4772,46 @@ const TRANSLATIONS = {
         <ul class="print-members">
           ${memberRows}
         </ul>
+
       </section>
 
+
       <section>
+
         <h2>
           ${escapeHtml(
-            t('relationshipLabel')
+            t(
+              'relationshipLabel'
+            )
           )}
         </h2>
 
         <ul>
+
           ${
             relationRows ||
             `<li>${escapeHtml(
               t('noData')
             )}</li>`
           }
+
         </ul>
+
       </section>
+
 
       <footer>
         ${escapeHtml(
-          t('courtesy')
+          t(
+            'courtesy'
+          )
         )}
       </footer>
     `;
 
+
     window.print();
+
 
     window.setTimeout(
       () =>
@@ -2662,103 +4823,153 @@ const TRANSLATIONS = {
     );
   }
 
+
   /*
-   * IMPORTANT:
-   * This function was missing from the old app.js.
-   * It generates a unique ID for people and relationships.
+   * FIX:
+   * cryptoRandomId is defined directly
+   * inside app.js so it can NEVER cause
+   * "cryptoRandomId is not defined".
    */
-  function cryptoRandomId(prefix = 'id') {
+  function cryptoRandomId(
+    prefix = 'id'
+  ) {
+
     if (
       globalThis.crypto?.randomUUID
     ) {
+
       return `${prefix}_${globalThis.crypto.randomUUID()}`;
     }
+
 
     if (
       globalThis.crypto?.getRandomValues
     ) {
+
       const bytes =
-        new Uint8Array(16);
+        new Uint8Array(
+          16
+        );
+
 
       globalThis.crypto.getRandomValues(
         bytes
       );
+
 
       return `${prefix}_${Array.from(
         bytes,
         (byte) =>
           byte
             .toString(16)
-            .padStart(2, '0')
+            .padStart(
+              2,
+              '0'
+            )
       ).join('')}`;
     }
+
 
     return `${prefix}_${Date.now()}_${Math.random()
       .toString(36)
       .slice(2, 10)}`;
   }
 
-  function escapeHtml(value) {
-    return String(value).replace(
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(
+      value
+    ).replace(
       /[&<>"']/g,
-      (character) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      })[character]
+      (character) =>
+        ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[
+          character
+        ]
     );
   }
 
+
   function getFilteredPeople() {
+
     const term =
       state.searchTerm;
 
+
     if (!term) {
-      return [...state.people];
+      return [
+        ...state.people
+      ];
     }
+
 
     return state.people.filter(
       (person) => {
+
         const fullName =
           `${person.firstName} ${person.lastName}`
             .toLowerCase();
 
+
         const nickname =
-          (person.nickname || '')
-            .toLowerCase();
+          (
+            person.nickname ||
+            ''
+          ).toLowerCase();
+
 
         return (
-          fullName.includes(term) ||
-          nickname.includes(term) ||
-          getDisplayName(person)
+          fullName.includes(
+            term
+          ) ||
+          nickname.includes(
+            term
+          ) ||
+          getDisplayName(
+            person
+          )
             .toLowerCase()
-            .includes(term)
+            .includes(
+              term
+            )
         );
       }
     );
   }
 
+
   function getFamilyContext(
     personId
   ) {
+
     const parents = [];
     const children = [];
     const spouse = [];
     const siblings = [];
     const related = [];
 
+
     state.relationships.forEach(
       (relation) => {
+
         if (
           relation.type ===
           'parentOf'
         ) {
+
           if (
             relation.to ===
             personId
           ) {
+
             parents.push(
               getPersonById(
                 relation.from
@@ -2766,10 +4977,12 @@ const TRANSLATIONS = {
             );
           }
 
+
           if (
             relation.from ===
             personId
           ) {
+
             children.push(
               getPersonById(
                 relation.to
@@ -2778,14 +4991,17 @@ const TRANSLATIONS = {
           }
         }
 
+
         if (
           relation.type ===
           'spouseOf'
         ) {
+
           if (
             relation.from ===
             personId
           ) {
+
             spouse.push(
               getPersonById(
                 relation.to
@@ -2793,10 +5009,12 @@ const TRANSLATIONS = {
             );
           }
 
+
           if (
             relation.to ===
             personId
           ) {
+
             spouse.push(
               getPersonById(
                 relation.from
@@ -2804,15 +5022,18 @@ const TRANSLATIONS = {
             );
           }
         }
+
 
         if (
           relation.type ===
           'siblingOf'
         ) {
+
           if (
             relation.from ===
             personId
           ) {
+
             siblings.push(
               getPersonById(
                 relation.to
@@ -2820,10 +5041,12 @@ const TRANSLATIONS = {
             );
           }
 
+
           if (
             relation.to ===
             personId
           ) {
+
             siblings.push(
               getPersonById(
                 relation.from
@@ -2831,6 +5054,7 @@ const TRANSLATIONS = {
             );
           }
         }
+
 
         if (
           relation.type ===
@@ -2844,10 +5068,12 @@ const TRANSLATIONS = {
           relation.type ===
             'grandparentOf'
         ) {
+
           if (
             relation.to ===
             personId
           ) {
+
             related.push(
               getPersonById(
                 relation.from
@@ -2855,10 +5081,12 @@ const TRANSLATIONS = {
             );
           }
 
+
           if (
             relation.from ===
             personId
           ) {
+
             related.push(
               getPersonById(
                 relation.to
@@ -2869,113 +5097,161 @@ const TRANSLATIONS = {
       }
     );
 
+
     return {
+
       parents:
         uniqById(
-          parents.filter(Boolean)
+          parents.filter(
+            Boolean
+          )
         ),
 
       children:
         uniqById(
-          children.filter(Boolean)
+          children.filter(
+            Boolean
+          )
         ),
 
       spouse:
         uniqById(
-          spouse.filter(Boolean)
+          spouse.filter(
+            Boolean
+          )
         ),
 
       siblings:
         uniqById(
-          siblings.filter(Boolean)
+          siblings.filter(
+            Boolean
+          )
         ),
 
       related:
         uniqById(
-          related.filter(Boolean)
+          related.filter(
+            Boolean
+          )
         )
     };
   }
 
+
   function buildEventList() {
+
     return state.people
-      .map((person) => {
-        const items = [];
 
-        if (person.birthDate) {
-          items.push({
-            year:
-              new Date(
-                person.birthDate
-              ).getFullYear(),
+      .map(
+        (person) => {
 
-            title:
-              `${getDisplayName(person)} ${t(
-                'birthEvent'
-              )}`,
+          const items = [];
 
-            label:
-              t('born'),
 
-            dateLabel:
-              person.birthDate,
+          if (
+            person.birthDate
+          ) {
 
-            person:
-              getDisplayName(person),
+            items.push({
 
-            color:
-              '#5c3b9a'
-          });
+              year:
+                new Date(
+                  person.birthDate
+                ).getFullYear(),
+
+              title:
+                `${getDisplayName(
+                  person
+                )} ${t(
+                  'birthEvent'
+                )}`,
+
+              label:
+                t('born'),
+
+              dateLabel:
+                person.birthDate,
+
+              person:
+                getDisplayName(
+                  person
+                ),
+
+              color:
+                '#5c3b9a'
+            });
+          }
+
+
+          if (
+            person.deathDate
+          ) {
+
+            items.push({
+
+              year:
+                new Date(
+                  person.deathDate
+                ).getFullYear(),
+
+              title:
+                `${getDisplayName(
+                  person
+                )} ${t(
+                  'deathEvent'
+                )}`,
+
+              label:
+                t('died'),
+
+              dateLabel:
+                person.deathDate,
+
+              person:
+                getDisplayName(
+                  person
+                ),
+
+              color:
+                '#d9465f'
+            });
+          }
+
+
+          return items;
         }
+      )
 
-        if (person.deathDate) {
-          items.push({
-            year:
-              new Date(
-                person.deathDate
-              ).getFullYear(),
-
-            title:
-              `${getDisplayName(person)} ${t(
-                'deathEvent'
-              )}`,
-
-            label:
-              t('died'),
-
-            dateLabel:
-              person.deathDate,
-
-            person:
-              getDisplayName(person),
-
-            color:
-              '#d9465f'
-          });
-        }
-
-        return items;
-      })
       .flat()
+
       .sort(
         (a, b) =>
-          a.year - b.year
+          a.year -
+          b.year
       );
   }
 
+
   function computeGenerationCount() {
+
     const root =
       state.people[0];
 
-    if (!root) return 0;
+
+    if (!root) {
+      return 0;
+    }
+
 
     return Math.max(
       1,
+
       new Set(
         state.people.map(
           (person) =>
             Math.max(
               1,
+
               getDistanceFromRoot(
                 root.id,
                 person.id
@@ -2986,23 +5262,32 @@ const TRANSLATIONS = {
     );
   }
 
+
   function getPersonById(
     personId
   ) {
+
     return (
       state.people.find(
         (person) =>
-          person.id === personId
+          person.id ===
+          personId
       ) || null
     );
   }
 
-  function uniqById(items) {
+
+  function uniqById(
+    items
+  ) {
+
     const seen =
       new Set();
 
+
     return items.filter(
       (item) => {
+
         if (
           !item ||
           !item.id
@@ -3010,75 +5295,107 @@ const TRANSLATIONS = {
           return false;
         }
 
+
         if (
-          seen.has(item.id)
+          seen.has(
+            item.id
+          )
         ) {
           return false;
         }
 
-        seen.add(item.id);
+
+        seen.add(
+          item.id
+        );
+
 
         return true;
       }
     );
   }
 
+
   function getDisplayName(
     person
   ) {
+
     if (!person) {
       return t(
         'unknownMember'
       );
     }
 
+
     const fullName =
       `${person.firstName || ''} ${person.lastName || ''}`
         .trim();
 
+
     return (
       fullName ||
       person.nickname ||
-      t('unknownMember')
+      t(
+        'unknownMember'
+      )
     );
   }
+
 
   function initialsFor(
     person
   ) {
+
     return (
       person.firstName ||
       person.nickname ||
       'A'
     )
-      .slice(0, 2)
+      .slice(
+        0,
+        2
+      )
       .toUpperCase();
   }
+
 
   function deletePerson(
     personId
   ) {
+
     const person =
       getPersonById(
         personId
       );
 
-    if (!person) return;
+
+    if (!person) {
+      return;
+    }
+
 
     const confirmed =
       window.confirm(
-        `${t('deleteConfirm')} "${getDisplayName(
+        `${t(
+          'deleteConfirm'
+        )} "${getDisplayName(
           person
         )}"`
       );
 
-    if (!confirmed) return;
+
+    if (!confirmed) {
+      return;
+    }
+
 
     state.people =
       state.people.filter(
         (entry) =>
-          entry.id !== personId
+          entry.id !==
+          personId
       );
+
 
     state.relationships =
       state.relationships.filter(
@@ -3089,35 +5406,47 @@ const TRANSLATIONS = {
             personId
       );
 
+
     state.selectedPersonId =
       state.people[0]?.id ||
       null;
 
+
     saveFamilyData();
+
     renderAll();
+
     closeProfilePanel();
   }
 
+
   function registerServiceWorker() {
+
     if (
       'serviceWorker' in
       navigator
     ) {
+
       window.addEventListener(
         'load',
         () => {
+
           navigator.serviceWorker
             .register(
               './service-worker.js'
             )
-            .catch((error) => {
-              console.warn(
-                'Service worker registration failed:',
-                error
-              );
-            });
+            .catch(
+              (error) => {
+
+                console.warn(
+                  'Service worker registration failed:',
+                  error
+                );
+              }
+            );
         }
       );
     }
   }
+
 })();
