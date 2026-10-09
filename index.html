@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,7 +16,7 @@
   <meta name="twitter:title" content="Family Tree — Private Family History" />
   <meta name="twitter:description" content="Build and preserve your private family history." />
   <meta name="robots" content="index,follow" />
-  <title>পারিবারিক বংশগাছ</title>
+  <title>Family Tree</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
   <link rel="stylesheet" href="css/style.css" />
@@ -48,24 +48,24 @@
           <img src="assets/logo.svg" alt="Family tree logo" />
         </div>
         <div>
-          <h1 data-i18n="appTitle">পারিবারিক বংশগাছ</h1>
+          <h1 data-i18n="appTitle">Family Tree</h1>
           <p>FamilyTree Studio</p>
         </div>
       </div>
 
       <nav class="nav-panel" aria-label="Main navigation" data-i18n-aria="mainNavigation">
-        <button class="nav-item active" data-section="dashboard" data-i18n="dashboard">ড্যাশবোর্ড</button>
-        <button class="nav-item" data-section="tree" data-i18n="familyTree">বংশগাছ</button>
-        <button class="nav-item" data-section="members" data-i18n="familyMembers">পরিবারের সদস্য</button>
-        <button class="nav-item" data-section="timeline" data-i18n="timeline">টাইমলাইন</button>
-        <button class="nav-item" data-section="photos" data-i18n="photos">ফটো</button>
-        <button class="nav-item" data-section="settings" data-i18n="settings">সেটিংস</button>
+        <button class="nav-item active" data-section="dashboard" data-i18n="dashboard">Dashboard</button>
+        <button class="nav-item" data-section="tree" data-i18n="familyTree">Family Tree</button>
+        <button class="nav-item" data-section="members" data-i18n="familyMembers">Family Members</button>
+        <button class="nav-item" data-section="timeline" data-i18n="timeline">Timeline</button>
+        <button class="nav-item" data-section="photos" data-i18n="photos">Photos</button>
+        <button class="nav-item" data-section="settings" data-i18n="settings">Settings</button>
       </nav>
 
       <div class="sidebar-card">
-        <p class="eyebrow" data-i18n="quickActions">দ্রুত কাজ</p>
-        <button class="secondary-btn full-width" id="quick-add-btn" data-i18n="quickAdd">সদস্য যোগ</button>
-        <button class="ghost-btn full-width" id="export-btn" data-i18n="export">এক্সপোর্ট</button>
+        <p class="eyebrow" data-i18n="quickActions">Quick Actions</p>
+        <button class="secondary-btn full-width" id="quick-add-btn" data-i18n="quickAdd">Add Member</button>
+        <button class="ghost-btn full-width" id="export-btn" data-i18n="export">Export</button>
       </div>
     </aside>
 
@@ -73,52 +73,48 @@
       <header class="topbar">
         <div class="search-box">
           <span class="search-icon">⌕</span>
-          <input id="global-search" type="search" placeholder="সদস্য খুঁজুন..." aria-label="Search family members" data-i18n-placeholder="search" data-i18n-aria="searchMembers" list="search-results" />
+          <input id="global-search" type="search" placeholder="Search members..." aria-label="Search family members" data-i18n-placeholder="search" data-i18n-aria="searchMembers" list="search-results" />
           <datalist id="search-results"></datalist>
         </div>
         <div class="header-actions">
-          <div class="language-switch" aria-label="Language">
-            <button type="button" id="lang-bn" aria-label="Bengali" aria-pressed="true">BN</button>
-            <span aria-hidden="true">|</span>
-            <button type="button" id="lang-en" aria-label="English" aria-pressed="false">EN</button>
-          </div>
+          <span class="language-switch" aria-label="Language">English</span>
           <div class="auth-controls">
             <span id="user-profile" class="user-profile" hidden>
               <img id="user-photo" class="user-photo" alt="" hidden />
               <span id="user-name"></span>
             </span>
-            <button class="secondary-btn" id="google-login-btn" data-i18n="signInGoogle">Google দিয়ে সাইন ইন</button>
-            <button class="ghost-btn" id="logout-btn" data-i18n="logout" hidden>লগ আউট</button>
+            <button class="secondary-btn" id="google-login-btn" data-i18n="signInGoogle">Sign in with Google</button>
+            <button class="ghost-btn" id="logout-btn" data-i18n="logout" hidden>Sign Out</button>
             <span id="auth-status" class="auth-status" aria-live="polite"></span>
           </div>
-          <button class="secondary-btn" id="save-btn" data-i18n="save">সংরক্ষণ করুন</button>
-          <button class="primary-btn" id="add-member-btn" data-i18n="addFamilyMember">সদস্য যোগ করুন</button>
+          <button class="secondary-btn" id="save-btn" data-i18n="save">Save</button>
+          <button class="primary-btn" id="add-member-btn" data-i18n="addFamilyMember">Add Member</button>
         </div>
       </header>
 
       <section id="dashboard" class="page-panel active">
         <div class="page-header">
           <div>
-            <p class="eyebrow" data-i18n="familyOverview">পরিবারের ওভারভিউ</p>
-            <h2 data-i18n="welcome">স্বাগতম, পারিবারিক ইতিহাসের কেন্দ্রে</h2>
+            <p class="eyebrow" data-i18n="familyOverview">Family Overview</p>
+            <h2 data-i18n="welcome">Welcome to your family history</h2>
           </div>
         </div>
 
         <div class="stats-grid">
           <article class="stat-card accent-purple">
-            <span class="stat-label" data-i18n="totalMembers">মোট সদস্য</span>
+            <span class="stat-label" data-i18n="totalMembers">Total Members</span>
             <strong id="total-members">0</strong>
           </article>
           <article class="stat-card accent-blue">
-            <span class="stat-label" data-i18n="generations">প্রজন্ম</span>
+            <span class="stat-label" data-i18n="generations">Generations</span>
             <strong id="generation-count">0</strong>
           </article>
           <article class="stat-card accent-gold">
-            <span class="stat-label" data-i18n="recentAdditions">সাম্প্রতিক যোগ</span>
+            <span class="stat-label" data-i18n="recentAdditions">Recent Additions</span>
             <strong id="recent-additions">0</strong>
           </article>
           <article class="stat-card accent-green">
-            <span class="stat-label" data-i18n="importantEvents">গুরুত্বপূর্ণ ঘটনা</span>
+            <span class="stat-label" data-i18n="importantEvents">Important Events</span>
             <strong id="event-count">0</strong>
           </article>
         </div>
@@ -126,15 +122,15 @@
         <div class="two-column-layout">
           <div class="card-panel">
             <div class="panel-head">
-              <h3 data-i18n="familyPreview">পরিবারের পূর্বাভাস</h3>
-              <button class="text-btn" id="preview-tree-btn" data-i18n="viewFamilyTree">বংশগাছ দেখুন</button>
+              <h3 data-i18n="familyPreview">Family Preview</h3>
+              <button class="text-btn" id="preview-tree-btn" data-i18n="viewFamilyTree">View Family Tree</button>
             </div>
             <div id="family-preview" class="family-preview"></div>
           </div>
 
           <div class="card-panel">
             <div class="panel-head">
-              <h3 data-i18n="recentEvents">সাম্প্রতিক ঘটনা</h3>
+              <h3 data-i18n="recentEvents">Recent Events</h3>
             </div>
             <div id="recent-events" class="event-list"></div>
           </div>
@@ -144,8 +140,8 @@
       <section id="tree" class="page-panel">
         <div class="page-header with-actions">
           <div>
-            <p class="eyebrow" data-i18n="familyTree">বংশগাছ</p>
-            <h2 data-i18n="interactiveRelationships">ইন্টারঅ্যাকটিভ পারিবারিক সম্পর্ক</h2>
+            <p class="eyebrow" data-i18n="familyTree">Family Tree</p>
+            <h2 data-i18n="interactiveRelationships">Family Connections</h2>
           </div>
           <div class="toolbar">
             <button class="toolbar-btn" data-action="zoom-out" data-i18n="zoomOut" title="Zoom out">Zoom out</button>
@@ -170,8 +166,8 @@
       <section id="members" class="page-panel">
         <div class="page-header">
           <div>
-            <p class="eyebrow" data-i18n="familyMembers">পরিবারের সদস্য</p>
-            <h2 data-i18n="allMembers">সকল সদস্য</h2>
+            <p class="eyebrow" data-i18n="familyMembers">Family Members</p>
+            <h2 data-i18n="allMembers">All Members</h2>
           </div>
         </div>
         <div id="members-list" class="member-list"></div>
@@ -180,8 +176,8 @@
       <section id="timeline" class="page-panel">
         <div class="page-header">
           <div>
-            <p class="eyebrow" data-i18n="timeline">টাইমলাইন</p>
-            <h2 data-i18n="familyImportantDates">পরিবারের গুরুত্বপূর্ণ দিন</h2>
+            <p class="eyebrow" data-i18n="timeline">Timeline</p>
+            <h2 data-i18n="familyImportantDates">Important Family Dates</h2>
           </div>
         </div>
         <div id="timeline-list" class="timeline-list"></div>
@@ -190,8 +186,8 @@
       <section id="photos" class="page-panel">
         <div class="page-header">
           <div>
-            <p class="eyebrow" data-i18n="photos">ফটো</p>
-            <h2 data-i18n="familyPhotos">পারিবারিক আলোকচিত্র</h2>
+            <p class="eyebrow" data-i18n="photos">Photos</p>
+            <h2 data-i18n="familyPhotos">Family Photos</h2>
           </div>
         </div>
         <div id="photos-grid" class="photos-grid"></div>
@@ -200,21 +196,21 @@
       <section id="settings" class="page-panel">
         <div class="page-header">
           <div>
-            <p class="eyebrow" data-i18n="settings">সেটিংস</p>
-            <h2 data-i18n="dataManagement">তথ্য ব্যবস্থাপনা</h2>
+            <p class="eyebrow" data-i18n="settings">Settings</p>
+            <h2 data-i18n="dataManagement">Data Management</h2>
           </div>
         </div>
         <div class="settings-grid">
           <div class="card-panel">
-            <h3 data-i18n="dataStorage">ডেটা স্টোরেজ</h3>
-            <p id="storage-status">লোকাল স্টোরেজে সংরক্ষিত</p>
-            <button class="secondary-btn" id="reset-btn" data-i18n="resetTree">ফ্যামিলি ট্রি রিসেট</button>
+            <h3 data-i18n="dataStorage">Data Storage</h3>
+            <p id="storage-status">Saved on this device</p>
+            <button class="secondary-btn" id="reset-btn" data-i18n="resetTree">Reset Family Tree</button>
           </div>
           <div class="card-panel">
-            <h3 data-i18n="importExport">আমদানি / রপ্তানি</h3>
+            <h3 data-i18n="importExport">Import / Export</h3>
             <div class="stacked-actions">
-              <button class="secondary-btn" id="export-tree-btn" data-i18n="export">রপ্তানি</button>
-              <button class="secondary-btn" id="import-tree-btn" data-i18n="import">আমদানি</button>
+              <button class="secondary-btn" id="export-tree-btn" data-i18n="export">Export</button>
+              <button class="secondary-btn" id="import-tree-btn" data-i18n="import">Import</button>
               <input id="import-file" type="file" accept="application/json" hidden />
             </div>
           </div>
@@ -229,25 +225,25 @@
     <div class="profile-header">
       <div class="profile-avatar" id="profile-avatar">A</div>
       <div>
-        <p class="eyebrow" data-i18n="profile">প্রোফাইল</p>
-        <h3 id="profile-name">নির্বাচিত সদস্য</h3>
+        <p class="eyebrow" data-i18n="profile">Profile</p>
+        <h3 id="profile-name">Selected Member</h3>
       </div>
       <button id="close-profile" class="icon-btn" aria-label="Close profile" data-i18n-aria="closeProfile">✕</button>
     </div>
 
     <div class="profile-content" id="profile-content"></div>
     <div class="profile-actions">
-      <button class="primary-btn" id="profile-edit-btn" data-i18n="edit">সম্পাদনা</button>
-      <button class="secondary-btn" id="profile-add-btn" data-i18n="addFamilyMember">সদস্য যোগ</button>
-      <button class="ghost-btn" id="profile-tree-btn" data-i18n="viewFamilyTree">বংশগাছ দেখুন</button>
-      <button class="danger-btn" id="profile-delete-btn" data-i18n="delete">মুছে ফেলুন</button>
+      <button class="primary-btn" id="profile-edit-btn" data-i18n="edit">Edit</button>
+      <button class="secondary-btn" id="profile-add-btn" data-i18n="addFamilyMember">Add Member</button>
+      <button class="ghost-btn" id="profile-tree-btn" data-i18n="viewFamilyTree">View Family Tree</button>
+      <button class="danger-btn" id="profile-delete-btn" data-i18n="delete">Delete</button>
     </div>
   </aside>
 
   <div id="member-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
     <div class="modal-card">
       <div class="modal-head">
-        <h3 id="member-modal-title" data-i18n="addFamilyMember">সদস্য যোগ করুন</h3>
+        <h3 id="member-modal-title" data-i18n="addFamilyMember">Add Member</h3>
         <button class="icon-btn" id="close-modal-btn" aria-label="Close dialog" data-i18n-aria="closeDialog">✕</button>
       </div>
       <form id="member-form">
@@ -255,114 +251,114 @@
         <div class="form-grid">
           <label class="full-span">
             <span class="form-label">
-              <span data-i18n="fullName">পূর্ণ নাম</span>
+              <span data-i18n="fullName">Full Name</span>
               <span class="required-indicator" aria-hidden="true">*</span>
             </span>
             <input id="full-name" name="fullName" type="text" required autocomplete="name" />
           </label>
           <label>
-            <span data-i18n="nickname">ডাকনাম</span>
+            <span data-i18n="nickname">Nickname</span>
             <input id="nickname" name="nickname" type="text" />
           </label>
           <label>
-            <span data-i18n="gender">লিঙ্গ</span>
+            <span data-i18n="gender">Gender</span>
             <select id="gender" name="gender">
-              <option value="male" data-i18n="male">পুরুষ</option>
-              <option value="female" data-i18n="female">মহিলা</option>
-              <option value="other" data-i18n="other">অন্যান্য</option>
+              <option value="male" data-i18n="male">Male</option>
+              <option value="female" data-i18n="female">Female</option>
+              <option value="other" data-i18n="other">Other</option>
             </select>
           </label>
           <label>
-            <span data-i18n="dateOfBirth">জন্ম তারিখ</span>
+            <span data-i18n="dateOfBirth">Date of Birth</span>
             <input id="birth-date" name="birthDate" type="date" />
           </label>
           <label>
-            <span data-i18n="birthPlace">জন্মস্থান</span>
+            <span data-i18n="birthPlace">Place of Birth</span>
             <input id="birth-place" name="birthPlace" type="text" />
           </label>
           <label>
-            <span data-i18n="dateOfDeath">মৃত্যু তারিখ</span>
+            <span data-i18n="dateOfDeath">Date of Death</span>
             <input id="death-date" name="deathDate" type="date" />
           </label>
           <label>
-            <span data-i18n="deathPlace">মৃত্যুস্থান</span>
+            <span data-i18n="deathPlace">Place of Death</span>
             <input id="death-place" name="deathPlace" type="text" />
           </label>
           <label>
-            <span data-i18n="occupation">পেশা</span>
+            <span data-i18n="occupation">Occupation</span>
             <input id="occupation" name="occupation" type="text" />
           </label>
           <label>
-            <span data-i18n="photoUrl">ফটো URL</span>
+            <span data-i18n="photoUrl">Photo URL</span>
             <input id="photo" name="photo" type="url" placeholder="https://..." />
           </label>
           <label class="full-span">
-            <span data-i18n="notes">জীবনী / নোট</span>
+            <span data-i18n="notes">Biography / Notes</span>
             <textarea id="biography" name="biography" rows="4"></textarea>
           </label>
           <label>
-            <span data-i18n="phone">ফোন</span>
+            <span data-i18n="phone">Phone</span>
             <input id="phone" name="phone" type="tel" autocomplete="tel" />
           </label>
           <label>
-            <span data-i18n="email">ইমেইল</span>
+            <span data-i18n="email">Email</span>
             <input id="email" name="email" type="email" autocomplete="email" />
           </label>
           <label class="full-span">
-            <span data-i18n="address">ঠিকানা</span>
+            <span data-i18n="address">Address</span>
             <textarea id="address" name="address" rows="2" autocomplete="street-address"></textarea>
           </label>
           <label>
-            <span data-i18n="father">পিতা</span>
+            <span data-i18n="father">Father</span>
             <select id="father-person" name="fatherPerson">
-              <option value="" data-i18n="chooseMember">সদস্য নির্বাচন করুন</option>
+              <option value="" data-i18n="chooseMember">Select a family member</option>
             </select>
           </label>
           <label>
-            <span data-i18n="mother">মাতা</span>
+            <span data-i18n="mother">Mother</span>
             <select id="mother-person" name="motherPerson">
-              <option value="" data-i18n="chooseMember">সদস্য নির্বাচন করুন</option>
+              <option value="" data-i18n="chooseMember">Select a family member</option>
             </select>
           </label>
           <label>
-            <span data-i18n="spouse">স্বামী/স্ত্রী</span>
+            <span data-i18n="spouse">Spouse</span>
             <select id="spouse-person" name="spousePerson" multiple size="3"></select>
           </label>
           <label>
-            <span data-i18n="children">সন্তান</span>
+            <span data-i18n="children">Children</span>
             <select id="children-person" name="childrenPerson" multiple size="3"></select>
           </label>
           <label>
-            <span data-i18n="relationship">সম্পর্ক</span>
+            <span data-i18n="relationship">Relationship</span>
             <select id="relationship-type" name="relationshipType">
-              <option value="none" data-i18n="noRelationship">কোনো সম্পর্ক নেই</option>
-              <option value="father" data-i18n="father">পিতা</option>
-              <option value="mother" data-i18n="mother">মাতা</option>
-              <option value="son" data-i18n="son">পুত্র</option>
-              <option value="daughter" data-i18n="daughter">কন্যা</option>
-              <option value="brother" data-i18n="brother">ভাই</option>
-              <option value="sister" data-i18n="sister">বোন</option>
-              <option value="husband" data-i18n="husband">স্বামী</option>
-              <option value="wife" data-i18n="wife">স্ত্রী</option>
-              <option value="grandfather" data-i18n="grandfather">দাদা</option>
-              <option value="grandmother" data-i18n="grandmother">দাদি</option>
-              <option value="uncle" data-i18n="uncle">চাচা/কাকু/মামা</option>
-              <option value="aunt" data-i18n="aunt">চাচী/কাকিমা/মামি</option>
-              <option value="cousin" data-i18n="cousin">চাচাতো/কাকাতো/মামাতো</option>
-              <option value="other" data-i18n="other">অন্যান্য</option>
+              <option value="none" data-i18n="noRelationship">No relationship</option>
+              <option value="father" data-i18n="father">Father</option>
+              <option value="mother" data-i18n="mother">Mother</option>
+              <option value="son" data-i18n="son">Son</option>
+              <option value="daughter" data-i18n="daughter">Daughter</option>
+              <option value="brother" data-i18n="brother">Brother</option>
+              <option value="sister" data-i18n="sister">Sister</option>
+              <option value="husband" data-i18n="husband">Husband</option>
+              <option value="wife" data-i18n="wife">Wife</option>
+              <option value="grandfather" data-i18n="grandfather">Grandfather</option>
+              <option value="grandmother" data-i18n="grandmother">Grandmother</option>
+              <option value="uncle" data-i18n="uncle">Uncle</option>
+              <option value="aunt" data-i18n="aunt">Aunt</option>
+              <option value="cousin" data-i18n="cousin">Cousin</option>
+              <option value="other" data-i18n="other">Other</option>
             </select>
           </label>
           <label>
-            <span data-i18n="relatedMember">সম্পর্কিত সদস্য</span>
+            <span data-i18n="relatedMember">Related Family Member</span>
             <select id="related-person" name="relatedPerson">
-              <option value="" data-i18n="chooseMember">সদস্য নির্বাচন করুন</option>
+              <option value="" data-i18n="chooseMember">Select a family member</option>
             </select>
           </label>
         </div>
         <p id="member-form-error" class="form-error" role="alert" aria-live="assertive" hidden></p>
         <div class="modal-actions">
-          <button type="button" class="ghost-btn" id="cancel-btn" data-i18n="cancel">বাতিল</button>
-          <button type="submit" class="primary-btn" data-i18n="save">সংরক্ষণ করুন</button>
+          <button type="button" class="ghost-btn" id="cancel-btn" data-i18n="cancel">Cancel</button>
+          <button type="submit" class="primary-btn" data-i18n="save">Save</button>
         </div>
       </form>
     </div>

@@ -26,141 +26,6 @@ const TREE_BRANCH_COLORS = [
 ];
 
 const TRANSLATIONS = {
-  bn: {
-    appTitle: 'পারিবারিক বংশগাছ',
-    dashboard: 'ড্যাশবোর্ড',
-    familyTree: 'বংশগাছ',
-    familyMembers: 'পরিবারের সদস্য',
-    timeline: 'টাইমলাইন',
-    photos: 'ফটো',
-    settings: 'সেটিংস',
-    quickActions: 'দ্রুত কাজ',
-    quickAdd: 'সদস্য যোগ',
-    addFamilyMember: 'পরিবারের সদস্য যোগ করুন',
-    export: 'রপ্তানি',
-    import: 'আমদানি',
-    save: 'সংরক্ষণ করুন',
-    cancel: 'বাতিল',
-    edit: 'সম্পাদনা',
-    delete: 'মুছে ফেলুন',
-    search: 'সদস্য খুঁজুন...',
-    searchMembers: 'পরিবারের সদস্য খুঁজুন',
-    signInGoogle: 'Google দিয়ে সাইন ইন',
-    logout: 'লগ আউট',
-    familyOverview: 'পরিবারের ওভারভিউ',
-    welcome: 'স্বাগতম, পারিবারিক ইতিহাসের কেন্দ্রে',
-    totalMembers: 'মোট সদস্য',
-    generations: 'প্রজন্ম',
-    recentAdditions: 'সাম্প্রতিক যোগ',
-    importantEvents: 'গুরুত্বপূর্ণ ঘটনা',
-    familyPreview: 'পরিবারের পূর্বাভাস',
-    viewFamilyTree: 'বংশগাছ দেখুন',
-    recentEvents: 'সাম্প্রতিক ঘটনা',
-    interactiveRelationships: 'পরিবারের সম্পর্ক',
-    allMembers: 'সকল সদস্য',
-    familyImportantDates: 'পরিবারের গুরুত্বপূর্ণ দিন',
-    familyPhotos: 'পারিবারিক আলোকচিত্র',
-    dataManagement: 'তথ্য ব্যবস্থাপনা',
-    dataStorage: 'ডেটা স্টোরেজ',
-    resetTree: 'ফ্যামিলি ট্রি রিসেট',
-    importExport: 'আমদানি / রপ্তানি',
-    profile: 'প্রোফাইল',
-    fullName: 'পূর্ণ নাম',
-    gender: 'লিঙ্গ',
-    male: 'পুরুষ',
-    female: 'মহিলা',
-    other: 'অন্যান্য',
-    dateOfBirth: 'জন্ম তারিখ',
-    birthPlace: 'জন্মস্থান',
-    dateOfDeath: 'মৃত্যু তারিখ',
-    deathPlace: 'মৃত্যুস্থান',
-    occupation: 'পেশা',
-    photoUrl: 'ফটো URL',
-    notes: 'নোট',
-    nickname: 'ডাকনাম',
-    phone: 'ফোন',
-    email: 'ইমেইল',
-    address: 'ঠিকানা',
-    relationship: 'সম্পর্ক',
-    spouse: 'স্বামী/স্ত্রী',
-    children: 'সন্তান',
-    child: 'সন্তান',
-    father: 'পিতা',
-    mother: 'মাতা',
-    son: 'পুত্র',
-    daughter: 'কন্যা',
-    brother: 'ভাই',
-    sister: 'বোন',
-    husband: 'স্বামী',
-    wife: 'স্ত্রী',
-    grandfather: 'দাদা',
-    grandmother: 'দাদি',
-    uncle: 'চাচা/কাকু/মামা',
-    aunt: 'চাচী/কাকিমা/মামি',
-    cousin: 'চাচাতো/কাকাতো/মামাতো',
-    noRelationship: 'কোনো সম্পর্ক নেই',
-    relatedMember: 'সম্পর্কিত সদস্য',
-    downloadPdf: 'PDF',
-    printTree: 'প্রিন্ট',
-    exportPdf: 'PDF রপ্তানি',
-    legendTitle: 'পারিবারিক শাখা',
-    branchLabel: 'শাখা',
-    branchColorHint: 'রং পূর্বপুরুষের পারিবারিক শাখা নির্দেশ করে',
-    pdfExportFailed: 'PDF তৈরি করা যায়নি। আবার চেষ্টা করুন।',
-    noMembers: 'কোনো পরিবারের সদস্য পাওয়া যায়নি',
-    noEvents: 'এখনো কোনো সময়রেখা নেই।',
-    noPhotos: 'এখনো কোনো ফটো সংযুক্ত করা হয়নি।',
-    noData: 'তথ্য নেই',
-    unknownOccupation: 'অজানা পেশা',
-    familyMember: 'পরিবারের সদস্য',
-    newMember: 'নতুন',
-    birthEvent: 'জন্মগ্রহণ করেছেন',
-    deathEvent: 'এর মৃত্যু ঘটেছে',
-    marriage: 'বিয়ে',
-    born: 'জন্ম',
-    died: 'মৃত্যু',
-    saveFailed: 'সংরক্ষণ ব্যর্থ হয়েছে।',
-    cloudSaved: 'ক্লাউডে সংরক্ষিত',
-    loadingCloud: 'Firestore থেকে তথ্য লোড হচ্ছে…',
-    importFailed: 'আমদানি ব্যর্থ হয়েছে:',
-    familyHistory: 'পারিবারিক ইতিহাস',
-    closeProfile: 'প্রোফাইল বন্ধ করুন',
-    closeDialog: 'ডায়ালগ বন্ধ করুন',
-    treeDiagram: 'পারিবারিক বংশগাছের চিত্র',
-    localSaved: 'এই ডিভাইসে সংরক্ষিত',
-    cloudSaving: 'ক্লাউডে সংরক্ষণ হচ্ছে…',
-    firebaseSetup: 'ক্লাউড লগইনের জন্য js/firebase-config.js-এ Firebase Web App config যোগ করুন।',
-    authInitializing: 'Firebase সংযোগ হচ্ছে…',
-    authFailed: 'Firebase লগইন প্রস্তুত করা যায়নি।',
-    authDomainUnauthorized: 'এই ডোমেইনটি Firebase Authentication-এ অনুমোদিত নয়। Firebase Console-এর Authentication > Settings > Authorized domains-এ এই ডোমেইনটি যোগ করুন:',
-    cloudUnavailable: 'Firebase সংযোগ প্রস্তুত নয়। কিছুক্ষণ পর আবার চেষ্টা করুন।',
-    loginFailed: 'Google লগইন ব্যর্থ হয়েছে',
-    logoutFailed: 'লগ আউট ব্যর্থ হয়েছে',
-    chooseMember: 'সদস্য নির্বাচন করুন',
-    addTitle: 'পরিবারের সদস্য যোগ করুন',
-    editTitle: 'সদস্য সম্পাদনা',
-    nameRequired: 'পূর্ণ নাম অবশ্যই দিতে হবে।',
-    exportDate: 'রপ্তানির তারিখ',
-    courtesy: 'সৌজন্যে by Md Injamam Ul Haque',
-    familyReport: 'পারিবারিক বংশগাছ',
-    loginNeeded: 'Google দিয়ে সাইন ইন করে ব্যক্তিগত Firestore-এ সংরক্ষণ করুন।',
-    treeEmpty: 'কোনো সদস্য নেই',
-    unknownMember: 'অজ্ঞাত সদস্য',
-    relationshipLabel: 'সম্পর্ক',
-    zoomOut: 'ছোট করুন',
-    zoomIn: 'বড় করুন',
-    center: 'কেন্দ্র',
-    fitTree: 'পুরো গাছ',
-    resetView: 'ভিউ রিসেট',
-    living: 'জীবিত',
-    deceased: 'প্রয়াত',
-    collapse: 'সংকোচন',
-    expand: 'বিস্তার',
-    resetConfirm: 'আপনি কি সত্যিই ফ্যামিলি ট্রি রিসেট করতে চান? এটি সব সদস্য ও সম্পর্ক মুছে ফেলবে।',
-    deleteConfirm: 'আপনি কি এই সদস্যকে মুছে ফেলতে চান?',
-    mainNavigation: 'প্রধান নেভিগেশন'
-  },
-
   en: {
     appTitle: 'Family Tree',
     dashboard: 'Dashboard',
@@ -276,7 +141,7 @@ const TRANSLATIONS = {
     editTitle: 'Edit Family Member',
     nameRequired: 'Full name is required.',
     exportDate: 'Exported',
-    courtesy: 'সৌজন্যে by Md Injamam Ul Haque',
+    courtesy: 'Courtesy of Md Injamam Ul Haque',
     familyReport: 'Family Tree',
     loginNeeded: 'Sign in with Google to save privately to Firestore.',
     treeEmpty: 'No family members yet',
@@ -306,10 +171,6 @@ const TRANSLATIONS = {
     selectedPersonId: null,
     activeSection: 'dashboard',
     searchTerm: '',
-    language:
-      localStorage.getItem('familyTreeLanguage') === 'en'
-        ? 'en'
-        : 'bn',
 
     firebase: null,
     user: null,
@@ -496,12 +357,6 @@ const TRANSLATIONS = {
     dom.eventCount =
       document.getElementById('event-count');
 
-    dom.languageBn =
-      document.getElementById('lang-bn');
-
-    dom.languageEn =
-      document.getElementById('lang-en');
-
     dom.googleLoginBtn =
       document.getElementById('google-login-btn');
 
@@ -532,36 +387,12 @@ const TRANSLATIONS = {
 
 
   function t(key) {
-    const language = state.activeSection === 'tree'
-      ? 'en'
-      : state.language;
-    return (
-      TRANSLATIONS[language][key] ||
-      TRANSLATIONS.en[key] ||
-      key
-    );
-  }
-
-
-  function setLanguage(language) {
-
-    if (!TRANSLATIONS[language]) return;
-
-    state.language = language;
-
-    localStorage.setItem(
-      'familyTreeLanguage',
-      language
-    );
-
-    renderAll();
+    return TRANSLATIONS.en[key] || key;
   }
 
 
   function applyLanguage() {
-    const language = state.activeSection === 'tree'
-      ? 'en'
-      : state.language;
+    const language = 'en';
 
     document.documentElement.lang =
       language;
@@ -614,26 +445,6 @@ const TRANSLATIONS = {
           )
         );
       });
-
-
-    if (dom.languageBn) {
-      dom.languageBn.setAttribute(
-        'aria-pressed',
-        String(
-          state.language === 'bn'
-        )
-      );
-    }
-
-
-    if (dom.languageEn) {
-      dom.languageEn.setAttribute(
-        'aria-pressed',
-        String(
-          state.language === 'en'
-        )
-      );
-    }
 
 
     setAuthStatus(
@@ -1252,24 +1063,6 @@ const TRANSLATIONS = {
       dom.importFileInput.addEventListener(
         'change',
         handleImportFile
-      );
-    }
-
-
-    if (dom.languageBn) {
-      dom.languageBn.addEventListener(
-        'click',
-        () =>
-          setLanguage('bn')
-      );
-    }
-
-
-    if (dom.languageEn) {
-      dom.languageEn.addEventListener(
-        'click',
-        () =>
-          setLanguage('en')
       );
     }
 
@@ -3977,65 +3770,6 @@ const TRANSLATIONS = {
     renderFamilyTree();
   }
 
-  function createAxisPages(extent, cardIntervals, targetSpan) {
-    if (extent <= targetSpan) return [{ start: 0, end: extent }];
-
-    const mergedIntervals = cardIntervals
-      .map(([start, end]) => [Math.max(0, start), Math.min(extent, end)])
-      .filter(([start, end]) => end > start)
-      .sort((first, second) => first[0] - second[0])
-      .reduce((merged, interval) => {
-        const previous = merged[merged.length - 1];
-        if (previous && interval[0] <= previous[1]) {
-          previous[1] = Math.max(previous[1], interval[1]);
-        } else {
-          merged.push(interval.slice());
-        }
-        return merged;
-      }, []);
-    const gaps = [];
-    for (let index = 1; index < mergedIntervals.length; index += 1) {
-      const start = mergedIntervals[index - 1][1];
-      const end = mergedIntervals[index][0];
-      if (end > start) gaps.push({ start, end, center: (start + end) / 2 });
-    }
-
-    const pages = [];
-    let start = 0;
-    while (start < extent) {
-      const idealEnd = start + targetSpan;
-      if (idealEnd >= extent) {
-        pages.push({ start, end: extent });
-        break;
-      }
-      const eligibleGaps = gaps.filter((gap) =>
-        gap.center >= start + targetSpan * 0.55 &&
-        gap.center <= Math.min(extent, start + targetSpan * 1.25)
-      );
-      const widerGaps = eligibleGaps.filter((gap) => gap.end - gap.start >= 36);
-      const laterGaps = gaps.filter((gap) => gap.center > start + targetSpan * 0.55);
-      const candidates = widerGaps.length
-        ? widerGaps
-        : eligibleGaps.length
-          ? eligibleGaps
-          : laterGaps;
-      if (!candidates.length) {
-        pages.push({ start, end: extent });
-        break;
-      }
-      const split = candidates.sort((first, second) =>
-        Math.abs(first.center - idealEnd) - Math.abs(second.center - idealEnd)
-      )[0];
-      const end = split.center;
-      pages.push({ start, end });
-      const overlap = split
-        ? Math.min(30, Math.max(0, (split.end - split.start) / 2 - 1))
-        : 0;
-      start = end - overlap;
-    }
-    return pages;
-  }
-
   async function makePdfImagesLocal(svg) {
     const imageElements = [...svg.querySelectorAll('image')];
     await Promise.all(imageElements.map(async (image) => {
@@ -4118,6 +3852,55 @@ const TRANSLATIONS = {
     }
   }
 
+  function treeSvgContent(layout, selectedPersonId = '') {
+    const defs = layout.positions.map((entry, index) => `
+      <clipPath id="tree-avatar-${index}">
+        <circle cx="34" cy="54" r="23"></circle>
+      </clipPath>
+    `).join('');
+    const links = layout.links.map((link) => `
+      <path class="tree-link ${link.type === 'spouse' ? 'spouse-link' : ''}"
+        d="${link.path}" style="stroke:${link.color}"></path>
+    `).join('');
+    const nodeMarkup = layout.positions.map((entry, index) => {
+      const person = getPersonById(entry.id);
+      if (!person) return '';
+
+      const isSelected = entry.id === selectedPersonId;
+      const deceased = Boolean(person.deathDate);
+      const birthYear = treeDateLabel(person.birthDate);
+      const deathYear = treeDateLabel(person.deathDate);
+      const dates = [
+        birthYear ? `* ${birthYear}` : '',
+        deathYear ? `† ${deathYear}` : ''
+      ].filter(Boolean).join('  ·  ');
+      const name = getDisplayName(person);
+      const nameLength = Math.min(140, Math.max(40, name.length * 7));
+      const photo = person.photo
+        ? `<image class="node-photo" href="${escapeHtml(person.photo)}"
+            x="11" y="31" width="46" height="46" preserveAspectRatio="xMidYMid slice"
+            clip-path="url(#tree-avatar-${index})"></image>`
+        : `<circle class="node-avatar-placeholder" cx="34" cy="54" r="23"></circle>
+           <text class="node-initials" x="34" y="58">${escapeHtml(initialsFor(person))}</text>`;
+
+      return `
+        <g class="tree-node ${isSelected ? 'selected' : ''} ${deceased ? 'deceased' : ''}"
+          data-person-id="${escapeHtml(person.id)}" tabindex="0" role="button"
+          aria-label="${escapeHtml(name)}" transform="translate(${entry.x}, ${entry.y})">
+          <rect class="node-card" width="216" height="114" rx="14"></rect>
+          <path class="node-branch-accent" d="M 2 16 V 98"
+            style="stroke:${entry.branchColor}"></path>
+          ${photo}
+          <text class="node-name" x="67" y="52" textLength="${nameLength}"
+            lengthAdjust="spacingAndGlyphs">${escapeHtml(name)}</text>
+          <text class="node-dates" x="67" y="73">${escapeHtml(dates || t('familyMember'))}</text>
+          <text class="node-life-status" x="67" y="94">${deceased ? t('deceased') : t('living')}</text>
+        </g>
+      `;
+    }).join('');
+    return `<defs>${defs}</defs>${links}${nodeMarkup}`;
+  }
+
   async function exportTreePdf() {
     if (!state.people.length) {
       alert(t('noMembers'));
@@ -4132,45 +3915,94 @@ const TRANSLATIONS = {
     try {
       const { jsPDF } = await import('jspdf');
       const rootId = state.selectedPersonId || state.people[0]?.id;
-      const layout = computeTreeLayout(
-        collectVisiblePeople(rootId, state.tree.maxDepth),
-        rootId
-      );
-      if (!layout.positions.length) throw new Error('The displayed tree has no members.');
+      const layout = computeTreeLayout(state.people.map((person) => person.id), rootId);
+      if (!layout.positions.length || layout.positions.length !== state.people.length) {
+        throw new Error('The complete family tree could not be laid out.');
+      }
 
-      const cardWidth = 216;
-      const cardHeight = 114;
-      const horizontalPages = createAxisPages(
-        layout.width,
-        layout.positions.map(({ x }) => [x, x + cardWidth]),
-        1000
-      );
-      const verticalPages = createAxisPages(
-        layout.height,
-        layout.positions.map(({ y }) => [y, y + cardHeight]),
-        580
-      );
-      const totalPages = horizontalPages.length * verticalPages.length;
+      const margins = { horizontal: 16, vertical: 16 };
+      const titleHeight = 12;
+      const paperSizes = [
+        ['a4', 297, 210],
+        ['legal', 356, 216],
+        ['tabloid', 432, 279],
+        ['a3', 420, 297],
+        ['a2', 594, 420],
+        ['a1', 841, 594],
+        ['a0', 1189, 841]
+      ];
+      const minReadableFontMm = 2.8;
+      const minimumScale = minReadableFontMm / 13;
+      const choosePage = ([format, width, height]) => {
+        const contentWidth = width - margins.horizontal * 2;
+        const contentHeight = height - margins.vertical * 2 - titleHeight;
+        const scale = Math.min(
+          contentWidth / layout.width,
+          contentHeight / layout.height
+        );
+        return { format, width, height, contentWidth, contentHeight, scale };
+      };
+      let page = paperSizes
+        .map(choosePage)
+        .find((candidate) => candidate.scale >= minimumScale);
+      if (!page) {
+        const maximumPageSize = 5000;
+        const scale = Math.min(
+          0.35,
+          (maximumPageSize - margins.horizontal * 2) / layout.width,
+          (maximumPageSize - margins.vertical * 2 - titleHeight) / layout.height
+        );
+        const width = Math.min(
+          maximumPageSize,
+          layout.width * scale + margins.horizontal * 2
+        );
+        const height = Math.min(
+          maximumPageSize,
+          layout.height * scale + margins.vertical * 2 + titleHeight
+        );
+        page = choosePage(['custom', width, height]);
+      }
+      if (!(page.scale > 0) || !Number.isFinite(page.scale)) {
+        throw new Error('The family tree is too large for a single PDF page.');
+      }
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
-        format: 'a4',
+        format: page.format === 'custom'
+          ? [page.width, page.height]
+          : page.format,
         compress: true
       });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const pageMargin = 12;
-      const contentTop = 25;
-      const contentWidth = pageWidth - pageMargin * 2;
-      const contentHeight = pageHeight - contentTop - 11;
+      const scale = Math.min(
+        (pageWidth - margins.horizontal * 2) / layout.width,
+        (pageHeight - margins.vertical * 2 - titleHeight) / layout.height
+      );
+      const renderedWidth = layout.width * scale;
+      const renderedHeight = layout.height * scale;
+      const imageX = (pageWidth - renderedWidth) / 2;
+      const imageY = margins.vertical + titleHeight +
+        (pageHeight - margins.vertical * 2 - titleHeight - renderedHeight) / 2;
+      if (
+        imageX < margins.horizontal ||
+        imageX + renderedWidth > pageWidth - margins.horizontal ||
+        imageY < margins.vertical + titleHeight ||
+        imageY + renderedHeight > pageHeight - margins.vertical
+      ) {
+        throw new Error('The complete family tree does not fit on the PDF page.');
+      }
       const titleDate = new Intl.DateTimeFormat('en', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       }).format(new Date());
-      const baseSvg = dom.treeSvg.cloneNode(true);
-      baseSvg.style.transform = 'none';
+      const baseSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       baseSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      baseSvg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
+      baseSvg.setAttribute('width', layout.width);
+      baseSvg.setAttribute('height', layout.height);
+      baseSvg.innerHTML = treeSvgContent(layout);
       baseSvg.insertAdjacentHTML('afterbegin', `
         <style>
           .node-card{fill:#fff;stroke:#d9d5e8;stroke-width:1.25}
@@ -4188,52 +4020,41 @@ const TRANSLATIONS = {
         </style>
       `);
       await makePdfImagesLocal(baseSvg);
+      const imageDensity = Math.min(
+        4,
+        12000 / renderedWidth,
+        12000 / renderedHeight,
+        Math.sqrt(48000000 / (renderedWidth * renderedHeight))
+      );
+      const image = await renderSvgForPdf(
+        baseSvg,
+        renderedWidth * imageDensity,
+        renderedHeight * imageDensity
+      );
 
-      let pageNumber = 0;
-      for (const verticalPage of verticalPages) {
-        for (const horizontalPage of horizontalPages) {
-          if (pageNumber) pdf.addPage('a4', 'landscape');
-          pageNumber += 1;
-          const svgPage = baseSvg.cloneNode(true);
-          const viewX = horizontalPage.start;
-          const viewY = verticalPage.start;
-          const viewWidth = horizontalPage.end - horizontalPage.start;
-          const viewHeight = verticalPage.end - verticalPage.start;
-          svgPage.setAttribute('viewBox', `${viewX} ${viewY} ${viewWidth} ${viewHeight}`);
-          svgPage.setAttribute('width', viewWidth);
-          svgPage.setAttribute('height', viewHeight);
-          svgPage.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
-          pdf.setTextColor(35, 32, 57);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setFontSize(13);
-          pdf.text('Family Tree', pageMargin, 13);
-          pdf.setFont('helvetica', 'normal');
-          pdf.setFontSize(8);
-          pdf.setTextColor(95, 91, 108);
-          pdf.text(titleDate, pageWidth - pageMargin, 13, { align: 'right' });
-          const image = await renderSvgForPdf(
-            svgPage,
-            contentWidth * 4,
-            contentHeight * 4
-          );
-          pdf.addImage(
-            image,
-            'PNG',
-            pageMargin,
-            contentTop,
-            contentWidth,
-            contentHeight,
-            undefined,
-            'FAST'
-          );
-          pdf.setFontSize(7);
-          pdf.text(`${pageNumber} / ${totalPages}`, pageWidth - pageMargin, pageHeight - 6, {
-            align: 'right'
-          });
-        }
+      pdf.setTextColor(35, 32, 57);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(Math.max(8, Math.min(14, 13 * scale)));
+      pdf.text('Family Tree', margins.horizontal, margins.vertical + 5);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(Math.max(7, Math.min(10, 8 * scale)));
+      pdf.setTextColor(95, 91, 108);
+      pdf.text(titleDate, pageWidth - margins.horizontal, margins.vertical + 5, {
+        align: 'right'
+      });
+      pdf.addImage(
+        image,
+        'PNG',
+        imageX,
+        imageY,
+        renderedWidth,
+        renderedHeight,
+        undefined,
+        'FAST'
+      );
+      if (pdf.internal.getNumberOfPages() !== 1) {
+        throw new Error('The PDF export did not produce exactly one page.');
       }
-
       pdf.save(`family-tree-${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (error) {
       console.error('Family tree PDF export failed.', error);
@@ -4277,56 +4098,10 @@ const TRANSLATIONS = {
         visibleIds,
         rootId
       );
-    const defs = layout.positions.map((entry, index) => `
-      <clipPath id="tree-avatar-${index}">
-        <circle cx="34" cy="54" r="23"></circle>
-      </clipPath>
-    `).join('');
-    const links = layout.links.map((link) => `
-      <path class="tree-link ${link.type === 'spouse' ? 'spouse-link' : ''}"
-        d="${link.path}" style="stroke:${link.color}"></path>
-    `).join('');
-    const nodeMarkup = layout.positions.map((entry, index) => {
-      const person = getPersonById(entry.id);
-      if (!person) return '';
-
-      const isSelected = entry.id === state.selectedPersonId;
-      const deceased = Boolean(person.deathDate);
-      const birthYear = treeDateLabel(person.birthDate);
-      const deathYear = treeDateLabel(person.deathDate);
-      const dates = [
-        birthYear ? `* ${birthYear}` : '',
-        deathYear ? `† ${deathYear}` : ''
-      ].filter(Boolean).join('  ·  ');
-      const name = getDisplayName(person);
-      const nameLength = Math.min(140, Math.max(40, name.length * 7));
-      const photo = person.photo
-        ? `<image class="node-photo" href="${escapeHtml(person.photo)}"
-            x="11" y="31" width="46" height="46" preserveAspectRatio="xMidYMid slice"
-            clip-path="url(#tree-avatar-${index})"></image>`
-        : `<circle class="node-avatar-placeholder" cx="34" cy="54" r="23"></circle>
-           <text class="node-initials" x="34" y="58">${escapeHtml(initialsFor(person))}</text>`;
-
-      return `
-        <g class="tree-node ${isSelected ? 'selected' : ''} ${deceased ? 'deceased' : ''}"
-          data-person-id="${escapeHtml(person.id)}" tabindex="0" role="button"
-          aria-label="${escapeHtml(name)}" transform="translate(${entry.x}, ${entry.y})">
-          <rect class="node-card" width="216" height="114" rx="14"></rect>
-          <path class="node-branch-accent" d="M 2 16 V 98"
-            style="stroke:${entry.branchColor}"></path>
-          ${photo}
-          <text class="node-name" x="67" y="52" textLength="${nameLength}"
-            lengthAdjust="spacingAndGlyphs">${escapeHtml(name)}</text>
-          <text class="node-dates" x="67" y="73">${escapeHtml(dates || t('familyMember'))}</text>
-          <text class="node-life-status" x="67" y="94">${deceased ? t('deceased') : t('living')}</text>
-        </g>
-      `;
-    }).join('');
-
     dom.treeSvg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
     dom.treeSvg.setAttribute('width', layout.width);
     dom.treeSvg.setAttribute('height', layout.height);
-    dom.treeSvg.innerHTML = `<defs>${defs}</defs>${links}${nodeMarkup}`;
+    dom.treeSvg.innerHTML = treeSvgContent(layout, state.selectedPersonId);
     if (dom.treeLegend) {
       dom.treeLegend.innerHTML = `
         <span class="tree-legend-title">${escapeHtml(t('legendTitle'))}</span>
@@ -4795,44 +4570,50 @@ const TRANSLATIONS = {
         .map((id) => positionById.get(id))
         .filter(Boolean);
       if (!parents.length || !children.length) return;
-      const parentBottom = Math.max(...parents.map((parent) => parent.y + cardHeight));
-      const childTop = Math.min(...children.map((child) => child.y));
-      if (childTop <= parentBottom) return;
-      const junctionY = parentBottom + (childTop - parentBottom) / 2;
-      const parentCenters = parents.map((parent) => parent.x + cardWidth / 2);
-      const childCenters = children.map((child) => child.x + cardWidth / 2);
-      const junctionLeft = Math.min(...parentCenters, ...childCenters);
-      const junctionRight = Math.max(...parentCenters, ...childCenters);
-      parents.forEach((parent) => {
-        const color = unitBranchColors.get(
-          generationFind(memberUnit.get(parentIds[0]))
-        )?.color || TREE_BRANCH_COLORS[0];
-        links.push({
-          type: 'parent',
-          color,
-          path: `M ${parent.x + cardWidth / 2} ${parent.y + cardHeight} V ${junctionY}`
-        });
-      });
-      if (junctionRight > junctionLeft) {
-        const color = unitBranchColors.get(
-          generationFind(memberUnit.get(parentIds[0]))
-        )?.color || TREE_BRANCH_COLORS[0];
-        links.push({
-          type: 'parent',
-          color,
-          path: `M ${junctionLeft} ${junctionY} H ${junctionRight}`
-        });
+      const actualPartnership = visibleSpouses.find((relation) =>
+        parentIds.includes(relation.from) && parentIds.includes(relation.to)
+      );
+      let anchorX;
+      let anchorY;
+      if (actualPartnership) {
+        const first = positionById.get(actualPartnership.from);
+        const second = positionById.get(actualPartnership.to);
+        if (!first || !second || first.y !== second.y) return;
+        const left = first.x < second.x ? first : second;
+        const right = first.x < second.x ? second : first;
+        anchorX = (left.x + cardWidth + right.x) / 2;
+        anchorY = left.y + cardHeight / 2;
+      } else if (parents.length === 1) {
+        anchorX = parents[0].x + cardWidth / 2;
+        anchorY = parents[0].y + cardHeight;
+      } else {
+        anchorX = parents.reduce(
+          (sum, parent) => sum + parent.x + cardWidth / 2,
+          0
+        ) / parents.length;
+        anchorY = Math.max(...parents.map((parent) => parent.y + cardHeight));
       }
-      children.forEach((child) => {
-        const color = unitBranchColors.get(
-          generationFind(memberUnit.get(parentIds[0]))
-        )?.color || TREE_BRANCH_COLORS[0];
-        links.push({
-          type: 'parent',
-          color,
-          path: `M ${child.x + cardWidth / 2} ${junctionY} V ${child.y}`
-        });
-      });
+      const childTop = Math.min(...children.map((child) => child.y));
+      if (childTop <= anchorY) return;
+      const childCenters = children.map((child) => child.x + cardWidth / 2);
+      const color = unitBranchColors.get(
+        generationFind(memberUnit.get(parentIds[0]))
+      )?.color || TREE_BRANCH_COLORS[0];
+      const childCenter = childCenters.reduce((sum, center) => sum + center, 0) /
+        childCenters.length;
+      const branchY = childTop - Math.min(36, (childTop - anchorY) / 2);
+      const path = children.length === 1
+        ? `M ${anchorX} ${anchorY} V ${branchY} H ${childCenter} V ${childTop}`
+        : [
+            `M ${anchorX} ${anchorY}`,
+            `V ${branchY}`,
+            `M ${Math.min(...childCenters)} ${branchY}`,
+            `H ${Math.max(...childCenters)}`,
+            ...children.map((child) =>
+              `M ${child.x + cardWidth / 2} ${branchY} V ${child.y}`
+            )
+          ].join(' ');
+      links.push({ type: 'parent', color, path });
     });
 
     visibleSpouses.forEach((relation) => {
@@ -4950,9 +4731,7 @@ const TRANSLATIONS = {
 
             const label =
               relation.role &&
-              TRANSLATIONS[
-                state.language
-              ][
+              TRANSLATIONS.en[
                 relation.role
               ]
                 ? t(
@@ -5120,9 +4899,7 @@ const TRANSLATIONS = {
 
     const exportedAt =
       new Intl.DateTimeFormat(
-        state.language === 'bn'
-          ? 'bn-BD'
-          : 'en-US',
+        'en-US',
         {
           dateStyle:
             'medium',
