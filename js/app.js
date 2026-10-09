@@ -14,6 +14,16 @@ import {
   writeTreeData
 } from './storage.js';
 
+const TREE_BRANCH_COLORS = [
+  '#1d4ed8',
+  '#047857',
+  '#b45309',
+  '#7e22ce',
+  '#be123c',
+  '#0e7490',
+  '#4d7c0f',
+  '#c2410c'
+];
 
 const TRANSLATIONS = {
   bn: {
@@ -92,6 +102,11 @@ const TRANSLATIONS = {
     relatedMember: 'সম্পর্কিত সদস্য',
     downloadPdf: 'PDF',
     printTree: 'প্রিন্ট',
+    exportPdf: 'PDF রপ্তানি',
+    legendTitle: 'পারিবারিক শাখা',
+    branchLabel: 'শাখা',
+    branchColorHint: 'রং পূর্বপুরুষের পারিবারিক শাখা নির্দেশ করে',
+    pdfExportFailed: 'PDF তৈরি করা যায়নি। আবার চেষ্টা করুন।',
     noMembers: 'কোনো পরিবারের সদস্য পাওয়া যায়নি',
     noEvents: 'এখনো কোনো সময়রেখা নেই।',
     noPhotos: 'এখনো কোনো ফটো সংযুক্ত করা হয়নি।',
@@ -222,6 +237,11 @@ const TRANSLATIONS = {
     relatedMember: 'Related family member',
     downloadPdf: 'PDF',
     printTree: 'Print',
+    exportPdf: 'Export PDF',
+    legendTitle: 'Family branches',
+    branchLabel: 'Branch',
+    branchColorHint: 'Colors follow each ancestor family branch',
+    pdfExportFailed: 'The PDF could not be generated. Please try again.',
     noMembers: 'No family members found',
     noEvents: 'No timeline events yet.',
     noPhotos: 'No photos have been added yet.',
@@ -264,9 +284,9 @@ const TRANSLATIONS = {
     relationshipLabel: 'Relationship',
     zoomOut: 'Zoom out',
     zoomIn: 'Zoom in',
-    center: 'Center',
-    fitTree: 'Fit tree',
-    resetView: 'Reset view',
+    center: 'Center Tree',
+    fitTree: 'Fit to Screen',
+    resetView: 'Reset View',
     living: 'Living',
     deceased: 'Deceased',
     collapse: 'Collapse',
@@ -505,12 +525,18 @@ const TRANSLATIONS = {
 
     dom.printTreeBtn =
       document.getElementById('print-tree-btn');
+
+    dom.treeLegend =
+      document.getElementById('tree-legend');
   }
 
 
   function t(key) {
+    const language = state.activeSection === 'tree'
+      ? 'en'
+      : state.language;
     return (
-      TRANSLATIONS[state.language][key] ||
+      TRANSLATIONS[language][key] ||
       TRANSLATIONS.en[key] ||
       key
     );
@@ -533,9 +559,12 @@ const TRANSLATIONS = {
 
 
   function applyLanguage() {
+    const language = state.activeSection === 'tree'
+      ? 'en'
+      : state.language;
 
     document.documentElement.lang =
-      state.language;
+      language;
 
     document.title =
       `${t('appTitle')} — ${t('familyHistory')}`;
@@ -549,7 +578,7 @@ const TRANSLATIONS = {
           element.dataset.i18n;
 
         if (
-          TRANSLATIONS[state.language][key]
+          TRANSLATIONS[language][key]
         ) {
           element.textContent =
             t(key);
@@ -1265,7 +1294,7 @@ const TRANSLATIONS = {
       dom.downloadPdfBtn.addEventListener(
         'click',
         () =>
-          openPrintableReport()
+          exportTreePdf()
       );
     }
 
@@ -1613,6 +1642,8 @@ const TRANSLATIONS = {
         );
       }
     );
+
+    renderAll();
 
     if (sectionName === 'tree') {
       requestAnimationFrame(centerTree);
@@ -3946,6 +3977,274 @@ const TRANSLATIONS = {
     renderFamilyTree();
   }
 
+  function createAxisPages(extent, cardIntervals, targetSpan) {
+    if (extent <= targetSpan) return [{ start: 0, end: extent }];
+
+    const mergedIntervals = cardIntervals
+      .map(([start, end]) => [Math.max(0, start), Math.min(extent, end)])
+      .filter(([start, end]) => end > start)
+      .sort((first, second) => first[0] - second[0])
+      .reduce((merged, interval) => {
+        const previous = merged[merged.length - 1];
+        if (previous && interval[0] <= previous[1]) {
+          previous[1] = Math.max(previous[1], interval[1]);
+        } else {
+          merged.push(interval.slice());
+        }
+        return merged;
+      }, []);
+    const gaps = [];
+    for (let index = 1; index < mergedIntervals.length; index += 1) {
+      const start = mergedIntervals[index - 1][1];
+      const end = mergedIntervals[index][0];
+      if (end > start) gaps.push({ start, end, center: (start + end) / 2 });
+    }
+
+    const pages = [];
+    let start = 0;
+    while (start < extent) {
+      const idealEnd = start + targetSpan;
+      if (idealEnd >= extent) {
+        pages.push({ start, end: extent });
+        break;
+      }
+      const eligibleGaps = gaps.filter((gap) =>
+        gap.center >= start + targetSpan * 0.55 &&
+        gap.center <= Math.min(extent, start + targetSpan * 1.25)
+      );
+      const widerGaps = eligibleGaps.filter((gap) => gap.end - gap.start >= 36);
+      const laterGaps = gaps.filter((gap) => gap.center > start + targetSpan * 0.55);
+      const candidates = widerGaps.length
+        ? widerGaps
+        : eligibleGaps.length
+          ? eligibleGaps
+          : laterGaps;
+      if (!candidates.length) {
+        pages.push({ start, end: extent });
+        break;
+      }
+      const split = candidates.sort((first, second) =>
+        Math.abs(first.center - idealEnd) - Math.abs(second.center - idealEnd)
+      )[0];
+      const end = split.center;
+      pages.push({ start, end });
+      const overlap = split
+        ? Math.min(30, Math.max(0, (split.end - split.start) / 2 - 1))
+        : 0;
+      start = end - overlap;
+    }
+    return pages;
+  }
+
+  async function makePdfImagesLocal(svg) {
+    const imageElements = [...svg.querySelectorAll('image')];
+    await Promise.all(imageElements.map(async (image) => {
+      const source = image.getAttribute('href') || image.getAttributeNS(
+        'http://www.w3.org/1999/xlink',
+        'href'
+      );
+      if (!source) return;
+      try {
+        const response = await fetch(source);
+        if (!response.ok) throw new Error(`Image request failed (${response.status})`);
+        const blob = await response.blob();
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(blob);
+        });
+        image.setAttribute('href', dataUrl);
+      } catch (error) {
+        const group = image.parentElement;
+        const clipPath = image.getAttribute('clip-path');
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'node-avatar-placeholder');
+        circle.setAttribute('cx', '34');
+        circle.setAttribute('cy', '54');
+        circle.setAttribute('r', '23');
+        if (clipPath) circle.setAttribute('clip-path', clipPath);
+        image.replaceWith(circle);
+        if (group) {
+          const person = getPersonById(group.getAttribute('data-person-id'));
+          if (person) {
+            const initials = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            initials.setAttribute('class', 'node-initials');
+            initials.setAttribute('x', '34');
+            initials.setAttribute('y', '58');
+            initials.setAttribute('text-anchor', 'middle');
+            initials.textContent = initialsFor(person);
+            group.appendChild(initials);
+          }
+        }
+        console.warn('A profile photo could not be embedded in the PDF.', error);
+      }
+    }));
+  }
+
+  async function renderSvgForPdf(svg, width, height) {
+    const markup = new XMLSerializer().serializeToString(svg);
+    const image = new Image();
+    const imageUrl = URL.createObjectURL(new Blob(
+      [markup],
+      { type: 'image/svg+xml;charset=utf-8' }
+    ));
+    try {
+      image.src = imageUrl;
+      await image.decode();
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.ceil(width));
+      canvas.height = Math.max(1, Math.ceil(height));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Canvas rendering is unavailable.');
+      context.fillStyle = '#fff';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      const scale = Math.min(
+        canvas.width / image.naturalWidth,
+        canvas.height / image.naturalHeight
+      );
+      const drawnWidth = image.naturalWidth * scale;
+      const drawnHeight = image.naturalHeight * scale;
+      context.drawImage(
+        image,
+        (canvas.width - drawnWidth) / 2,
+        (canvas.height - drawnHeight) / 2,
+        drawnWidth,
+        drawnHeight
+      );
+      return canvas.toDataURL('image/png');
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
+  }
+
+  async function exportTreePdf() {
+    if (!state.people.length) {
+      alert(t('noMembers'));
+      return;
+    }
+    if (dom.downloadPdfBtn?.disabled) return;
+
+    if (dom.downloadPdfBtn) {
+      dom.downloadPdfBtn.disabled = true;
+      dom.downloadPdfBtn.setAttribute('aria-busy', 'true');
+    }
+    try {
+      const { jsPDF } = await import('jspdf');
+      const rootId = state.selectedPersonId || state.people[0]?.id;
+      const layout = computeTreeLayout(
+        collectVisiblePeople(rootId, state.tree.maxDepth),
+        rootId
+      );
+      if (!layout.positions.length) throw new Error('The displayed tree has no members.');
+
+      const cardWidth = 216;
+      const cardHeight = 114;
+      const horizontalPages = createAxisPages(
+        layout.width,
+        layout.positions.map(({ x }) => [x, x + cardWidth]),
+        1000
+      );
+      const verticalPages = createAxisPages(
+        layout.height,
+        layout.positions.map(({ y }) => [y, y + cardHeight]),
+        580
+      );
+      const totalPages = horizontalPages.length * verticalPages.length;
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const pageMargin = 12;
+      const contentTop = 25;
+      const contentWidth = pageWidth - pageMargin * 2;
+      const contentHeight = pageHeight - contentTop - 11;
+      const titleDate = new Intl.DateTimeFormat('en', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      }).format(new Date());
+      const baseSvg = dom.treeSvg.cloneNode(true);
+      baseSvg.style.transform = 'none';
+      baseSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      baseSvg.insertAdjacentHTML('afterbegin', `
+        <style>
+          .node-card{fill:#fff;stroke:#d9d5e8;stroke-width:1.25}
+          .tree-node.deceased .node-card{fill:#f6f5f8}
+          .tree-node text{font-family:"Segoe UI",Tahoma,sans-serif;font-size:12px;font-weight:normal}
+          .node-name{fill:#242039;font-size:13px;font-weight:bold}
+          .node-dates{fill:#656176;font-size:11px;font-weight:normal}
+          .node-life-status{fill:#16835f;font-size:10px;font-weight:bold}
+          .tree-node.deceased .node-life-status{fill:#766f80}
+          .node-avatar-placeholder{fill:#eee8fb;stroke:#d8cdef;stroke-width:1}
+          .node-initials{fill:#64449b;font-size:13px;font-weight:bold;text-anchor:middle}
+          .node-branch-accent{fill:none;stroke-width:4;stroke-linecap:round}
+          .tree-link{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+          .tree-link.spouse-link{stroke-width:2.5}
+        </style>
+      `);
+      await makePdfImagesLocal(baseSvg);
+
+      let pageNumber = 0;
+      for (const verticalPage of verticalPages) {
+        for (const horizontalPage of horizontalPages) {
+          if (pageNumber) pdf.addPage('a4', 'landscape');
+          pageNumber += 1;
+          const svgPage = baseSvg.cloneNode(true);
+          const viewX = horizontalPage.start;
+          const viewY = verticalPage.start;
+          const viewWidth = horizontalPage.end - horizontalPage.start;
+          const viewHeight = verticalPage.end - verticalPage.start;
+          svgPage.setAttribute('viewBox', `${viewX} ${viewY} ${viewWidth} ${viewHeight}`);
+          svgPage.setAttribute('width', viewWidth);
+          svgPage.setAttribute('height', viewHeight);
+          svgPage.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+          pdf.setTextColor(35, 32, 57);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(13);
+          pdf.text('Family Tree', pageMargin, 13);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+          pdf.setTextColor(95, 91, 108);
+          pdf.text(titleDate, pageWidth - pageMargin, 13, { align: 'right' });
+          const image = await renderSvgForPdf(
+            svgPage,
+            contentWidth * 4,
+            contentHeight * 4
+          );
+          pdf.addImage(
+            image,
+            'PNG',
+            pageMargin,
+            contentTop,
+            contentWidth,
+            contentHeight,
+            undefined,
+            'FAST'
+          );
+          pdf.setFontSize(7);
+          pdf.text(`${pageNumber} / ${totalPages}`, pageWidth - pageMargin, pageHeight - 6, {
+            align: 'right'
+          });
+        }
+      }
+
+      pdf.save(`family-tree-${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (error) {
+      console.error('Family tree PDF export failed.', error);
+      alert(t('pdfExportFailed'));
+    } finally {
+      if (dom.downloadPdfBtn) {
+        dom.downloadPdfBtn.disabled = false;
+        dom.downloadPdfBtn.removeAttribute('aria-busy');
+      }
+    }
+  }
 
   function renderFamilyTree() {
     if (!dom.treeSvg) {
@@ -3961,6 +4260,10 @@ const TRANSLATIONS = {
         `<text x="20" y="20">${t(
           'treeEmpty'
         )}</text>`;
+      if (dom.treeLegend) {
+        dom.treeLegend.innerHTML = '';
+        dom.treeLegend.hidden = true;
+      }
       return;
     }
 
@@ -3981,7 +4284,7 @@ const TRANSLATIONS = {
     `).join('');
     const links = layout.links.map((link) => `
       <path class="tree-link ${link.type === 'spouse' ? 'spouse-link' : ''}"
-        d="${link.path}"></path>
+        d="${link.path}" style="stroke:${link.color}"></path>
     `).join('');
     const nodeMarkup = layout.positions.map((entry, index) => {
       const person = getPersonById(entry.id);
@@ -4009,6 +4312,8 @@ const TRANSLATIONS = {
           data-person-id="${escapeHtml(person.id)}" tabindex="0" role="button"
           aria-label="${escapeHtml(name)}" transform="translate(${entry.x}, ${entry.y})">
           <rect class="node-card" width="216" height="114" rx="14"></rect>
+          <path class="node-branch-accent" d="M 2 16 V 98"
+            style="stroke:${entry.branchColor}"></path>
           ${photo}
           <text class="node-name" x="67" y="52" textLength="${nameLength}"
             lengthAdjust="spacingAndGlyphs">${escapeHtml(name)}</text>
@@ -4022,6 +4327,19 @@ const TRANSLATIONS = {
     dom.treeSvg.setAttribute('width', layout.width);
     dom.treeSvg.setAttribute('height', layout.height);
     dom.treeSvg.innerHTML = `<defs>${defs}</defs>${links}${nodeMarkup}`;
+    if (dom.treeLegend) {
+      dom.treeLegend.innerHTML = `
+        <span class="tree-legend-title">${escapeHtml(t('legendTitle'))}</span>
+        ${layout.branches.map((branch) => `
+          <span class="tree-legend-item">
+            <span class="tree-legend-swatch" style="--branch-color:${branch.color}"></span>
+            ${escapeHtml(branch.label)}
+          </span>
+        `).join('')}
+        <span class="tree-legend-hint">${escapeHtml(t('branchColorHint'))}</span>
+      `;
+      dom.treeLegend.hidden = !layout.branches.length;
+    }
     dom.treeSvg.style.transform =
       `translate(${state.tree.panX}px, ${state.tree.panY}px) scale(${state.tree.scale})`;
 
@@ -4259,6 +4577,36 @@ const TRANSLATIONS = {
         .reduce((max, parentId) => Math.max(max, generations.get(parentId) + 1), 0);
       generations.set(unitId, parentGeneration);
     });
+    const unitKey = (unitId) => unitById.get(unitId).members
+      .slice()
+      .sort()
+      .join(':');
+    const unitBranchColors = new Map();
+    const rootUnits = generationUnits
+      .filter((unitId) => generationParents.get(unitId).size === 0)
+      .sort((first, second) => unitKey(first).localeCompare(unitKey(second)));
+    rootUnits.forEach((unitId, index) => {
+      unitBranchColors.set(unitId, {
+        color: TREE_BRANCH_COLORS[index % TREE_BRANCH_COLORS.length],
+        index
+      });
+    });
+    topological.forEach((unitId) => {
+      if (unitBranchColors.has(unitId)) return;
+      const inherited = [...generationParents.get(unitId)]
+        .map((parentId) => unitBranchColors.get(parentId))
+        .filter(Boolean)
+        .sort((first, second) => first.index - second.index)[0];
+      if (inherited) {
+        unitBranchColors.set(unitId, inherited);
+      } else {
+        const index = unitBranchColors.size;
+        unitBranchColors.set(unitId, {
+          color: TREE_BRANCH_COLORS[index % TREE_BRANCH_COLORS.length],
+          index
+        });
+      }
+    });
     const rootGeneration = generations.get(rootGenerationUnit) || 0;
     generations.forEach((generation, unitId) => generations.set(unitId, generation - rootGeneration));
 
@@ -4330,37 +4678,103 @@ const TRANSLATIONS = {
     const cardHeight = 114;
     const partnerGap = 18;
     const unitGap = 64;
-    const rowWidths = new Map();
-    generationKeys.forEach((generation) => {
-      const width = layers.get(generation).reduce((sum, unitId) => {
-        const memberCount = unitById.get(unitId).members.length;
-        return sum + memberCount * cardWidth + Math.max(0, memberCount - 1) * partnerGap;
-      }, 0) + Math.max(0, layers.get(generation).length - 1) * unitGap;
-      rowWidths.set(generation, width);
-    });
-    const contentWidth = Math.max(0, ...rowWidths.values());
+    const unitWidths = new Map([...unitById].map(([unitId, unit]) => [
+      unitId,
+      unit.members.length * cardWidth + Math.max(0, unit.members.length - 1) * partnerGap
+    ]));
     const marginX = 48;
     const marginY = 48;
     const rowHeight = cardHeight + 112;
     const minGeneration = generationKeys[0] || 0;
     const positions = [];
+    const unitCenters = new Map();
+    const parentsByGeneration = new Map();
+    acceptedParentEdges.forEach(({ from, to }) => {
+      const parentUnitId = memberUnit.get(from);
+      const childGenerationUnit = generationFind(memberUnit.get(to));
+      if (!parentsByGeneration.has(childGenerationUnit)) {
+        parentsByGeneration.set(childGenerationUnit, new Set());
+      }
+      parentsByGeneration.get(childGenerationUnit).add(parentUnitId);
+    });
 
     generationKeys.forEach((generation) => {
-      const rowWidth = rowWidths.get(generation);
-      let cursor = marginX + (contentWidth - rowWidth) / 2;
+      const families = new Map();
       layers.get(generation).forEach((unitId) => {
-        const unit = unitById.get(unitId);
-        const width = unit.members.length * cardWidth +
-          Math.max(0, unit.members.length - 1) * partnerGap;
-        unit.members.forEach((id, memberIndex) => {
-          const x = cursor + memberIndex * (cardWidth + partnerGap);
-          const y = marginY + (generation - minGeneration) * rowHeight;
-          positions.push({ id, x, y, generation });
+        const generationUnit = generationFind(unitId);
+        const parents = [...(parentsByGeneration.get(generationUnit) || [])].sort();
+        const key = parents.length
+          ? parents.join('|')
+          : `root:${generationUnit}`;
+        if (!families.has(key)) {
+          families.set(key, { parents, units: [], width: 0, target: 0 });
+        }
+        const family = families.get(key);
+        family.units.push(unitId);
+        family.width += unitWidths.get(unitId);
+      });
+      const familyGroups = [...families.values()];
+      familyGroups.forEach((family) => {
+        family.width += Math.max(0, family.units.length - 1) * unitGap;
+        if (family.parents.length) {
+          const centers = family.parents
+            .map((parentId) => unitCenters.get(parentId))
+            .filter(Number.isFinite);
+          family.target = centers.length
+            ? centers.reduce((sum, center) => sum + center, 0) / centers.length
+            : 0;
+        }
+      });
+      const rootFamilies = familyGroups.filter((family) => !family.parents.length);
+      const rootWidth = rootFamilies.reduce((sum, family) => sum + family.width, 0) +
+        Math.max(0, rootFamilies.length - 1) * unitGap;
+      let rootCursor = -rootWidth / 2;
+      rootFamilies.forEach((family) => {
+        family.target = rootCursor + family.width / 2;
+        rootCursor += family.width + unitGap;
+      });
+      familyGroups.sort((first, second) =>
+        first.target - second.target ||
+        first.units[0].localeCompare(second.units[0])
+      );
+      let previousRight = Number.NEGATIVE_INFINITY;
+      familyGroups.forEach((family) => {
+        let cursor = family.target - family.width / 2;
+        if (cursor < previousRight + unitGap) cursor = previousRight + unitGap;
+        family.units.forEach((unitId) => {
+          const unit = unitById.get(unitId);
+          const generationUnit = generationFind(unitId);
+          const center = cursor + unitWidths.get(unitId) / 2;
+          unitCenters.set(unitId, center);
+          unit.members.forEach((id, memberIndex) => {
+            const x = cursor + memberIndex * (cardWidth + partnerGap);
+            const y = marginY + (generation - minGeneration) * rowHeight;
+            const branch = unitBranchColors.get(generationUnit);
+            positions.push({
+              id,
+              x,
+              y,
+              generation,
+              branchColor: branch?.color || TREE_BRANCH_COLORS[0],
+              branchIndex: branch?.index || 0
+            });
+          });
+          cursor += unitWidths.get(unitId) + unitGap;
         });
-        cursor += width + unitGap;
+        previousRight = cursor - unitGap;
       });
     });
 
+    let minX = 0;
+    let maxX = Number.NEGATIVE_INFINITY;
+    positions.forEach((entry) => {
+      minX = Math.min(minX, entry.x);
+      maxX = Math.max(maxX, entry.x + cardWidth);
+    });
+    const horizontalShift = marginX - minX;
+    positions.forEach((entry) => {
+      entry.x += horizontalShift;
+    });
     const positionById = new Map(positions.map((entry) => [entry.id, entry]));
     const links = [];
     const parentIdsByChild = new Map();
@@ -4390,20 +4804,32 @@ const TRANSLATIONS = {
       const junctionLeft = Math.min(...parentCenters, ...childCenters);
       const junctionRight = Math.max(...parentCenters, ...childCenters);
       parents.forEach((parent) => {
+        const color = unitBranchColors.get(
+          generationFind(memberUnit.get(parentIds[0]))
+        )?.color || TREE_BRANCH_COLORS[0];
         links.push({
           type: 'parent',
+          color,
           path: `M ${parent.x + cardWidth / 2} ${parent.y + cardHeight} V ${junctionY}`
         });
       });
       if (junctionRight > junctionLeft) {
+        const color = unitBranchColors.get(
+          generationFind(memberUnit.get(parentIds[0]))
+        )?.color || TREE_BRANCH_COLORS[0];
         links.push({
           type: 'parent',
+          color,
           path: `M ${junctionLeft} ${junctionY} H ${junctionRight}`
         });
       }
       children.forEach((child) => {
+        const color = unitBranchColors.get(
+          generationFind(memberUnit.get(parentIds[0]))
+        )?.color || TREE_BRANCH_COLORS[0];
         links.push({
           type: 'parent',
+          color,
           path: `M ${child.x + cardWidth / 2} ${junctionY} V ${child.y}`
         });
       });
@@ -4417,8 +4843,12 @@ const TRANSLATIONS = {
       const right = first.x < second.x ? second : first;
       if (left.x + cardWidth < right.x) {
         const y = left.y + cardHeight / 2;
+        const color = unitBranchColors.get(
+          generationFind(memberUnit.get(relation.from))
+        )?.color || TREE_BRANCH_COLORS[0];
         links.push({
           type: 'spouse',
+          color,
           path: `M ${left.x + cardWidth} ${y} H ${right.x}`
         });
       }
@@ -4427,7 +4857,11 @@ const TRANSLATIONS = {
     return {
       positions,
       links,
-      width: contentWidth + marginX * 2,
+      branches: rootUnits.map((unitId, index) => ({
+        label: `${t('branchLabel')} ${index + 1}`,
+        color: unitBranchColors.get(unitId)?.color || TREE_BRANCH_COLORS[index % TREE_BRANCH_COLORS.length]
+      })),
+      width: maxX + horizontalShift + marginX,
       height: generationKeys.length * rowHeight - 112 + marginY * 2
     };
   }

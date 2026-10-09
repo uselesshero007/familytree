@@ -770,7 +770,16 @@ input:focus, select:focus, textarea:focus {
   white-space: nowrap;
 }
 .page-panel { margin-top: 14px; }
-#tree .page-header { align-items: center; margin-bottom: 8px; }
+#tree .page-header {
+  position: sticky;
+  top: 128px;
+  z-index: 18;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: var(--bg);
+}
 #tree .page-header h2 { font-size: 1.18rem; }
 #tree .page-header .eyebrow { margin-bottom: 2px; }
 .toolbar { gap: 5px; }
@@ -852,6 +861,38 @@ input:focus, select:focus, textarea:focus {
   stroke: #75629b;
   stroke-width: 2.5px;
 }
+.tree-node .node-branch-accent {
+  fill: none;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.tree-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  padding: 0 2px 12px;
+  color: var(--text-soft);
+  font-size: 0.72rem;
+}
+.tree-legend[hidden] { display: none; }
+.tree-legend-title {
+  color: var(--text);
+  font-weight: 700;
+}
+.tree-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.tree-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--branch-color);
+}
+.tree-legend-hint { margin-left: auto; }
 
 @media (max-width: 760px) {
   .sidebar { flex-wrap: wrap; gap: 5px 8px; padding: 6px 10px; }
@@ -867,12 +908,15 @@ input:focus, select:focus, textarea:focus {
   }
   .nav-item { padding: 6px 9px; font-size: 0.76rem; }
   .topbar { top: 91px; gap: 7px; padding: 7px; }
+  #tree .page-header { top: 264px; }
   .topbar .search-box { flex: 1 1 100%; }
   .header-actions { justify-content: flex-start; gap: 5px; }
   .header-actions > * { flex: 0 1 auto; }
   .auth-controls { flex: 1 1 100%; justify-content: flex-start; }
   .auth-status { flex: 1 1 100%; text-align: left; }
   .tree-viewport { height: calc(100dvh - 285px); min-height: 340px; }
+  .tree-legend { gap: 6px 10px; }
+  .tree-legend-hint { flex-basis: 100%; margin-left: 0; }
   .toolbar { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
   .toolbar > * { flex: 0 0 auto; }
 }

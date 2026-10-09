@@ -78,9 +78,9 @@
         </div>
         <div class="header-actions">
           <div class="language-switch" aria-label="Language">
-            <button type="button" id="lang-bn" aria-pressed="true">বাংলা</button>
+            <button type="button" id="lang-bn" aria-label="Bengali" aria-pressed="true">BN</button>
             <span aria-hidden="true">|</span>
-            <button type="button" id="lang-en" aria-pressed="false">English</button>
+            <button type="button" id="lang-en" aria-label="English" aria-pressed="false">EN</button>
           </div>
           <div class="auth-controls">
             <span id="user-profile" class="user-profile" hidden>
@@ -148,18 +148,19 @@
             <h2 data-i18n="interactiveRelationships">ইন্টারঅ্যাকটিভ পারিবারিক সম্পর্ক</h2>
           </div>
           <div class="toolbar">
-            <button class="toolbar-btn" data-action="zoom-out" data-i18n="zoomOut">-</button>
-            <button class="toolbar-btn" data-action="zoom-in" data-i18n="zoomIn">+</button>
-            <button class="toolbar-btn" data-action="fit" data-i18n="fitTree">পুরো গাছ</button>
-            <button class="toolbar-btn" data-action="center" data-i18n="center">কেন্দ্র</button>
-            <button class="toolbar-btn" data-action="reset-view" data-i18n="resetView">ভিউ রিসেট</button>
-            <button class="toolbar-btn" data-action="collapse" data-i18n="collapse">সংকোচন</button>
-            <button class="toolbar-btn" data-action="expand" data-i18n="expand">বিস্তার</button>
-            <button class="secondary-btn" id="download-pdf-btn" data-i18n="downloadPdf">ফ্যামিলি ট্রি PDF ডাউনলোড</button>
-            <button class="ghost-btn" id="print-tree-btn" data-i18n="printTree">ফ্যামিলি ট্রি প্রিন্ট</button>
+            <button class="toolbar-btn" data-action="zoom-out" data-i18n="zoomOut" title="Zoom out">Zoom out</button>
+            <button class="toolbar-btn" data-action="zoom-in" data-i18n="zoomIn" title="Zoom in">Zoom in</button>
+            <button class="toolbar-btn" data-action="fit" data-i18n="fitTree" title="Fit the tree to the screen">Fit to Screen</button>
+            <button class="toolbar-btn" data-action="center" data-i18n="center" title="Center on the selected member">Center Tree</button>
+            <button class="toolbar-btn" data-action="reset-view" data-i18n="resetView" title="Reset tree zoom and position">Reset View</button>
+            <button class="toolbar-btn" data-action="collapse" data-i18n="collapse" title="Show fewer generations">Collapse</button>
+            <button class="toolbar-btn" data-action="expand" data-i18n="expand" title="Show more generations">Expand</button>
+            <button class="secondary-btn" id="download-pdf-btn" data-i18n="exportPdf">Export PDF</button>
+            <button class="ghost-btn" id="print-tree-btn" data-i18n="printTree">Print</button>
           </div>
         </div>
         <div class="tree-container" id="print-tree-container">
+          <div id="tree-legend" class="tree-legend" aria-label="Family branches"></div>
           <div id="family-tree-viewport" class="tree-viewport">
             <svg id="family-tree-svg" class="family-tree-svg" aria-label="Family tree diagram" data-i18n-aria="treeDiagram"></svg>
           </div>
