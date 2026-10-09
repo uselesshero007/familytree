@@ -116,6 +116,7 @@ const TRANSLATIONS = {
     firebaseSetup: 'ক্লাউড লগইনের জন্য js/firebase-config.js-এ Firebase Web App config যোগ করুন।',
     authInitializing: 'Firebase সংযোগ হচ্ছে…',
     authFailed: 'Firebase লগইন প্রস্তুত করা যায়নি।',
+    authDomainUnauthorized: 'এই ডোমেইনটি Firebase Authentication-এ অনুমোদিত নয়। Firebase Console-এর Authentication > Settings > Authorized domains-এ এই ডোমেইনটি যোগ করুন:',
     cloudUnavailable: 'Firebase সংযোগ প্রস্তুত নয়। কিছুক্ষণ পর আবার চেষ্টা করুন।',
     loginFailed: 'Google লগইন ব্যর্থ হয়েছে',
     logoutFailed: 'লগ আউট ব্যর্থ হয়েছে',
@@ -240,6 +241,7 @@ const TRANSLATIONS = {
     firebaseSetup: 'Firebase configuration is incomplete. Check js/firebase-config.js.',
     authInitializing: 'Connecting to Firebase…',
     authFailed: 'Firebase authentication could not be initialized.',
+    authDomainUnauthorized: 'This domain is not authorized for Firebase Authentication. Add this domain in Firebase Console under Authentication > Settings > Authorized domains:',
     cloudUnavailable: 'Firebase is not ready. Please try again shortly.',
     loginFailed: 'Google sign-in failed',
     logoutFailed: 'Sign out failed',
@@ -961,8 +963,27 @@ const TRANSLATIONS = {
         error
       );
 
+      const unauthorizedDomain =
+        error?.code === 'auth/unauthorized-domain';
+      const errorDetails =
+        error instanceof Error
+          ? error.message
+          : String(error);
+      const message = unauthorizedDomain
+        ? `${t('authDomainUnauthorized')} ${window.location.hostname}`
+        : `${t('loginFailed')}: ${errorDetails}`;
+
+      setAuthStatus(
+        unauthorizedDomain
+          ? 'authDomainUnauthorized'
+          : 'loginFailed',
+        unauthorizedDomain
+          ? window.location.hostname
+          : errorDetails
+      );
+
       alert(
-        `${t('loginFailed')}: ${error.message}`
+        message
       );
     }
   }
