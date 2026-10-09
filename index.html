@@ -204,7 +204,10 @@
           <div class="card-panel">
             <h3 data-i18n="dataStorage">Data Storage</h3>
             <p id="storage-status">Saved on this device</p>
-            <button class="secondary-btn" id="reset-btn" data-i18n="resetTree">Reset Family Tree</button>
+            <div class="stacked-actions">
+              <button class="danger-btn" id="delete-selected-btn" data-i18n="delete">Delete</button>
+              <button class="danger-btn" id="delete-all-btn" data-i18n="deleteAll">Delete All</button>
+            </div>
           </div>
           <div class="card-panel">
             <h3 data-i18n="importExport">Import / Export</h3>
@@ -212,6 +215,8 @@
               <button class="secondary-btn" id="export-tree-btn" data-i18n="export">Export</button>
               <button class="secondary-btn" id="import-tree-btn" data-i18n="import">Import</button>
               <input id="import-file" type="file" accept="application/json" hidden />
+              <button class="secondary-btn" id="import-gedcom-btn" data-i18n="importGedcom">Import GEDCOM</button>
+              <input id="import-gedcom-file" type="file" accept=".ged,application/x-gedcom,text/plain" hidden />
             </div>
           </div>
         </div>
@@ -362,6 +367,43 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <div id="gedcom-preview-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="gedcom-preview-title">
+    <section class="modal-card confirmation-card">
+      <div class="modal-head">
+        <h3 id="gedcom-preview-title" data-i18n="gedcomPreviewTitle">GEDCOM Import Preview</h3>
+      </div>
+      <div class="confirmation-content">
+        <p id="gedcom-preview-summary"></p>
+        <h4 data-i18n="gedcomPeopleHeading">People detected</h4>
+        <ul id="gedcom-preview-people" class="gedcom-warning-list"></ul>
+        <h4 data-i18n="gedcomRelationshipsHeading">Relationships detected</h4>
+        <ul id="gedcom-preview-relationships" class="gedcom-warning-list"></ul>
+        <p data-i18n="gedcomUnsupportedNotice">Photos, media, and unsupported GEDCOM fields will not be imported.</p>
+        <ul id="gedcom-preview-warnings" class="gedcom-warning-list"></ul>
+      </div>
+      <div class="modal-actions confirmation-actions">
+        <button type="button" class="ghost-btn" id="gedcom-cancel-btn" data-i18n="cancel">Cancel</button>
+        <button type="button" class="primary-btn" id="gedcom-import-confirm-btn" data-i18n="importAction">Import</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="delete-all-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="delete-all-title" aria-describedby="delete-all-message">
+    <section class="modal-card confirmation-card">
+      <div class="modal-head">
+        <h3 id="delete-all-title" data-i18n="deleteAllTitle">Delete All Family Data?</h3>
+      </div>
+      <div class="confirmation-content">
+        <p id="delete-all-message" data-i18n="deleteAllMessage">This will permanently delete all family members and relationships in your current family tree. This action cannot be undone. Do you want to continue?</p>
+        <p id="delete-all-error" class="form-error" role="alert" aria-live="assertive" hidden></p>
+      </div>
+      <div class="modal-actions confirmation-actions">
+        <button type="button" class="ghost-btn" id="delete-all-cancel-btn" data-i18n="cancel">Cancel</button>
+        <button type="button" class="danger-btn" id="delete-all-confirm-btn" data-i18n="deleteAll">Delete All</button>
+      </div>
+    </section>
   </div>
 
   <script type="module" src="js/app.js"></script>

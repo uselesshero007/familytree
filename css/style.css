@@ -637,6 +637,13 @@ input:focus, select:focus, textarea:focus {
   gap: 10px;
   margin-top: 18px;
 }
+.confirmation-card { width: min(520px, 100%); }
+.confirmation-content { padding: 18px 20px 0; color: var(--text); }
+.confirmation-content p { margin: 0 0 12px; line-height: 1.55; }
+.confirmation-content h4 { margin: 14px 0 6px; }
+.confirmation-actions { padding: 0 20px 20px; }
+.gedcom-warning-list { margin: 0; padding-left: 20px; color: var(--text-soft); }
+.gedcom-warning-list li { margin: 5px 0; }
 
 .empty-state {
   background: rgba(255,255,255,0.76);

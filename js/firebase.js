@@ -13,6 +13,8 @@ import {
   doc,
   getDocs,
   getFirestore,
+  limit,
+  query,
   serverTimestamp,
   writeBatch
 } from 'firebase/firestore';
@@ -156,6 +158,24 @@ export async function createFirebaseClient() {
         });
         await batch.commit();
       }
+    },
+    deleteFamily: async (uid) => {
+      const memberCollection = collection(db, 'users', uid, 'familyMembers');
+      let deleted = 0;
+      while (true) {
+        const snapshot = await getDocs(query(memberCollection, limit(450)));
+        if (snapshot.empty) break;
+        const batch = writeBatch(db);
+        snapshot.docs.forEach((memberSnapshot) => batch.delete(memberSnapshot.ref));
+        await batch.commit();
+        deleted += snapshot.size;
+      }
+
+      const remaining = await getDocs(query(memberCollection, limit(1)));
+      if (!remaining.empty) {
+        throw new Error('Some family member documents remain in Firestore.');
+      }
+      return deleted;
     }
   };
 }

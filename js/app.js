@@ -1,11 +1,12 @@
 import { createFirebaseClient } from './firebase.js';
 
 import {
-  buildSeedFamily,
   createPerson,
   cryptoRandomId,
   FAMILY_STORAGE_KEY
 } from './family-data.js';
+
+import { parseGedcom } from './gedcom.js';
 
 import {
   exportTreeJson,
@@ -62,7 +63,20 @@ const TRANSLATIONS = {
     familyPhotos: 'Family Photos',
     dataManagement: 'Data Management',
     dataStorage: 'Data Storage',
-    resetTree: 'Reset Family Tree',
+    deleteAll: 'Delete All',
+    importGedcom: 'Import GEDCOM',
+    importAction: 'Import',
+    gedcomPreviewTitle: 'GEDCOM Import Preview',
+    gedcomPeopleHeading: 'People detected',
+    gedcomRelationshipsHeading: 'Relationships detected',
+    gedcomUnsupportedNotice: 'Photos, media, and unsupported GEDCOM fields will not be imported.',
+    deleteAllTitle: 'Delete All Family Data?',
+    deleteAllMessage: 'This will permanently delete all family members and relationships in your current family tree. This action cannot be undone. Do you want to continue?',
+    deleteAllFailed: 'Family data could not be completely deleted.',
+    deleteAllSuccess: 'All family members and relationships were deleted.',
+    gedcomEmpty: 'The selected GEDCOM file is empty.',
+    gedcomImportSuccess: 'GEDCOM import complete.',
+    gedcomImportCloudFailed: 'GEDCOM records were saved on this device, but Firestore could not be updated:',
     importExport: 'Import / Export',
     profile: 'Profile',
     fullName: 'Full Name',
@@ -144,7 +158,7 @@ const TRANSLATIONS = {
     courtesy: 'Courtesy of Md Injamam Ul Haque',
     familyReport: 'Family Tree',
     loginNeeded: 'Sign in with Google to save privately to Firestore.',
-    treeEmpty: 'No family members yet',
+    treeEmpty: 'Your family tree is empty. Import a GEDCOM file or add a family member to get started.',
     unknownMember: 'Unknown family member',
     relationshipLabel: 'Relationship',
     zoomOut: 'Zoom out',
@@ -156,7 +170,6 @@ const TRANSLATIONS = {
     deceased: 'Deceased',
     collapse: 'Collapse',
     expand: 'Expand',
-    resetConfirm: 'Reset the family tree? This will remove all members and relationships.',
     deleteConfirm: 'Delete this family member?',
     mainNavigation: 'Main navigation'
   }
@@ -176,8 +189,11 @@ const TRANSLATIONS = {
     user: null,
 
     cloudSaveQueue: Promise.resolve(),
+    cloudSaveError: null,
     cloudLoadToken: 0,
     isSavingMember: false,
+    isDeletingAll: false,
+    pendingGedcomImport: null,
 
     authStatusKey: 'firebaseSetup',
     authStatusDetails: '',
@@ -246,11 +262,53 @@ const TRANSLATIONS = {
     dom.previewTreeBtn =
       document.getElementById('preview-tree-btn');
 
-    dom.resetBtn =
-      document.getElementById('reset-btn');
+    dom.deleteAllBtn =
+      document.getElementById('delete-all-btn');
+
+    dom.deleteSelectedBtn =
+      document.getElementById('delete-selected-btn');
+
+    dom.deleteAllModal =
+      document.getElementById('delete-all-modal');
+
+    dom.deleteAllCancelBtn =
+      document.getElementById('delete-all-cancel-btn');
+
+    dom.deleteAllConfirmBtn =
+      document.getElementById('delete-all-confirm-btn');
+
+    dom.deleteAllError =
+      document.getElementById('delete-all-error');
 
     dom.importBtn =
       document.getElementById('import-tree-btn');
+
+    dom.importGedcomBtn =
+      document.getElementById('import-gedcom-btn');
+
+    dom.importGedcomFile =
+      document.getElementById('import-gedcom-file');
+
+    dom.gedcomPreviewModal =
+      document.getElementById('gedcom-preview-modal');
+
+    dom.gedcomPreviewSummary =
+      document.getElementById('gedcom-preview-summary');
+
+    dom.gedcomPreviewPeople =
+      document.getElementById('gedcom-preview-people');
+
+    dom.gedcomPreviewRelationships =
+      document.getElementById('gedcom-preview-relationships');
+
+    dom.gedcomPreviewWarnings =
+      document.getElementById('gedcom-preview-warnings');
+
+    dom.gedcomCancelBtn =
+      document.getElementById('gedcom-cancel-btn');
+
+    dom.gedcomImportConfirmBtn =
+      document.getElementById('gedcom-import-confirm-btn');
 
     dom.exportTreeBtn =
       document.getElementById('export-tree-btn');
@@ -897,25 +955,8 @@ const TRANSLATIONS = {
         stored.relationships;
 
     } else {
-
-      const seed =
-        buildSeedFamily();
-
-
-      state.people =
-        seed.people;
-
-      state.relationships =
-        seed.relationships;
-
-
-      writeTreeData({
-        people:
-          state.people,
-
-        relationships:
-          state.relationships
-      });
+      state.people = [];
+      state.relationships = [];
     }
 
 
@@ -1032,12 +1073,23 @@ const TRANSLATIONS = {
     }
 
 
-    if (dom.resetBtn) {
-      dom.resetBtn.addEventListener(
+    if (dom.deleteAllBtn) {
+      dom.deleteAllBtn.addEventListener(
         'click',
-        resetFamilyTree
+        openDeleteAllConfirmation
       );
     }
+
+    if (dom.deleteSelectedBtn) {
+      dom.deleteSelectedBtn.addEventListener('click', () => {
+        if (state.selectedPersonId) deletePerson(state.selectedPersonId);
+      });
+    }
+
+    dom.deleteAllCancelBtn?.addEventListener('click', closeDeleteAllConfirmation);
+    dom.deleteAllConfirmBtn?.addEventListener('click', deleteAllFamilyData);
+    dom.gedcomCancelBtn?.addEventListener('click', cancelGedcomImport);
+    dom.gedcomImportConfirmBtn?.addEventListener('click', importPendingGedcom);
 
 
     if (dom.exportTreeBtn) {
@@ -1065,6 +1117,9 @@ const TRANSLATIONS = {
         handleImportFile
       );
     }
+
+    dom.importGedcomBtn?.addEventListener('click', () => dom.importGedcomFile?.click());
+    dom.importGedcomFile?.addEventListener('change', handleGedcomFile);
 
 
     if (dom.googleLoginBtn) {
@@ -3446,6 +3501,8 @@ const TRANSLATIONS = {
 
   function saveFamilyData() {
 
+    if (state.isDeletingAll) return false;
+
     const data =
       JSON.parse(
         JSON.stringify({
@@ -3520,6 +3577,7 @@ const TRANSLATIONS = {
             uid
           ) {
 
+            state.cloudSaveError = null;
             setAuthStatus(
               'cloudSaved'
             );
@@ -3539,6 +3597,7 @@ const TRANSLATIONS = {
               uid
             ) {
 
+              state.cloudSaveError = error;
               setAuthStatus(
                 'saveFailed',
                 error.message
@@ -3654,40 +3713,283 @@ const TRANSLATIONS = {
       });
   }
 
+  const MAX_GEDCOM_FILE_SIZE = 15 * 1024 * 1024;
 
-  function resetFamilyTree() {
+  function gedcomFingerprint(text) {
+    let hash = 2166136261;
+    for (let index = 0; index < text.length; index += 1) {
+      hash ^= text.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16);
+  }
 
-    const shouldReset =
-      window.confirm(
-        t(
-          'resetConfirm'
-        )
-      );
+  function sameGedcomPerson(first, second) {
+    const normalize = (value) => String(value || '').trim().toLocaleLowerCase();
+    if (
+      normalize(first.firstName) !== normalize(second.firstName) ||
+      normalize(first.lastName) !== normalize(second.lastName)
+    ) return false;
 
+    const knownDates = ['birthDate', 'deathDate']
+      .filter((key) => first[key]);
+    return knownDates.length > 0 &&
+      knownDates.every((key) => normalize(first[key]) === normalize(second[key]));
+  }
 
-    if (!shouldReset) {
+  function gedcomMatches(person) {
+    return state.people.find((existing) =>
+      (person.gedcomRef && existing.gedcomRef === person.gedcomRef) ||
+      sameGedcomPerson(person, existing)
+    );
+  }
+
+  function handleGedcomFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const clearInput = () => {
+      if (dom.importGedcomFile) dom.importGedcomFile.value = '';
+    };
+    if (!/\.ged$/i.test(file.name)) {
+      alert('Choose a GEDCOM file with a .ged extension.');
+      clearInput();
+      return;
+    }
+    if (!file.size) {
+      alert(t('gedcomEmpty'));
+      clearInput();
+      return;
+    }
+    if (file.size > MAX_GEDCOM_FILE_SIZE) {
+      alert('The GEDCOM file is too large. The maximum supported size is 15 MB.');
+      clearInput();
       return;
     }
 
+    file.text()
+      .then((text) => {
+        const parsed = parseGedcom(text);
+        const sourceFingerprint = gedcomFingerprint(text);
+        parsed.people = parsed.people.map((person) => ({
+          ...person,
+          gedcomRef: `${sourceFingerprint}:${person.gedcomId}`
+        }));
+        state.pendingGedcomImport = parsed;
 
-    const seed =
-      buildSeedFamily();
+        const duplicates = parsed.people.filter((person) => gedcomMatches(person)).length;
+        const newPeople = parsed.people.length - duplicates;
+        dom.gedcomPreviewSummary.textContent =
+          `${parsed.people.length} people and ${parsed.relationships.length} relationships detected. ` +
+          `${newPeople} new people will be added; ${duplicates} likely duplicates will be matched to existing members.`;
+        const peopleByGedcomId = new Map(parsed.people.map((person) => [
+          person.gedcomId,
+          `${person.firstName} ${person.lastName}`.trim() || t('unknownMember')
+        ]));
+        const populatePreviewList = (list, items, renderItem, totalCount) => {
+          list.replaceChildren();
+          items.slice(0, 20).forEach((item) => {
+            const row = document.createElement('li');
+            row.textContent = renderItem(item);
+            list.append(row);
+          });
+          if (totalCount > 20) {
+            const row = document.createElement('li');
+            row.textContent = `Showing 20 of ${totalCount}.`;
+            list.append(row);
+          } else if (!totalCount) {
+            const row = document.createElement('li');
+            row.textContent = 'None detected.';
+            list.append(row);
+          }
+        };
+        populatePreviewList(
+          dom.gedcomPreviewPeople,
+          parsed.people,
+          (person) => {
+            const dates = [
+              person.birthDate ? `born ${person.birthDate}` : '',
+              person.deathDate ? `died ${person.deathDate}` : ''
+            ].filter(Boolean).join(', ');
+            const name = peopleByGedcomId.get(person.gedcomId);
+            return `${name}${dates ? ` (${dates})` : ''}`;
+          },
+          parsed.people.length
+        );
+        populatePreviewList(
+          dom.gedcomPreviewRelationships,
+          parsed.relationships,
+          (relationship) => {
+            const from = peopleByGedcomId.get(relationship.from) || relationship.from;
+            const to = peopleByGedcomId.get(relationship.to) || relationship.to;
+            return relationship.type === 'spouseOf'
+              ? `Spouse: ${from} <-> ${to}`
+              : `${relationship.role === 'mother' ? 'Mother' : 'Father'}: ${from} -> ${to}`;
+          },
+          parsed.relationships.length
+        );
+        dom.gedcomPreviewWarnings.replaceChildren();
+        parsed.warnings.forEach((warning) => {
+          const item = document.createElement('li');
+          item.textContent = warning;
+          dom.gedcomPreviewWarnings.append(item);
+        });
+        dom.gedcomPreviewModal.classList.remove('hidden');
+        dom.gedcomImportConfirmBtn.disabled = false;
+      })
+      .catch((error) => {
+        console.error('GEDCOM import preview failed:', error);
+        alert(`GEDCOM import failed: ${error.message}`);
+        clearInput();
+      });
+  }
 
+  function cancelGedcomImport() {
+    state.pendingGedcomImport = null;
+    dom.gedcomPreviewModal?.classList.add('hidden');
+    if (dom.importGedcomFile) dom.importGedcomFile.value = '';
+  }
 
-    state.people =
-      seed.people;
+  async function importPendingGedcom() {
+    const parsed = state.pendingGedcomImport;
+    if (!parsed || dom.gedcomImportConfirmBtn?.disabled) return;
+    dom.gedcomImportConfirmBtn.disabled = true;
 
-    state.relationships =
-      seed.relationships;
+    const previousPeople = state.people;
+    const previousRelationships = state.relationships;
+    state.people = [...state.people];
+    state.relationships = [...state.relationships];
+    const sourceIds = new Map();
+    const fingerprint = parsed.people[0]?.gedcomRef?.split(':')[0] || 'gedcom';
+    let addedPeople = 0;
+    let addedRelationships = 0;
 
-    state.selectedPersonId =
-      state.people[0]?.id ||
-      null;
+    parsed.people.forEach((person) => {
+      const existing = gedcomMatches(person);
+      if (existing) {
+        sourceIds.set(person.gedcomId, existing.id);
+      } else {
+        const created = createPerson({
+          ...person,
+          id: cryptoRandomId('person')
+        });
+        created.gedcomRef = `${fingerprint}:${person.gedcomId}`;
+        state.people.push(created);
+        sourceIds.set(person.gedcomId, created.id);
+        addedPeople += 1;
+      }
+    });
 
+    const relationshipExists = (candidate) => state.relationships.some((relation) => {
+      if (relation.type !== candidate.type) return false;
+      if (candidate.type === 'spouseOf') {
+        return (relation.from === candidate.from && relation.to === candidate.to) ||
+          (relation.from === candidate.to && relation.to === candidate.from);
+      }
+      return relation.from === candidate.from && relation.to === candidate.to;
+    });
 
-    saveFamilyData();
+    parsed.relationships.forEach((relationship) => {
+      const from = sourceIds.get(relationship.from);
+      const to = sourceIds.get(relationship.to);
+      if (!from || !to || from === to) return;
+      const candidate = { ...relationship, from, to };
+      if (relationshipExists(candidate)) return;
+      state.relationships.push({
+        id: cryptoRandomId('rel'),
+        ...candidate
+      });
+      addedRelationships += 1;
+    });
 
+    if (!saveFamilyData()) {
+      state.people = previousPeople;
+      state.relationships = previousRelationships;
+      dom.gedcomImportConfirmBtn.disabled = false;
+      return;
+    }
+
+    state.selectedPersonId ||= state.people[0]?.id || null;
     renderAll();
+    await state.cloudSaveQueue;
+    const cloudError = state.user ? state.cloudSaveError : null;
+    const warnings = parsed.warnings.length
+      ? `\n\nNot imported: ${parsed.warnings.join(' ')}`
+      : '';
+    const result = cloudError
+      ? `${t('gedcomImportCloudFailed')} ${cloudError.message}\n\nThe imported records remain saved on this device.`
+      : `${t('gedcomImportSuccess')} ${addedPeople} people and ${addedRelationships} relationships added. Photos and unsupported fields were not imported.`;
+    cancelGedcomImport();
+    alert(`${result}${warnings}`);
+  }
+
+  function openDeleteAllConfirmation() {
+    if (state.isDeletingAll) return;
+    dom.deleteAllError.hidden = true;
+    dom.deleteAllError.textContent = '';
+    dom.deleteAllCancelBtn.disabled = false;
+    dom.deleteAllConfirmBtn.disabled = false;
+    dom.deleteAllModal.classList.remove('hidden');
+  }
+
+  function closeDeleteAllConfirmation() {
+    if (state.isDeletingAll) return;
+    dom.deleteAllModal?.classList.add('hidden');
+  }
+
+  async function deleteAllFamilyData() {
+    if (state.isDeletingAll) return;
+    const deletingUid = state.user?.uid || null;
+    const deletingFirebase = state.firebase;
+    state.isDeletingAll = true;
+    ++state.cloudLoadToken;
+    dom.deleteAllCancelBtn.disabled = true;
+    dom.deleteAllConfirmBtn.disabled = true;
+    dom.deleteAllConfirmBtn.textContent = 'Deleting…';
+    dom.deleteAllError.hidden = true;
+    let deletionSource = 'local device storage';
+    let localStorageCleared = false;
+
+    try {
+      await state.cloudSaveQueue;
+      if (deletingUid && !deletingFirebase) {
+        throw new Error('Firebase is unavailable. No data was deleted.');
+      }
+
+      const localKeys = deletingUid
+        ? [userStorageKey(deletingUid)]
+        : [FAMILY_STORAGE_KEY];
+      localKeys.forEach((key) => localStorage.removeItem(key));
+      localStorageCleared = true;
+
+      if (deletingUid) {
+        deletionSource = 'Firestore';
+        await deletingFirebase.deleteFamily(deletingUid);
+      }
+
+      if ((state.user?.uid || null) === deletingUid) {
+        state.people = [];
+        state.relationships = [];
+        state.selectedPersonId = null;
+        state.cloudSaveError = null;
+        renderAll();
+      }
+      dom.deleteAllModal.classList.add('hidden');
+      alert(t('deleteAllSuccess'));
+    } catch (error) {
+      console.error('Delete All failed:', error);
+      dom.deleteAllError.textContent =
+        `${t('deleteAllFailed')} ${deletionSource}: ${error.message}` +
+        (localStorageCleared && deletingUid
+          ? ' The local cache was cleared, but Firestore deletion still needs attention.'
+          : '');
+      dom.deleteAllError.hidden = false;
+      dom.deleteAllCancelBtn.disabled = false;
+      dom.deleteAllConfirmBtn.disabled = false;
+    } finally {
+      state.isDeletingAll = false;
+      dom.deleteAllConfirmBtn.textContent = t('deleteAll');
+    }
   }
 
 
@@ -3921,7 +4223,7 @@ const TRANSLATIONS = {
       }
 
       const margins = { horizontal: 16, vertical: 16 };
-      const titleHeight = 12;
+      const titleHeight = 20;
       const paperSizes = [
         ['a4', 297, 210],
         ['legal', 356, 216],
@@ -4034,12 +4336,14 @@ const TRANSLATIONS = {
 
       pdf.setTextColor(35, 32, 57);
       pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(Math.max(8, Math.min(14, 13 * scale)));
-      pdf.text('Family Tree', margins.horizontal, margins.vertical + 5);
+      pdf.setFontSize(9);
+      pdf.text('Courtesy of Md Injamam Ul Haque', margins.horizontal, margins.vertical + 4);
+      pdf.setFontSize(13);
+      pdf.text('Family Tree', margins.horizontal, margins.vertical + 11);
       pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(Math.max(7, Math.min(10, 8 * scale)));
+      pdf.setFontSize(8);
       pdf.setTextColor(95, 91, 108);
-      pdf.text(titleDate, pageWidth - margins.horizontal, margins.vertical + 5, {
+      pdf.text(titleDate, pageWidth - margins.horizontal, margins.vertical + 11, {
         align: 'right'
       });
       pdf.addImage(
@@ -4077,6 +4381,7 @@ const TRANSLATIONS = {
       state.people[0]?.id;
 
     if (!rootId) {
+      if (dom.deleteSelectedBtn) dom.deleteSelectedBtn.disabled = true;
       dom.treeSvg.innerHTML =
         `<text x="20" y="20">${t(
           'treeEmpty'
@@ -4087,6 +4392,7 @@ const TRANSLATIONS = {
       }
       return;
     }
+    if (dom.deleteSelectedBtn) dom.deleteSelectedBtn.disabled = false;
 
     const visibleIds =
       collectVisiblePeople(
