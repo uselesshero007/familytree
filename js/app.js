@@ -25,6 +25,7 @@ const TRANSLATIONS = {
     photos: 'ফটো',
     settings: 'সেটিংস',
     quickActions: 'দ্রুত কাজ',
+    quickAdd: 'সদস্য যোগ',
     addFamilyMember: 'পরিবারের সদস্য যোগ করুন',
     export: 'রপ্তানি',
     import: 'আমদানি',
@@ -45,7 +46,7 @@ const TRANSLATIONS = {
     familyPreview: 'পরিবারের পূর্বাভাস',
     viewFamilyTree: 'বংশগাছ দেখুন',
     recentEvents: 'সাম্প্রতিক ঘটনা',
-    interactiveRelationships: 'ইন্টারঅ্যাকটিভ পারিবারিক সম্পর্ক',
+    interactiveRelationships: 'পরিবারের সম্পর্ক',
     allMembers: 'সকল সদস্য',
     familyImportantDates: 'পরিবারের গুরুত্বপূর্ণ দিন',
     familyPhotos: 'পারিবারিক আলোকচিত্র',
@@ -89,8 +90,8 @@ const TRANSLATIONS = {
     cousin: 'চাচাতো/কাকাতো/মামাতো',
     noRelationship: 'কোনো সম্পর্ক নেই',
     relatedMember: 'সম্পর্কিত সদস্য',
-    downloadPdf: 'ফ্যামিলি ট্রি PDF ডাউনলোড',
-    printTree: 'ফ্যামিলি ট্রি প্রিন্ট',
+    downloadPdf: 'PDF',
+    printTree: 'প্রিন্ট',
     noMembers: 'কোনো পরিবারের সদস্য পাওয়া যায়নি',
     noEvents: 'এখনো কোনো সময়রেখা নেই।',
     noPhotos: 'এখনো কোনো ফটো সংযুক্ত করা হয়নি।',
@@ -134,6 +135,10 @@ const TRANSLATIONS = {
     zoomOut: 'ছোট করুন',
     zoomIn: 'বড় করুন',
     center: 'কেন্দ্র',
+    fitTree: 'পুরো গাছ',
+    resetView: 'ভিউ রিসেট',
+    living: 'জীবিত',
+    deceased: 'প্রয়াত',
     collapse: 'সংকোচন',
     expand: 'বিস্তার',
     resetConfirm: 'আপনি কি সত্যিই ফ্যামিলি ট্রি রিসেট করতে চান? এটি সব সদস্য ও সম্পর্ক মুছে ফেলবে।',
@@ -150,6 +155,7 @@ const TRANSLATIONS = {
     photos: 'Photos',
     settings: 'Settings',
     quickActions: 'Quick Actions',
+    quickAdd: 'Add member',
     addFamilyMember: 'Add Family Member',
     export: 'Export',
     import: 'Import',
@@ -170,7 +176,7 @@ const TRANSLATIONS = {
     familyPreview: 'Family Preview',
     viewFamilyTree: 'View Family Tree',
     recentEvents: 'Recent Events',
-    interactiveRelationships: 'Interactive Family Relationships',
+    interactiveRelationships: 'Family connections',
     allMembers: 'All Members',
     familyImportantDates: 'Important Family Dates',
     familyPhotos: 'Family Photos',
@@ -214,8 +220,8 @@ const TRANSLATIONS = {
     cousin: 'Cousin',
     noRelationship: 'No relationship',
     relatedMember: 'Related family member',
-    downloadPdf: 'Download Family Tree PDF',
-    printTree: 'Print Family Tree',
+    downloadPdf: 'PDF',
+    printTree: 'Print',
     noMembers: 'No family members found',
     noEvents: 'No timeline events yet.',
     noPhotos: 'No photos have been added yet.',
@@ -259,6 +265,10 @@ const TRANSLATIONS = {
     zoomOut: 'Zoom out',
     zoomIn: 'Zoom in',
     center: 'Center',
+    fitTree: 'Fit tree',
+    resetView: 'Reset view',
+    living: 'Living',
+    deceased: 'Deceased',
     collapse: 'Collapse',
     expand: 'Expand',
     resetConfirm: 'Reset the family tree? This will remove all members and relationships.',
@@ -301,7 +311,9 @@ const TRANSLATIONS = {
       dragStartX: 0,
       dragStartY: 0,
       lastPanX: 40,
-      lastPanY: 50
+      lastPanY: 50,
+      activePointers: new Map(),
+      pinch: null
     }
   };
 
@@ -1430,32 +1442,41 @@ const TRANSLATIONS = {
       dom.treeViewport.addEventListener(
         'pointerdown',
         (event) => {
-
-          if (
-            event.target.closest(
-              '.tree-node'
-            )
-          ) {
-            return;
+          const isTouch = event.pointerType === 'touch';
+          if (isTouch) {
+            state.tree.activePointers.set(event.pointerId, {
+              x: event.clientX,
+              y: event.clientY
+            });
+            if (state.tree.activePointers.size === 2) {
+              const points = [...state.tree.activePointers.values()];
+              const centerX = (points[0].x + points[1].x) / 2;
+              const centerY = (points[0].y + points[1].y) / 2;
+              state.tree.pinch = {
+                distance: Math.hypot(
+                  points[1].x - points[0].x,
+                  points[1].y - points[0].y
+                ),
+                scale: state.tree.scale,
+                anchorX: (centerX - state.tree.panX) / state.tree.scale,
+                anchorY: (centerY - state.tree.panY) / state.tree.scale
+              };
+              state.tree.dragging = false;
+            } else if (!event.target.closest('.tree-node')) {
+              state.tree.dragging = true;
+              state.tree.dragStartX = event.clientX;
+              state.tree.dragStartY = event.clientY;
+              state.tree.lastPanX = state.tree.panX;
+              state.tree.lastPanY = state.tree.panY;
+            }
+          } else {
+            if (event.target.closest('.tree-node')) return;
+            state.tree.dragging = true;
+            state.tree.dragStartX = event.clientX;
+            state.tree.dragStartY = event.clientY;
+            state.tree.lastPanX = state.tree.panX;
+            state.tree.lastPanY = state.tree.panY;
           }
-
-
-          state.tree.dragging =
-            true;
-
-          state.tree.dragStartX =
-            event.clientX;
-
-          state.tree.dragStartY =
-            event.clientY;
-
-          state.tree.lastPanX =
-            state.tree.panX;
-
-          state.tree.lastPanY =
-            state.tree.panY;
-
-
           try {
             dom.treeViewport.setPointerCapture(
               event.pointerId
@@ -1468,7 +1489,39 @@ const TRANSLATIONS = {
       dom.treeViewport.addEventListener(
         'pointermove',
         (event) => {
-
+          if (event.pointerType === 'touch' &&
+              state.tree.activePointers.has(event.pointerId)) {
+            state.tree.activePointers.set(event.pointerId, {
+              x: event.clientX,
+              y: event.clientY
+            });
+            if (state.tree.activePointers.size >= 2) {
+              const points = [...state.tree.activePointers.values()].slice(0, 2);
+              const centerX = (points[0].x + points[1].x) / 2;
+              const centerY = (points[0].y + points[1].y) / 2;
+              const distance = Math.hypot(
+                points[1].x - points[0].x,
+                points[1].y - points[0].y
+              );
+              if (!state.tree.pinch) {
+                state.tree.pinch = {
+                  distance,
+                  scale: state.tree.scale,
+                  anchorX: (centerX - state.tree.panX) / state.tree.scale,
+                  anchorY: (centerY - state.tree.panY) / state.tree.scale
+                };
+              }
+              const pinch = state.tree.pinch;
+              state.tree.scale = Math.min(
+                2.2,
+                Math.max(0.25, pinch.scale * distance / Math.max(1, pinch.distance))
+              );
+              state.tree.panX = centerX - pinch.anchorX * state.tree.scale;
+              state.tree.panY = centerY - pinch.anchorY * state.tree.scale;
+              renderFamilyTree();
+              return;
+            }
+          }
           if (
             !state.tree.dragging
           ) {
@@ -1487,8 +1540,7 @@ const TRANSLATIONS = {
 
           state.tree.panX =
             state.tree.lastPanX +
-            dx /
-              state.tree.scale;
+            dx;
 
           state.tree.panY =
             state.tree.lastPanY +
@@ -1503,27 +1555,28 @@ const TRANSLATIONS = {
 
       dom.treeViewport.addEventListener(
         'pointerup',
-        () => {
-          state.tree.dragging =
-            false;
+        (event) => {
+          state.tree.activePointers.delete(event.pointerId);
+          state.tree.pinch = null;
+          state.tree.dragging = false;
+          if (state.tree.activePointers.size === 1) {
+            const [point] = state.tree.activePointers.values();
+            state.tree.dragging = true;
+            state.tree.dragStartX = point.x;
+            state.tree.dragStartY = point.y;
+            state.tree.lastPanX = state.tree.panX;
+            state.tree.lastPanY = state.tree.panY;
+          }
         }
       );
 
 
       dom.treeViewport.addEventListener(
         'pointercancel',
-        () => {
-          state.tree.dragging =
-            false;
-        }
-      );
-
-
-      dom.treeViewport.addEventListener(
-        'pointerleave',
-        () => {
-          state.tree.dragging =
-            false;
+        (event) => {
+          state.tree.activePointers.delete(event.pointerId);
+          state.tree.pinch = null;
+          state.tree.dragging = false;
         }
       );
     }
@@ -1560,6 +1613,10 @@ const TRANSLATIONS = {
         );
       }
     );
+
+    if (sectionName === 'tree') {
+      requestAnimationFrame(centerTree);
+    }
   }
 
 
@@ -2375,6 +2432,7 @@ const TRANSLATIONS = {
       'closed'
     );
     renderFamilyTree();
+    centerTree();
   }
 
 
@@ -3812,63 +3870,22 @@ const TRANSLATIONS = {
   function handleTreeAction(
     action
   ) {
-
-    if (
-      action ===
-      'zoom-in'
-    ) {
-
-      changeZoom(
-        state.tree.scale +
-          0.15
-      );
-    }
-
-
-    if (
-      action ===
-      'zoom-out'
-    ) {
-
-      changeZoom(
-        state.tree.scale -
-          0.15
-      );
-    }
-
-
-    if (
-      action ===
-      'center'
-    ) {
-
+    if (action === 'zoom-in') {
+      changeZoom(state.tree.scale + 0.15);
+    } else if (action === 'zoom-out') {
+      changeZoom(state.tree.scale - 0.15);
+    } else if (action === 'center') {
       centerTree();
+    } else if (action === 'fit') {
+      fitTreeToViewport();
+    } else if (action === 'reset-view') {
+      state.tree.scale = 1;
+      centerTree();
+    } else if (action === 'expand') {
+      state.tree.maxDepth += 1;
+    } else if (action === 'collapse') {
+      state.tree.maxDepth = Math.max(1, state.tree.maxDepth - 1);
     }
-
-
-    if (
-      action ===
-      'expand'
-    ) {
-
-      state.tree.maxDepth +=
-        1;
-    }
-
-
-    if (
-      action ===
-      'collapse'
-    ) {
-
-      state.tree.maxDepth =
-        Math.max(
-          1,
-          state.tree.maxDepth -
-            1
-        );
-    }
-
 
     renderFamilyTree();
   }
@@ -3877,280 +3894,136 @@ const TRANSLATIONS = {
   function changeZoom(
     value
   ) {
-
-    state.tree.scale =
-      Math.min(
-        2.2,
-        Math.max(
-          0.5,
-          value
-        )
-      );
-
-
+    state.tree.scale = Math.min(2.2, Math.max(0.25, value));
     renderFamilyTree();
   }
 
 
   function centerTree() {
+    const person = getPersonById(state.selectedPersonId);
+    const node = person
+      ? [...dom.treeSvg.querySelectorAll('.tree-node')]
+        .find((entry) => entry.dataset.personId === person.id)
+      : null;
+    const viewportWidth = dom.treeViewport.clientWidth;
+    const viewportHeight = dom.treeViewport.clientHeight;
 
-    const viewportWidth =
-      dom.treeViewport.clientWidth;
+    if (node) {
+      const transform = node.getAttribute('transform') || '';
+      const [, x = 0, y = 0] = transform.match(
+        /translate\(([-\d.]+)[ ,]+([-\d.]+)\)/
+      ) || [];
+      state.tree.panX = viewportWidth / 2 - (Number(x) + 108) * state.tree.scale;
+      state.tree.panY = viewportHeight / 2 - (Number(y) + 57) * state.tree.scale;
+    } else {
+      state.tree.panX = viewportWidth / 2 - 108 * state.tree.scale;
+      state.tree.panY = viewportHeight / 2 - 57 * state.tree.scale;
+    }
+    renderFamilyTree();
+  }
 
-    const viewportHeight =
-      dom.treeViewport.clientHeight;
 
+  function fitTreeToViewport() {
+    const width = Number(dom.treeSvg.getAttribute('width')) || 0;
+    const height = Number(dom.treeSvg.getAttribute('height')) || 0;
+    const viewportWidth = dom.treeViewport.clientWidth;
+    const viewportHeight = dom.treeViewport.clientHeight;
 
-    state.tree.panX =
-      viewportWidth / 2 -
-      120;
+    if (!width || !height || !viewportWidth || !viewportHeight) {
+      return;
+    }
 
-    state.tree.panY =
-      viewportHeight / 2 -
-      80;
-
-
+    state.tree.scale = Math.min(
+      2.2,
+      Math.max(0.02, Math.min(
+        (viewportWidth - 48) / width,
+        (viewportHeight - 48) / height
+      )
+      )
+    );
+    state.tree.panX = (viewportWidth - width * state.tree.scale) / 2;
+    state.tree.panY = (viewportHeight - height * state.tree.scale) / 2;
     renderFamilyTree();
   }
 
 
   function renderFamilyTree() {
-
     if (!dom.treeSvg) {
       return;
     }
-
 
     const rootId =
       state.selectedPersonId ||
       state.people[0]?.id;
 
-
     if (!rootId) {
-
       dom.treeSvg.innerHTML =
         `<text x="20" y="20">${t(
           'treeEmpty'
         )}</text>`;
-
       return;
     }
-
 
     const visibleIds =
       collectVisiblePeople(
         rootId,
         state.tree.maxDepth
       );
-
-
-    const positions =
+    const layout =
       computeTreeLayout(
         visibleIds,
         rootId
       );
+    const defs = layout.positions.map((entry, index) => `
+      <clipPath id="tree-avatar-${index}">
+        <circle cx="34" cy="54" r="23"></circle>
+      </clipPath>
+    `).join('');
+    const links = layout.links.map((link) => `
+      <path class="tree-link ${link.type === 'spouse' ? 'spouse-link' : ''}"
+        d="${link.path}"></path>
+    `).join('');
+    const nodeMarkup = layout.positions.map((entry, index) => {
+      const person = getPersonById(entry.id);
+      if (!person) return '';
 
+      const isSelected = entry.id === state.selectedPersonId;
+      const deceased = Boolean(person.deathDate);
+      const birthYear = treeDateLabel(person.birthDate);
+      const deathYear = treeDateLabel(person.deathDate);
+      const dates = [
+        birthYear ? `* ${birthYear}` : '',
+        deathYear ? `† ${deathYear}` : ''
+      ].filter(Boolean).join('  ·  ');
+      const name = getDisplayName(person);
+      const nameLength = Math.min(140, Math.max(40, name.length * 7));
+      const photo = person.photo
+        ? `<image class="node-photo" href="${escapeHtml(person.photo)}"
+            x="11" y="31" width="46" height="46" preserveAspectRatio="xMidYMid slice"
+            clip-path="url(#tree-avatar-${index})"></image>`
+        : `<circle class="node-avatar-placeholder" cx="34" cy="54" r="23"></circle>
+           <text class="node-initials" x="34" y="58">${escapeHtml(initialsFor(person))}</text>`;
 
-    const svgWidth =
-      Math.max(
-        1200,
-        ...positions.map(
-          (entry) =>
-            entry.x + 220
-        )
-      );
+      return `
+        <g class="tree-node ${isSelected ? 'selected' : ''} ${deceased ? 'deceased' : ''}"
+          data-person-id="${escapeHtml(person.id)}" tabindex="0" role="button"
+          aria-label="${escapeHtml(name)}" transform="translate(${entry.x}, ${entry.y})">
+          <rect class="node-card" width="216" height="114" rx="14"></rect>
+          ${photo}
+          <text class="node-name" x="67" y="52" textLength="${nameLength}"
+            lengthAdjust="spacingAndGlyphs">${escapeHtml(name)}</text>
+          <text class="node-dates" x="67" y="73">${escapeHtml(dates || t('familyMember'))}</text>
+          <text class="node-life-status" x="67" y="94">${deceased ? t('deceased') : t('living')}</text>
+        </g>
+      `;
+    }).join('');
 
-
-    const svgHeight =
-      Math.max(
-        700,
-        ...positions.map(
-          (entry) =>
-            entry.y + 100
-        )
-      );
-
-
-    const nodeMarkup =
-      positions
-        .map((entry) => {
-
-          const person =
-            getPersonById(
-              entry.id
-            );
-
-
-          if (!person) {
-            return '';
-          }
-
-
-          const isSelected =
-            entry.id ===
-            state.selectedPersonId;
-
-
-          const width =
-            170;
-
-          const height =
-            70;
-
-
-          return `
-            <g
-              class="tree-node ${
-                isSelected
-                  ? 'selected'
-                  : ''
-              }"
-              data-person-id="${escapeHtml(
-                person.id
-              )}"
-              transform="translate(${entry.x}, ${entry.y})"
-            >
-
-              <rect
-                width="${width}"
-                height="${height}"
-                rx="18"
-              ></rect>
-
-              <rect
-                class="node-tag"
-                width="${width}"
-                height="20"
-                x="0"
-                y="0"
-                rx="18"
-              ></rect>
-
-              <text
-                x="14"
-                y="15"
-                font-size="11"
-                style="fill:#5c3b9a;font-weight:700;"
-              >
-                ${t(
-                  person.gender ||
-                    'other'
-                )}
-              </text>
-
-              <text
-                x="14"
-                y="36"
-                font-size="14"
-                font-weight="700"
-              >
-                ${escapeHtml(
-                  getDisplayName(
-                    person
-                  )
-                )}
-              </text>
-
-              <text
-                x="14"
-                y="54"
-                font-size="11"
-                style="fill:#5f6780;"
-              >
-                ${escapeHtml(
-                  person.occupation ||
-                    t(
-                      'familyMember'
-                    )
-                )}
-              </text>
-
-            </g>
-          `;
-        })
-        .join('');
-
-
-    const links = [];
-
-
-    const allLinks =
-      collectRelationshipsForVisiblePeople(
-        visibleIds
-      );
-
-
-    allLinks.forEach(
-      (link) => {
-
-        const from =
-          positions.find(
-            (entry) =>
-              entry.id ===
-              link.from
-          );
-
-
-        const to =
-          positions.find(
-            (entry) =>
-              entry.id ===
-              link.to
-          );
-
-
-        if (!from || !to) {
-          return;
-        }
-
-
-        const x1 =
-          from.x + 170 / 2;
-
-        const y1 =
-          from.y + 70;
-
-        const x2 =
-          to.x + 170 / 2;
-
-        const y2 =
-          to.y;
-
-
-        links.push(`
-          <path
-            class="tree-link"
-            d="
-              M ${x1} ${y1}
-              C ${x1} ${
-                (y1 + y2) / 2
-              },
-                ${x2} ${
-                  (y1 + y2) / 2
-                },
-                ${x2} ${y2}
-            "
-          />
-        `);
-      }
-    );
-
-
-    dom.treeSvg.setAttribute(
-      'viewBox',
-      `0 0 ${svgWidth} ${svgHeight}`
-    );
-
-
-    dom.treeSvg.innerHTML =
-      `${links.join(
-        ''
-      )}${nodeMarkup}`;
-
-
+    dom.treeSvg.setAttribute('viewBox', `0 0 ${layout.width} ${layout.height}`);
+    dom.treeSvg.setAttribute('width', layout.width);
+    dom.treeSvg.setAttribute('height', layout.height);
+    dom.treeSvg.innerHTML = `<defs>${defs}</defs>${links}${nodeMarkup}`;
     dom.treeSvg.style.transform =
       `translate(${state.tree.panX}px, ${state.tree.panY}px) scale(${state.tree.scale})`;
-
 
     dom.treeSvg
       .querySelectorAll(
@@ -4171,11 +4044,17 @@ const TRANSLATIONS = {
               state.selectedPersonId =
                 personId;
 
-
               renderProfilePanel();
+              dom.profilePanel?.classList.remove('closed');
               renderFamilyTree();
             }
           );
+          node.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              node.click();
+            }
+          });
         }
       );
   }
@@ -4185,97 +4064,50 @@ const TRANSLATIONS = {
     rootId,
     maxDepth
   ) {
+    const peopleById = new Map(state.people.map((person) => [person.id, person]));
+    const adjacency = new Map();
+    const connect = (from, to, cost) => {
+      if (!peopleById.has(from) || !peopleById.has(to) || from === to) return;
+      if (!adjacency.has(from)) adjacency.set(from, []);
+      adjacency.get(from).push({ id: to, cost });
+    };
 
-    const visited =
-      new Set();
-
-
-    const queue = [
-      {
-        id: rootId,
-        depth: 0
+    state.relationships.forEach((relation) => {
+      if (relation.type === 'parentOf') {
+        connect(relation.from, relation.to, 1);
+        connect(relation.to, relation.from, 1);
+      } else if (relation.type === 'spouseOf' || relation.type === 'siblingOf') {
+        connect(relation.from, relation.to, 0);
+        connect(relation.to, relation.from, 0);
       }
-    ];
+    });
 
-
-    while (
-      queue.length
-    ) {
-
-      const current =
-        queue.shift();
-
-
-      if (
-        !current ||
-        !current.id ||
-        visited.has(
-          current.id
-        )
-      ) {
-        continue;
-      }
-
-
-      visited.add(
-        current.id
-      );
-
-
-      if (
-        current.depth >=
-        maxDepth
-      ) {
-        continue;
-      }
-
-
-      const context =
-        getFamilyContext(
-          current.id
-        );
-
-
-      const relatedIds = [
-
-        ...context.parents,
-
-        ...context.spouse,
-
-        ...context.children,
-
-        ...context.siblings,
-
-        ...context.related
-
-      ]
-        .map(
-          (person) =>
-            person &&
-            person.id
-              ? person.id
-              : null
-        )
-        .filter(
-          Boolean
-        );
-
-
-      relatedIds.forEach(
-        (id) =>
-          queue.push({
-            id,
-            depth:
-              current.depth +
-              1
-          })
-      );
+    const distance = new Map([[rootId, 0]]);
+    const queue = [rootId];
+    for (let index = 0; index < queue.length; index += 1) {
+      const currentId = queue[index];
+      const currentDistance = distance.get(currentId);
+      (adjacency.get(currentId) || []).forEach(({ id, cost }) => {
+        const nextDistance = currentDistance + cost;
+        if (nextDistance > maxDepth || (distance.has(id) && distance.get(id) <= nextDistance)) {
+          return;
+        }
+        distance.set(id, nextDistance);
+        queue.push(id);
+      });
     }
 
-
-    return [
-      ...visited
-    ];
+    const visibleIds = new Set(distance.keys());
+    state.people.forEach((person) => {
+      const hasValidCoreRelationship = state.relationships.some((relation) =>
+        ['parentOf', 'spouseOf', 'siblingOf'].includes(relation.type) &&
+        peopleById.has(relation.from) &&
+        peopleById.has(relation.to) &&
+        (relation.from === person.id || relation.to === person.id)
+      );
+      if (!hasValidCoreRelationship) visibleIds.add(person.id);
+    });
+    return [...visibleIds];
   }
 
 
@@ -4283,247 +4115,321 @@ const TRANSLATIONS = {
     visibleIds,
     rootId
   ) {
+    const peopleById = new Map(state.people.map((person) => [person.id, person]));
+    const visible = new Set(visibleIds.filter((id) => peopleById.has(id)));
+    const units = new Map();
+    const memberUnit = new Map();
+    let nextUnitId = 0;
 
-    const depthMap =
-      new Map();
-
-
-    visibleIds.forEach(
-      (id) => {
-
-        const depth =
-          getDistanceFromRoot(
-            rootId,
-            id
-          );
-
-
-        if (
-          !depthMap.has(
-            depth
-          )
-        ) {
-
-          depthMap.set(
-            depth,
-            []
-          );
-        }
-
-
-        depthMap
-          .get(depth)
-          .push(id);
+    const find = (id, parents) => {
+      let root = id;
+      while (parents.get(root) !== root) root = parents.get(root);
+      while (parents.get(id) !== id) {
+        const next = parents.get(id);
+        parents.set(id, root);
+        id = next;
       }
+      return root;
+    };
+    const union = (first, second, parents) => {
+      const firstRoot = find(first, parents);
+      const secondRoot = find(second, parents);
+      if (firstRoot !== secondRoot) parents.set(secondRoot, firstRoot);
+    };
+    const visibleSpouses = state.relationships.filter((relation) =>
+      relation.type === 'spouseOf' &&
+      visible.has(relation.from) &&
+      visible.has(relation.to) &&
+      relation.from !== relation.to &&
+      !state.relationships.some((candidate) =>
+        candidate.type === 'parentOf' &&
+        ((candidate.from === relation.from && candidate.to === relation.to) ||
+          (candidate.from === relation.to && candidate.to === relation.from))
+      )
     );
+    const spouseParent = new Map([...visible].map((id) => [id, id]));
 
+    visibleSpouses.forEach((relation) => union(relation.from, relation.to, spouseParent));
+    visible.forEach((id) => {
+      const root = find(id, spouseParent);
+      if (!units.has(root)) {
+        units.set(root, { id: `unit-${nextUnitId++}`, members: [], parents: new Set(), children: new Set() });
+      }
+      const unit = units.get(root);
+      unit.members.push(id);
+      memberUnit.set(id, unit.id);
+    });
+    const genderOrder = { male: 0, female: 1, other: 2 };
+    units.forEach((unit) => unit.members.sort((first, second) =>
+      (genderOrder[peopleById.get(first).gender] ?? 2) -
+        (genderOrder[peopleById.get(second).gender] ?? 2) ||
+      String(first).localeCompare(String(second))
+    ));
 
+    const unitById = new Map([...units.values()].map((unit) => [unit.id, unit]));
+    const generationParent = new Map([...unitById.keys()].map((id) => [id, id]));
+    const generationChildren = new Map([...unitById.keys()].map((id) => [id, new Set()]));
+    const acceptedParentEdges = [];
+    visibleSpouses.forEach((relation) => {
+      union(memberUnit.get(relation.from), memberUnit.get(relation.to), generationParent);
+    });
+    state.relationships.forEach((relation) => {
+      if (relation.type === 'siblingOf' && visible.has(relation.from) && visible.has(relation.to)) {
+        union(memberUnit.get(relation.from), memberUnit.get(relation.to), generationParent);
+      }
+    });
+    const parentsByChild = new Map();
+    state.relationships.forEach((relation) => {
+      if (relation.type !== 'parentOf' || !visible.has(relation.from) || !visible.has(relation.to)) return;
+      if (!parentsByChild.has(relation.to)) parentsByChild.set(relation.to, new Set());
+      parentsByChild.get(relation.to).add(memberUnit.get(relation.from));
+    });
+    parentsByChild.forEach((parentUnits) => {
+      const [firstParent, ...otherParents] = parentUnits;
+      otherParents.forEach((parentUnit) => union(firstParent, parentUnit, generationParent));
+    });
+    const generationFind = (id) => find(id, generationParent);
+    const reaches = (startId, targetId) => {
+      const seen = new Set();
+      const pending = [startId];
+      while (pending.length) {
+        const current = pending.pop();
+        if (current === targetId) return true;
+        if (seen.has(current)) continue;
+        seen.add(current);
+        (generationChildren.get(current) || []).forEach((childId) => pending.push(childId));
+      }
+      return false;
+    };
+    const parentRelationshipExists = (parentId, childId) =>
+      state.relationships.some((relation) =>
+        relation.type === 'parentOf' &&
+        ((relation.from === parentId && relation.to === childId) ||
+          (relation.from === childId && relation.to === parentId))
+      );
+
+    state.relationships.forEach((relation) => {
+      if (!visible.has(relation.from) || !visible.has(relation.to)) return;
+      if (relation.type === 'spouseOf' &&
+          parentRelationshipExists(relation.from, relation.to)) return;
+      if (relation.type === 'parentOf' && relation.from !== relation.to) {
+        const parentUnitId = memberUnit.get(relation.from);
+        const childUnitId = memberUnit.get(relation.to);
+        if (!parentUnitId || !childUnitId || parentUnitId === childUnitId) return;
+        const parentGenerationUnit = generationFind(parentUnitId);
+        const childGenerationUnit = generationFind(childUnitId);
+        if (parentGenerationUnit === childGenerationUnit) return;
+        if (reaches(childGenerationUnit, parentGenerationUnit)) return;
+        if (!generationChildren.get(parentGenerationUnit).has(childGenerationUnit)) {
+          unitById.get(parentUnitId).children.add(childUnitId);
+          unitById.get(childUnitId).parents.add(parentUnitId);
+          generationChildren.get(parentGenerationUnit).add(childGenerationUnit);
+        }
+        if (!acceptedParentEdges.some((edge) => edge.from === relation.from && edge.to === relation.to)) {
+          acceptedParentEdges.push({ from: relation.from, to: relation.to });
+        }
+      }
+    });
+
+    const generationUnits = [...new Set([...unitById.keys()].map(generationFind))];
+    const indegree = new Map(generationUnits.map((id) => [id, 0]));
+    generationChildren.forEach((children) => children.forEach((childId) => {
+      indegree.set(childId, indegree.get(childId) + 1);
+    }));
+    const ready = generationUnits.filter((id) => indegree.get(id) === 0);
+    const topological = [];
+    for (let index = 0; index < ready.length; index += 1) {
+      const unitId = ready[index];
+      topological.push(unitId);
+      generationChildren.get(unitId).forEach((childId) => {
+        indegree.set(childId, indegree.get(childId) - 1);
+        if (indegree.get(childId) === 0) ready.push(childId);
+      });
+    }
+
+    const rootUnitId = memberUnit.get(rootId);
+    const rootGenerationUnit = generationFind(rootUnitId);
+    const generations = new Map();
+    const generationParents = new Map(generationUnits.map((id) => [id, new Set()]));
+    generationChildren.forEach((children, parentId) => children.forEach((childId) => {
+      generationParents.get(childId).add(parentId);
+    }));
+    topological.forEach((unitId) => {
+      const parentGeneration = [...generationParents.get(unitId)]
+        .reduce((max, parentId) => Math.max(max, generations.get(parentId) + 1), 0);
+      generations.set(unitId, parentGeneration);
+    });
+    const rootGeneration = generations.get(rootGenerationUnit) || 0;
+    generations.forEach((generation, unitId) => generations.set(unitId, generation - rootGeneration));
+
+    const layers = new Map();
+    unitById.forEach((unit, unitId) => {
+      unit.generation = generations.get(generationFind(unitId)) || 0;
+      const generation = unit.generation;
+      if (!layers.has(generation)) layers.set(generation, []);
+      layers.get(generation).push(unitId);
+    });
+    const generationKeys = [...layers.keys()].sort((a, b) => a - b);
+    const birthOrder = (unitId) => {
+      const dates = unitById.get(unitId).members
+        .map((id) => peopleById.get(id).birthDate)
+        .filter(Boolean)
+        .sort();
+      return dates[0] || '';
+    };
+    const tieBreak = (first, second) => {
+      const key = (unitId) => unitById.get(unitId).members
+        .slice()
+        .sort()
+        .join(':');
+      return birthOrder(first).localeCompare(birthOrder(second)) ||
+        key(first).localeCompare(key(second));
+    };
+    const positionsInLayer = (generation) =>
+      new Map(layers.get(generation).map((id, index) => [id, index]));
+
+    generationKeys.forEach((generation) => layers.get(generation).sort(tieBreak));
+    for (let pass = 0; pass < 6; pass += 1) {
+      generationKeys.slice(1).forEach((generation, index) => {
+        const previous = positionsInLayer(generationKeys[index]);
+        layers.get(generation).sort((first, second) => {
+          const barycenter = (unitId) => {
+            const parents = [...unitById.get(unitId).parents]
+              .map((parentId) => previous.get(parentId))
+              .filter(Number.isFinite);
+            return parents.length
+              ? parents.reduce((sum, value) => sum + value, 0) / parents.length
+              : Number.POSITIVE_INFINITY;
+          };
+          return barycenter(first) - barycenter(second) || tieBreak(first, second);
+        });
+      });
+      generationKeys.slice(0, -1).reverse().forEach((generation, index) => {
+        const next = positionsInLayer(generationKeys[generationKeys.length - index - 1]);
+        layers.get(generation).sort((first, second) => {
+          const barycenter = (unitId) => {
+            const children = [...unitById.get(unitId).children]
+              .map((childId) => next.get(childId))
+              .filter(Number.isFinite);
+            return children.length
+              ? children.reduce((sum, value) => sum + value, 0) / children.length
+              : Number.POSITIVE_INFINITY;
+          };
+          const firstCenter = barycenter(first);
+          const secondCenter = barycenter(second);
+          const firstIsRoot = first === rootUnitId ? 1 : 0;
+          const secondIsRoot = second === rootUnitId ? 1 : 0;
+          return secondIsRoot - firstIsRoot ||
+            firstCenter - secondCenter ||
+            tieBreak(first, second);
+        });
+      });
+    }
+
+    const cardWidth = 216;
+    const cardHeight = 114;
+    const partnerGap = 18;
+    const unitGap = 64;
+    const rowWidths = new Map();
+    generationKeys.forEach((generation) => {
+      const width = layers.get(generation).reduce((sum, unitId) => {
+        const memberCount = unitById.get(unitId).members.length;
+        return sum + memberCount * cardWidth + Math.max(0, memberCount - 1) * partnerGap;
+      }, 0) + Math.max(0, layers.get(generation).length - 1) * unitGap;
+      rowWidths.set(generation, width);
+    });
+    const contentWidth = Math.max(0, ...rowWidths.values());
+    const marginX = 48;
+    const marginY = 48;
+    const rowHeight = cardHeight + 112;
+    const minGeneration = generationKeys[0] || 0;
     const positions = [];
 
+    generationKeys.forEach((generation) => {
+      const rowWidth = rowWidths.get(generation);
+      let cursor = marginX + (contentWidth - rowWidth) / 2;
+      layers.get(generation).forEach((unitId) => {
+        const unit = unitById.get(unitId);
+        const width = unit.members.length * cardWidth +
+          Math.max(0, unit.members.length - 1) * partnerGap;
+        unit.members.forEach((id, memberIndex) => {
+          const x = cursor + memberIndex * (cardWidth + partnerGap);
+          const y = marginY + (generation - minGeneration) * rowHeight;
+          positions.push({ id, x, y, generation });
+        });
+        cursor += width + unitGap;
+      });
+    });
 
-    depthMap.forEach(
-      (ids, depth) => {
-
-        const sorted =
-          ids.sort(
-            (a, b) =>
-              getDisplayName(
-                getPersonById(
-                  a
-                )
-              ).localeCompare(
-                getDisplayName(
-                  getPersonById(
-                    b
-                  )
-                )
-              )
-          );
-
-
-        sorted.forEach(
-          (id, index) => {
-
-            positions.push({
-
-              id,
-
-              x:
-                260 * depth +
-                40 +
-                (index % 3) *
-                  60,
-
-              y:
-                index * 110 +
-                40 +
-                depth * 15
-            });
-          }
-        );
-      }
-    );
-
-
-    return positions;
-  }
-
-
-  function getDistanceFromRoot(
-    rootId,
-    targetId
-  ) {
-
-    if (
-      rootId ===
-      targetId
-    ) {
-      return 0;
-    }
-
-
-    const queue = [
-      {
-        id: rootId,
-        depth: 0
-      }
-    ];
-
-
-    const visited =
-      new Set([
-        rootId
-      ]);
-
-
-    while (
-      queue.length
-    ) {
-
-      const current =
-        queue.shift();
-
-
-      const context =
-        getFamilyContext(
-          current.id
-        );
-
-
-      const nextIds = [
-
-        ...context.parents,
-
-        ...context.spouse,
-
-        ...context.children,
-
-        ...context.siblings,
-
-        ...context.related
-
-      ]
-        .map(
-          (person) =>
-            person.id
-        );
-
-
-      for (
-        const nextId of
-        nextIds
-      ) {
-
-        if (
-          nextId ===
-          targetId
-        ) {
-
-          return (
-            current.depth +
-            1
-          );
-        }
-
-
-        if (
-          !visited.has(
-            nextId
-          )
-        ) {
-
-          visited.add(
-            nextId
-          );
-
-
-          queue.push({
-
-            id:
-              nextId,
-
-            depth:
-              current.depth +
-              1
-          });
-        }
-      }
-    }
-
-
-    return 0;
-  }
-
-
-  function collectRelationshipsForVisiblePeople(
-    visibleIds
-  ) {
-
+    const positionById = new Map(positions.map((entry) => [entry.id, entry]));
     const links = [];
-
-
-    state.relationships.forEach(
-      (relation) => {
-
-        if (
-          visibleIds.includes(
-            relation.from
-          ) &&
-          visibleIds.includes(
-            relation.to
-          )
-        ) {
-
-          const link = {
-
-            from:
-              relation.from,
-
-            to:
-              relation.to
-          };
-
-
-          if (
-            !links.some(
-              (item) =>
-                item.from ===
-                  link.from &&
-                item.to ===
-                  link.to
-            )
-          ) {
-
-            links.push(
-              link
-            );
-          }
-        }
+    const parentIdsByChild = new Map();
+    acceptedParentEdges.forEach(({ from, to }) => {
+      if (!parentIdsByChild.has(to)) parentIdsByChild.set(to, new Set());
+      parentIdsByChild.get(to).add(from);
+    });
+    const childGroups = new Map();
+    parentIdsByChild.forEach((parentSet, childId) => {
+      const parentIds = [...parentSet].sort();
+      const key = parentIds.join('|');
+      if (!childGroups.has(key)) childGroups.set(key, { parentIds, childIds: [] });
+      childGroups.get(key).childIds.push(childId);
+    });
+    childGroups.forEach(({ parentIds, childIds }) => {
+      const parents = parentIds.map((id) => positionById.get(id)).filter(Boolean);
+      const children = [...new Set(childIds)]
+        .map((id) => positionById.get(id))
+        .filter(Boolean);
+      if (!parents.length || !children.length) return;
+      const parentBottom = Math.max(...parents.map((parent) => parent.y + cardHeight));
+      const childTop = Math.min(...children.map((child) => child.y));
+      if (childTop <= parentBottom) return;
+      const junctionY = parentBottom + (childTop - parentBottom) / 2;
+      const parentCenters = parents.map((parent) => parent.x + cardWidth / 2);
+      const childCenters = children.map((child) => child.x + cardWidth / 2);
+      const junctionLeft = Math.min(...parentCenters, ...childCenters);
+      const junctionRight = Math.max(...parentCenters, ...childCenters);
+      parents.forEach((parent) => {
+        links.push({
+          type: 'parent',
+          path: `M ${parent.x + cardWidth / 2} ${parent.y + cardHeight} V ${junctionY}`
+        });
+      });
+      if (junctionRight > junctionLeft) {
+        links.push({
+          type: 'parent',
+          path: `M ${junctionLeft} ${junctionY} H ${junctionRight}`
+        });
       }
-    );
+      children.forEach((child) => {
+        links.push({
+          type: 'parent',
+          path: `M ${child.x + cardWidth / 2} ${junctionY} V ${child.y}`
+        });
+      });
+    });
 
+    visibleSpouses.forEach((relation) => {
+      const first = positionById.get(relation.from);
+      const second = positionById.get(relation.to);
+      if (!first || !second || first.generation !== second.generation) return;
+      const left = first.x < second.x ? first : second;
+      const right = first.x < second.x ? second : first;
+      if (left.x + cardWidth < right.x) {
+        const y = left.y + cardHeight / 2;
+        links.push({
+          type: 'spouse',
+          path: `M ${left.x + cardWidth} ${y} H ${right.x}`
+        });
+      }
+    });
 
-    return links;
+    return {
+      positions,
+      links,
+      width: contentWidth + marginX * 2,
+      height: generationKeys.length * rowHeight - 112 + marginY * 2
+    };
   }
 
 
@@ -5275,33 +5181,15 @@ const TRANSLATIONS = {
 
 
   function computeGenerationCount() {
+    const root = state.people[0];
+    if (!root) return 0;
 
-    const root =
-      state.people[0];
-
-
-    if (!root) {
-      return 0;
-    }
-
-
-    return Math.max(
-      1,
-
-      new Set(
-        state.people.map(
-          (person) =>
-            Math.max(
-              1,
-
-              getDistanceFromRoot(
-                root.id,
-                person.id
-              ) + 1
-            )
-        )
-      ).size
-    );
+    return new Set(
+      computeTreeLayout(
+        state.people.map((person) => person.id),
+        root.id
+      ).positions.map((entry) => entry.generation)
+    ).size;
   }
 
 
@@ -5381,6 +5269,13 @@ const TRANSLATIONS = {
         'unknownMember'
       )
     );
+  }
+
+
+  function treeDateLabel(value) {
+    if (!value) return '';
+    const match = String(value).match(/\b\d{4}\b/);
+    return match ? match[0] : String(value);
   }
 
 

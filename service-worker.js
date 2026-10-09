@@ -1,4 +1,4 @@
-const CACHE_NAME = 'family-tree-cache-v6';
+const CACHE_NAME = 'family-tree-cache-v7';
 const APP_SHELL_URL = new URL('./index.html', self.registration.scope);
 const ASSETS = [
   './',
