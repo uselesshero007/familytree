@@ -1,4 +1,4 @@
-const CACHE_NAME = 'family-tree-cache-v5';
+const CACHE_NAME = 'family-tree-cache-v6';
 const APP_SHELL_URL = new URL('./index.html', self.registration.scope);
 const ASSETS = [
   './',
@@ -46,6 +46,30 @@ self.addEventListener('fetch', (event) => {
           return response;
         } catch (error) {
           const cached = await cache.match(APP_SHELL_URL);
+          if (cached) return cached;
+          throw error;
+        }
+      })()
+    );
+    return;
+  }
+
+  if (
+    event.request.destination === 'script' ||
+    event.request.destination === 'style'
+  ) {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+
+        try {
+          const response = await fetch(event.request);
+          if (response.ok) {
+            await cache.put(event.request, response.clone());
+          }
+          return response;
+        } catch (error) {
+          const cached = await cache.match(event.request);
           if (cached) return cached;
           throw error;
         }

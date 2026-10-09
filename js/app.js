@@ -2333,9 +2333,6 @@ const TRANSLATIONS = {
     `;
 
 
-    dom.profilePanel.classList.remove(
-      'closed'
-    );
   }
 
 
@@ -2353,6 +2350,9 @@ const TRANSLATIONS = {
 
 
     renderProfilePanel();
+    dom.profilePanel.classList.remove(
+      'closed'
+    );
     renderFamilyTree();
   }
 
